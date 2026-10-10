@@ -80,7 +80,7 @@ function ResumeKick({ active }: { active: boolean }) {
   return null;
 }
 
-function Rig({ geometry, focus, autoRotate, interactive, focusDistance = 1 }: Pick<TwinSceneProps, "geometry" | "focus" | "autoRotate" | "interactive" | "focusDistance">) {
+function Rig({ geometry, focus, autoRotate, interactive, focusDistance = 1, wide = false }: Pick<TwinSceneProps, "geometry" | "focus" | "autoRotate" | "interactive" | "focusDistance"> & { wide?: boolean }) {
   const controls = useRef<CameraControls>(null);
   const idleSince = useRef(0);
   const userActive = useRef(false);
@@ -100,14 +100,15 @@ function Rig({ geometry, focus, autoRotate, interactive, focusDistance = 1 }: Pi
     const offset = new THREE.Vector3(x - tx, y - ty, z - tz);
     if (!focus) {
       const r = frameRadius(geometry);
-      offset.setLength((r / Math.sin(Math.min(vHalf, hHalf))) * 0.92);
+      // The sun view needs room for the sky arc and the shadow, so it stands much further back.
+      offset.setLength((r / Math.sin(Math.min(vHalf, hHalf))) * (wide ? 2.3 : 0.92));
     } else {
       offset.multiplyScalar(Math.max(1, Math.tan(vHalf) / Math.tan(hHalf)) * 0.85 * focusDistance);
     }
     const animate = initialized.current;
     initialized.current = true;
     c.setLookAt(tx + offset.x, ty + offset.y, tz + offset.z, tx, ty, tz, animate);
-  }, [focus, geometry, size.width, size.height, fov, focusDistance]);
+  }, [focus, geometry, size.width, size.height, fov, focusDistance, wide]);
 
   useEffect(() => {
     const c = controls.current;
@@ -137,7 +138,7 @@ function Rig({ geometry, focus, autoRotate, interactive, focusDistance = 1 }: Pi
       ref={controls}
       enabled={interactive}
       minDistance={8}
-      maxDistance={60}
+      maxDistance={90}
       minPolarAngle={0.35}
       maxPolarAngle={1.42}
       truckSpeed={0}
@@ -234,7 +235,7 @@ export default function TwinScene({
       <GroundGlow thermal={thermal} />
       <ContactShadows key={shadowKey} frames={1} position={[0, 0.002, 0]} opacity={0.6} scale={24} blur={2.4} far={10} resolution={256} color="#000000" />
 
-      <Rig geometry={geometry} focus={focus} autoRotate={autoRotate} interactive={interactive} focusDistance={focusDistance} />
+      <Rig geometry={geometry} focus={focus} autoRotate={autoRotate} interactive={interactive} focusDistance={focusDistance} wide={Boolean(sun)} />
 
       {fancy && (
         <EffectComposer multisampling={0}>
