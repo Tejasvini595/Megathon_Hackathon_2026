@@ -30,17 +30,31 @@ Set `ENGINE_URL` to the Python engine to replace the preview numbers (see "Engin
 
 ## Where things live
 
+Pages are server components. Client code is limited to the interactive pieces (3D stage, toggles, forms, chat), and a component used by a single route lives next to that route.
+
 ```
-src/lib/twin/types.ts        TwinState: the frontend <-> engine contract (all numbers come from the engine)
-src/lib/twin/mock.ts         P10001-shaped preview data used when ENGINE_URL is unset
-src/lib/engine.ts            getTwin(home): calls ENGINE_URL/twin or falls back to the mock
-src/lib/extract/fields.ts    The typed property record (categories every decision model must answer in)
-src/lib/extract/index.ts     Extractor interface + rules baseline. Swap in Jev / omni decision models here
-src/components/twin/         Procedural 3D house (house.tsx) and scene, camera, bloom (scene.tsx)
-src/app/api/homes            POST capture (multipart), PATCH confirm record
-src/app/api/uploads/[id]     Owner-only file serving (files in ./storage, gitignored)
-prisma/schema.prisma         Auth models + Home, HomeInput, Extraction, Scenario, ChatMessage, MemoryEvent
+src/app/(auth)/actions.ts            signIn / signUp server functions (Better Auth + nextCookies)
+src/app/(flow)/new/actions.ts        createHome (multipart capture) and confirmHome server functions
+src/app/(flow)/new/*.tsx             capture flow, analysing view, review step, on-device photo downscaling
+src/app/(app)/home|plan/page.tsx     server-rendered content; *-stage.tsx is the only client part
+src/app/(app)/ask/actions.ts         askHome server function (placeholder until the LLM layer lands)
+src/app/(app)/you/actions.ts         signOut server function
+src/app/api/uploads/[id]             owner-only file serving for <img src> (files in ./storage, gitignored)
+src/components/twin/                 shared 3D: house.tsx, scene.tsx, twin-canvas.tsx (WebGL fallback,
+                                     pause when hidden), twin-view.tsx (view state + FocusButton)
+src/lib/twin/types.ts                TwinState: the frontend <-> engine contract
+src/lib/engine.ts                    getTwin(home): calls ENGINE_URL/twin or falls back to the mock
+src/lib/extract/                     typed record fields + Extractor interface (swap in Jev / omni models)
+prisma/schema.prisma                 auth models + Home, HomeInput, Extraction, Scenario, ChatMessage, MemoryEvent
 ```
+
+## 3D performance rules
+
+- The canvas renders on demand. It only runs continuously while auto-rotating or in thermal view, and it stops while off-screen, covered by the sheet, or in a background tab.
+- There are no shadow maps; a single contact shadow is baked when the house shape changes. DPR is capped at 1.75 and drops to 1 if the frame rate falls, and bloom is switched off at the same point.
+- There is one material per house part, not one per mesh. The vignette is CSS.
+- Don't put `backdrop-filter` over the canvas: the browser would re-blur it every frame.
+- If WebGL is unavailable or the context is lost, a static fallback replaces the canvas.
 
 ## Engine contract
 

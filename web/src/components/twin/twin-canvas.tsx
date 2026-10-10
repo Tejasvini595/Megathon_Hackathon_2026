@@ -71,24 +71,50 @@ class SceneBoundary extends Component<{ fallback: ReactNode; children: ReactNode
   }
 }
 
-/** Pauses rendering while the canvas is scrolled away or the tab is hidden. */
-function useOnScreen<T extends Element>() {
+/**
+ * Pauses rendering while the canvas is scrolled away, covered (a sticky hero under a scrolled
+ * sheet never leaves the viewport), or the tab is hidden.
+ */
+function useOnScreen<T extends HTMLElement>() {
   const ref = useRef<T>(null);
   const [visible, setVisible] = useState(true);
+  const [covered, setCovered] = useState(false);
   const [tabVisible, setTabVisible] = useState(true);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     const io = new IntersectionObserver(([e]) => setVisible(e.isIntersecting), { threshold: 0.05 });
     io.observe(el);
+
+    // Is the canvas still the topmost thing in the visible part of its box? Checked at most once per frame.
+    let raf = 0;
+    const check = () => {
+      raf = 0;
+      const r = el.getBoundingClientRect();
+      const top = Math.max(r.top, 0);
+      const bottom = Math.min(r.bottom, window.innerHeight);
+      if (bottom - top < 24) return;
+      const hit = document.elementFromPoint(r.left + r.width / 2, top + (bottom - top) * 0.35);
+      setCovered(!hit || !el.contains(hit));
+    };
+    const schedule = () => {
+      if (!raf) raf = requestAnimationFrame(check);
+    };
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule, { passive: true });
+    schedule();
+
     const onVis = () => setTabVisible(document.visibilityState === "visible");
     document.addEventListener("visibilitychange", onVis);
     return () => {
       io.disconnect();
+      cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
       document.removeEventListener("visibilitychange", onVis);
     };
   }, []);
-  return [ref, visible && tabVisible] as const;
+  return [ref, visible && !covered && tabVisible] as const;
 }
 
 export function TwinCanvas({ className, ...props }: TwinSceneProps & { className?: string }) {

@@ -59,6 +59,15 @@ function GroundGlow({ thermal }: { thermal: boolean }) {
   );
 }
 
+/** Draw a fresh frame when rendering resumes (on-demand loops don't redraw by themselves). */
+function ResumeKick({ active }: { active: boolean }) {
+  const invalidate = useThree((st) => st.invalidate);
+  useEffect(() => {
+    if (active) invalidate();
+  }, [active, invalidate]);
+  return null;
+}
+
 function Rig({ geometry, focus, autoRotate, interactive }: Pick<TwinSceneProps, "geometry" | "focus" | "autoRotate" | "interactive">) {
   const controls = useRef<CameraControls>(null);
   const idleSince = useRef(0);
@@ -168,6 +177,7 @@ export default function TwinScene({
           setFancy(false);
         }}
       />
+      <ResumeKick active={active} />
       <color attach="background" args={[BG]} />
       <fog attach="fog" args={[BG, 40, 90]} />
 
