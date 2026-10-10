@@ -1,7 +1,7 @@
 import { centroid, inferFromFootprint, measure, project, type Inference, type Measure } from "./footprint";
 import { buildingsNear } from "./osm";
 import { findPostcode, normalisePostcode } from "./postcode";
-import type { Origin, Xz } from "./types";
+import type { BuildingTags, Origin, Xz } from "./types";
 
 export type StreetBuilding = {
   osmId: number;
@@ -9,6 +9,7 @@ export type StreetBuilding = {
   centre: Xz;
   measure: Measure;
   suggestions: Inference;
+  tags: BuildingTags;
   label?: string;
 };
 
@@ -50,6 +51,7 @@ export async function describeStreet(postcode: string): Promise<StreetResult> {
       centre: roundXz(centroid(footprints[i])),
       measure: { widthM: round1(m.widthM), depthM: round1(m.depthM), bearingDeg: Math.round(m.bearingDeg), areaM2: Math.round(m.areaM2) },
       suggestions: inferFromFootprint(footprints[i], others, b.tags),
+      tags: b.tags,
       label: label || undefined,
     };
   });
