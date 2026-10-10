@@ -1,23 +1,32 @@
 import { Suspense } from "react";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import type { Metadata } from "next";
-import { ArrowRight, ChevronDown, Flame, Info, Leaf, Sparkles, Thermometer, TriangleAlert, Zap, type LucideIcon } from "lucide-react";
+import { ArrowRight, Flame, Info, Leaf, Sparkles, Thermometer, TriangleAlert, Zap, type LucideIcon } from "lucide-react";
 import { EmptyHome } from "@/components/app/empty-home";
-import { PageSkeleton } from "@/components/app/page-skeleton";
 import { FocusButton, TwinViewProvider } from "@/components/twin/twin-view";
-import { getActiveHome } from "@/lib/homes";
-import { formatNumber, formatSaving, scoreTone } from "@/lib/score";
+import { getActiveHome, getActiveHomeRow } from "@/lib/homes";
+import { prisma } from "@/lib/prisma";
+import { requireUser } from "@/lib/dal";
+import { formatNumber, formatSaving, scoreTone, epcTone } from "@/lib/score";
 import type { Element, TwinState } from "@/lib/twin/types";
 import { cn } from "@/lib/utils";
+import { HomeSheet } from "./home-sheet";
+import { HomeSkeleton } from "./home-skeleton";
 import { HomeStage } from "./home-stage";
+import { HomeSwitcher } from "./home-switcher";
 import { ScoreRing } from "./score-ring";
 
 export const metadata: Metadata = { title: "Home" };
 
-export default function Page() {
+type HomeSearchParams = { homeId?: string; id?: string };
+
+export default function Page(props: {
+  searchParams: Promise<HomeSearchParams>;
+}) {
   return (
-    <Suspense fallback={<PageSkeleton />}>
-      <HomeContent />
+    <Suspense fallback={<HomeSkeleton />}>
+      <HomeContent searchParams={props.searchParams} />
     </Suspense>
   );
 }
@@ -30,9 +39,29 @@ const ELEMENTS: { key: Element; label: string }[] = [
   { key: "floor", label: "Floor" },
 ];
 
-async function HomeContent() {
-  const { user, twin } = await getActiveHome();
-  if (!twin) return <EmptyHome name={user.name} />;
+async function HomeContent({ searchParams }: { searchParams: Promise<HomeSearchParams> }) {
+  const { homeId, id } = await searchParams;
+  const requestedId = homeId || id;
+  const user = await requireUser();
+
+  // If no homeId in URL, redirect to the home the user was last on
+  if (!requestedId) {
+    const { home } = await getActiveHomeRow();
+    if (!home) return <EmptyHome name={user.name} />;
+    redirect(`/home?homeId=${home.id}`);
+  }
+
+  const { home, twin } = await getActiveHome(requestedId);
+  if (!home || !twin) {
+    redirect("/home");
+  }
+
+  const homes = await prisma.home.findMany({
+    where: { userId: user.id },
+    orderBy: { updatedAt: "desc" },
+    select: { id: true, nickname: true, postcode: true, status: true },
+  });
+
   const next = twin.retrofits[0];
 
   return (
@@ -40,23 +69,24 @@ async function HomeContent() {
       <section className="sticky top-0 h-[64dvh] min-h-[420px] w-full">
         <HomeStage geometry={twin.geometry} heatLoss={twin.heatLoss} />
         <header className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between px-5 pt-safe">
-          <div className="pt-3">
-            <h1 className="flex items-center gap-1 text-2xl font-semibold tracking-tight">
-              {twin.nickname} <ChevronDown className="mt-1 size-4 text-muted-foreground" />
-            </h1>
-            <p className="text-xs text-muted-foreground">{[twin.postcode, twin.epcBand && `EPC ${twin.epcBand}`].filter(Boolean).join(" · ") || "No postcode"}</p>
+          <div className="pointer-events-auto pt-3">
+            <HomeSwitcher
+              homes={homes}
+              currentHomeId={home.id}
+              nickname={twin.nickname}
+              postcode={twin.postcode}
+            />
           </div>
-          <div className="glass mt-3 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs">
-            <span className="size-1.5 rounded-full" style={{ background: scoreTone(twin.score) }} />
-            <span className="tabular font-medium">{twin.score}</span>
-            <span className="text-muted-foreground">{twin.scoreClass}</span>
-          </div>
+          {twin.epcBand && (
+            <div className="glass pointer-events-auto mt-3 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium shadow-lg">
+              <span className="size-1.5 rounded-full" style={{ background: epcTone(twin.epcBand) }} />
+              <span className="font-semibold tracking-wide">EPC {twin.epcBand}</span>
+            </div>
+          )}
         </header>
       </section>
 
-      {/* Opaque sheet: a backdrop blur over a live WebGL canvas would re-blur every frame. */}
-      <section className="relative z-10 -mt-10 rounded-t-[32px] border-t hairline bg-background px-5 pb-40 pt-3">
-        <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-surface-2" />
+      <HomeSheet>
 
         {twin.source === "mock" && (
           <div className="mb-5 flex items-start gap-2 rounded-2xl bg-amber/10 px-3.5 py-2.5 text-xs text-amber">
@@ -175,7 +205,7 @@ async function HomeContent() {
             ))}
           </div>
         )}
-      </section>
+      </HomeSheet>
     </TwinViewProvider>
   );
 }

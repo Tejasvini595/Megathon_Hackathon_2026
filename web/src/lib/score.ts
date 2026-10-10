@@ -7,6 +7,17 @@ export function scoreTone(score: number) {
   return "var(--ember)";
 }
 
+/** Colour for an EPC rating A-G. */
+export function epcTone(band: string | null | undefined) {
+  if (!band) return "var(--muted-foreground)";
+  const b = band.toUpperCase();
+  if (b === "A" || b === "B") return "var(--volt)";
+  if (b === "C") return "color-mix(in oklch, var(--volt) 70%, var(--amber))";
+  if (b === "D") return "var(--amber)";
+  if (b === "E") return "color-mix(in oklch, var(--amber) 40%, var(--ember))";
+  return "var(--ember)";
+}
+
 export const formatNumber = (n: number | null | undefined, digits = 0) =>
   n == null ? "—" : n.toLocaleString("en-GB", { maximumFractionDigits: digits, minimumFractionDigits: digits });
 
