@@ -1,0 +1,102 @@
+{
+ "n_scenarios": 98,
+ "by_kind": {
+  "default package": 30,
+  "free-text what-if": 15,
+  "infeasible request (flat)": 10,
+  "savings unavailable (community/oil heating)": 10,
+  "missing usage data": 10,
+  "missing current value": 10,
+  "conflicting signals": 10,
+  "heat pump only (electricity rises)": 3
+ },
+ "template": {
+  "n_texts": 98,
+  "n_sentences": 710,
+  "groundedness": 1.0,
+  "factual_accuracy": 1.0,
+  "unsupported_claim_rate": 0.0,
+  "completeness": 0.95
+ },
+ "red_team_rendered_text": {
+  "wrong number": {
+   "n": 88,
+   "caught": 88,
+   "should_catch": true,
+   "recall": 1.0
+  },
+  "small made-up number": {
+   "n": 88,
+   "caught": 88,
+   "should_catch": true,
+   "recall": 1.0
+  },
+  "flipped direction": {
+   "n": 88,
+   "caught": 88,
+   "should_catch": true,
+   "recall": 1.0
+  },
+  "wrong class": {
+   "n": 88,
+   "caught": 76,
+   "should_catch": true,
+   "recall": 0.8636363636363636
+  },
+  "over-claim": {
+   "n": 98,
+   "caught": 98,
+   "should_catch": true,
+   "recall": 1.0
+  },
+  "invented measure": {
+   "n": 98,
+   "caught": 98,
+   "should_catch": true,
+   "recall": 1.0
+  },
+  "invented NON-numeric fact about the home": {
+   "n": 98,
+   "caught": 0,
+   "should_catch": false,
+   "recall": 0.0
+  },
+  "saving claimed for infeasible measure": {
+   "n": 20,
+   "caught": 20,
+   "should_catch": true,
+   "recall": 1.0
+  }
+ },
+ "false_positive_rate_on_clean_templates": 0.0,
+ "red_team_slot_mode_llm_style": {
+  "digits typed instead of a slot": {
+   "n": 98,
+   "caught": 98,
+   "recall": 1.0
+  },
+  "unknown slot": {
+   "n": 98,
+   "caught": 98,
+   "recall": 1.0
+  },
+  "wrong unit on a slot": {
+   "n": 98,
+   "caught": 98,
+   "recall": 1.0
+  },
+  "made-up small number": {
+   "n": 98,
+   "caught": 98,
+   "recall": 1.0
+  }
+ },
+ "slot_mode_false_positive_rate": 0.0,
+ "llm_raw_output": "not run (use --llm with ANTHROPIC_API_KEY)",
+ "ps_targets": {
+  "evaluated_on": "template (deterministic; LLM not run)",
+  "groundedness>=0.90": true,
+  "factual_accuracy>=0.90": true,
+  "unsupported<0.05": true
+ }
+}
