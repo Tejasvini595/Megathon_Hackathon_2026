@@ -1,0 +1,996 @@
+{
+ "notes": "Targets are simulator / real-EPC / real-sales references. Agreement with simulated labels does not prove real-world accuracy; see the module docstring for which checks are independent and which are partly circular.",
+ "n_homes": {
+  "train": 76098,
+  "geo_test": 19131,
+  "val": 17281,
+  "test": 16808
+ },
+ "score_diagnostics": {
+  "class_counts": {
+   "Moderate": 80636,
+   "Poor": 24948,
+   "Good": 22581,
+   "Highly efficient": 837,
+   "Very poor": 316
+  },
+  "corr_sap_vs_metered_intensity": -0.34895789628338564,
+  "corr_sap_vs_epc_modelled_intensity": -0.735567229071716,
+  "mean_score_by_epc_band": {
+   "A": 80.7,
+   "B": 70.8,
+   "C": 59.4,
+   "D": 51.0,
+   "E": 43.0,
+   "F": 36.3,
+   "G": 28.1
+  }
+ },
+ "energy_model": {
+  "val": {
+   "n": 16958,
+   "elec_mae": 506.0402638710558,
+   "elec_baseline_mae": 978.1362532219591,
+   "gas_mae": 1057.0833680326527,
+   "gas_baseline_mae": 3303.5651133300403,
+   "gas_r2": 0.9317795479872788,
+   "elec_r2": 0.826951155621509
+  },
+  "test": {
+   "n": 16478,
+   "elec_mae": 521.4846248473197,
+   "elec_baseline_mae": 1017.5746620891864,
+   "gas_mae": 1120.576450764554,
+   "gas_baseline_mae": 3450.222619317299,
+   "gas_r2": 0.8811622906482386,
+   "elec_r2": 0.8184144489888268
+  },
+  "geo_test": {
+   "n": 18777,
+   "elec_mae": 506.31704726910357,
+   "elec_baseline_mae": 810.0233051102884,
+   "gas_mae": 1048.5627467679506,
+   "gas_baseline_mae": 2629.0710880243023,
+   "gas_r2": 0.9078289801356588,
+   "elec_r2": 0.7840025154361048
+  }
+ },
+ "energy_model_lean_customer_inputs_only": {
+  "val": {
+   "n": 16958,
+   "elec_mae": 517.2496225042496,
+   "elec_baseline_mae": 978.1362532219591,
+   "gas_mae": 1155.257410014012,
+   "gas_baseline_mae": 3303.5651133300403,
+   "gas_r2": 0.9137895354924799
+  },
+  "test": {
+   "n": 16478,
+   "elec_mae": 530.9968277137224,
+   "elec_baseline_mae": 1017.5746620891864,
+   "gas_mae": 1228.5961851289849,
+   "gas_baseline_mae": 3450.222619317299,
+   "gas_r2": 0.856289746861355
+  },
+  "geo_test": {
+   "n": 18777,
+   "elec_mae": 512.735447821536,
+   "elec_baseline_mae": 810.0233051102884,
+   "gas_mae": 1188.116354743834,
+   "gas_baseline_mae": 2629.0710880243023,
+   "gas_r2": 0.8737277622815562
+  }
+ },
+ "annualisation_vs_true": {
+  "elec_median_ape_pct": 0.7604735883424325,
+  "gas_median_ape_pct": 0.8396379651230157,
+  "homes_unavailable": 2531
+ },
+ "relevance_model": {
+  "temperature": 0.9000000000000004,
+  "abstain_threshold": 0.8649690037178538,
+  "target_coverage_on_val": 0.8,
+  "val": {
+   "n": 52162,
+   "acc": 0.9228173766343315,
+   "macro_f1": 0.9219570930066596,
+   "informative_measures_only": {
+    "n": 35702,
+    "acc": 0.8885216514480981,
+    "macro_f1": 0.8936095332429129,
+    "balanced_acc": 0.9086635062393128,
+    "baseline_popularity_macro_f1": 0.6065732603454522,
+    "ablation_no_usage_features_macro_f1": 0.8208705325248037,
+    "ablation_no_monthly_shape_macro_f1": 0.865942913091082,
+    "ablation_no_thermostat_signal_macro_f1": 0.8889981245551509
+   },
+   "baseline_popularity_macro_f1": 0.6506384764944759,
+   "baseline_popularity_acc": 0.7248571757217898,
+   "ablation_no_usage_features": {
+    "acc": 0.8589394578428742,
+    "macro_f1": 0.8543395421081174
+   },
+   "ablation_no_monthly_shape": {
+    "acc": 0.9007898470150685,
+    "macro_f1": 0.9004766586254558
+   },
+   "per_measure": {
+    "cavity_wall_insulation": {
+     "n": 1786,
+     "acc": 0.856,
+     "majority_acc": 0.796
+    },
+    "condensing_boiler": {
+     "n": 9,
+     "acc": 0.889,
+     "majority_acc": 0.889
+    },
+    "double_glazing": {
+     "n": 1428,
+     "acc": 0.973,
+     "majority_acc": 0.653
+    },
+    "floor_insulation": {
+     "n": 9238,
+     "acc": 0.987,
+     "majority_acc": 0.518
+    },
+    "heat_pump": {
+     "n": 8432,
+     "acc": 1.0,
+     "majority_acc": 1.0
+    },
+    "loft_insulation": {
+     "n": 2789,
+     "acc": 0.99,
+     "majority_acc": 0.769
+    },
+    "smart_controls": {
+     "n": 14880,
+     "acc": 0.821,
+     "majority_acc": 0.555
+    },
+    "solar_pv": {
+     "n": 8019,
+     "acc": 0.994,
+     "majority_acc": 0.925
+    },
+    "solid_wall_insulation": {
+     "n": 5581,
+     "acc": 0.844,
+     "majority_acc": 0.792
+    }
+   },
+   "with_abstention": {
+    "coverage": 0.7999884973735669,
+    "acc": 0.9805171463490618,
+    "acc_informative": 0.9684140049623883,
+    "n_needs_survey": 10433
+   },
+   "coverage_curve": {
+    "abstain_0pct": {
+     "coverage": 1.0,
+     "acc": 0.9228173766343315,
+     "acc_informative": 0.8885216514480981
+    },
+    "abstain_10pct": {
+     "coverage": 0.899984663164756,
+     "acc": 0.9588880604963255,
+     "acc_informative": 0.9374386171675506
+    },
+    "abstain_20pct": {
+     "coverage": 0.7999884973735669,
+     "acc": 0.9805171463490618,
+     "acc_informative": 0.9684140049623883
+    },
+    "abstain_30pct": {
+     "coverage": 0.699992331582378,
+     "acc": 0.9926053734286419,
+     "acc_informative": 0.9870553359683795
+    }
+   }
+  },
+  "test": {
+   "n": 53262,
+   "acc": 0.9245991513649506,
+   "macro_f1": 0.9232261592112582,
+   "informative_measures_only": {
+    "n": 36268,
+    "acc": 0.8905371126061542,
+    "macro_f1": 0.8943789014834178,
+    "balanced_acc": 0.9109239054368851,
+    "baseline_popularity_macro_f1": 0.6116776478217228,
+    "ablation_no_usage_features_macro_f1": 0.8195096228343294,
+    "ablation_no_monthly_shape_macro_f1": 0.8673652000514352,
+    "ablation_no_thermostat_signal_macro_f1": 0.8892088223001301
+   },
+   "baseline_popularity_macro_f1": 0.6552546507930676,
+   "baseline_popularity_acc": 0.7290563628853591,
+   "ablation_no_usage_features": {
+    "acc": 0.8588674852615373,
+    "macro_f1": 0.8534708111471011
+   },
+   "ablation_no_monthly_shape": {
+    "acc": 0.9032142991250798,
+    "macro_f1": 0.9021671156462205
+   },
+   "per_measure": {
+    "cavity_wall_insulation": {
+     "n": 1776,
+     "acc": 0.871,
+     "majority_acc": 0.838
+    },
+    "condensing_boiler": {
+     "n": 9,
+     "acc": 0.889,
+     "majority_acc": 1.0
+    },
+    "double_glazing": {
+     "n": 1479,
+     "acc": 0.978,
+     "majority_acc": 0.665
+    },
+    "floor_insulation": {
+     "n": 9481,
+     "acc": 0.987,
+     "majority_acc": 0.518
+    },
+    "heat_pump": {
+     "n": 8677,
+     "acc": 1.0,
+     "majority_acc": 1.0
+    },
+    "loft_insulation": {
+     "n": 2914,
+     "acc": 0.993,
+     "majority_acc": 0.786
+    },
+    "smart_controls": {
+     "n": 14948,
+     "acc": 0.824,
+     "majority_acc": 0.559
+    },
+    "solar_pv": {
+     "n": 8308,
+     "acc": 0.995,
+     "majority_acc": 0.921
+    },
+    "solid_wall_insulation": {
+     "n": 5670,
+     "acc": 0.836,
+     "majority_acc": 0.789
+    }
+   },
+   "with_abstention": {
+    "coverage": 0.805677593781683,
+    "acc": 0.9805648769574944,
+    "acc_informative": 0.9685160299481667,
+    "n_needs_survey": 10350
+   },
+   "coverage_curve": {
+    "abstain_0pct": {
+     "coverage": 1.0,
+     "acc": 0.9245991513649506,
+     "acc_informative": 0.8905371126061542
+    },
+    "abstain_10pct": {
+     "coverage": 0.8999849799106304,
+     "acc": 0.9600292062167518,
+     "acc_informative": 0.939
+    },
+    "abstain_20pct": {
+     "coverage": 0.7999887349329728,
+     "acc": 0.9815531929873971,
+     "acc_informative": 0.9699005748019264
+    },
+    "abstain_30pct": {
+     "coverage": 0.6999924899553153,
+     "acc": 0.9932408872676555,
+     "acc_informative": 0.9880417805544709
+    }
+   }
+  },
+  "geo_test": {
+   "n": 66893,
+   "acc": 0.9229067316460616,
+   "macro_f1": 0.9226193862718404,
+   "informative_measures_only": {
+    "n": 42078,
+    "acc": 0.8808403441228195,
+    "macro_f1": 0.88713018528963,
+    "balanced_acc": 0.8968528229057776,
+    "baseline_popularity_macro_f1": 0.6001310161436773,
+    "ablation_no_usage_features_macro_f1": 0.8235300046988264,
+    "ablation_no_monthly_shape_macro_f1": 0.8691479611651068,
+    "ablation_no_thermostat_signal_macro_f1": 0.878773165226382
+   },
+   "baseline_popularity_macro_f1": 0.653643673228682,
+   "baseline_popularity_acc": 0.7272509829130104,
+   "ablation_no_usage_features": {
+    "acc": 0.8649335505957275,
+    "macro_f1": 0.8604430639834858
+   },
+   "ablation_no_monthly_shape": {
+    "acc": 0.9092879673508439,
+    "macro_f1": 0.9082982322297601
+   },
+   "per_measure": {
+    "cavity_wall_insulation": {
+     "n": 1119,
+     "acc": 0.849,
+     "majority_acc": 0.839
+    },
+    "condensing_boiler": {
+     "n": 11,
+     "acc": 0.909,
+     "majority_acc": 0.909
+    },
+    "double_glazing": {
+     "n": 1019,
+     "acc": 0.959,
+     "majority_acc": 0.606
+    },
+    "floor_insulation": {
+     "n": 12071,
+     "acc": 0.978,
+     "majority_acc": 0.609
+    },
+    "heat_pump": {
+     "n": 12876,
+     "acc": 1.0,
+     "majority_acc": 1.0
+    },
+    "loft_insulation": {
+     "n": 3860,
+     "acc": 0.992,
+     "majority_acc": 0.767
+    },
+    "smart_controls": {
+     "n": 17081,
+     "acc": 0.804,
+     "majority_acc": 0.575
+    },
+    "solar_pv": {
+     "n": 11928,
+     "acc": 0.988,
+     "majority_acc": 0.932
+    },
+    "solid_wall_insulation": {
+     "n": 6928,
+     "acc": 0.832,
+     "majority_acc": 0.805
+    }
+   },
+   "with_abstention": {
+    "coverage": 0.7980954658932923,
+    "acc": 0.9819057073819469,
+    "acc_informative": 0.9680814235269681,
+    "n_needs_survey": 13506
+   },
+   "coverage_curve": {
+    "abstain_0pct": {
+     "coverage": 1.0,
+     "acc": 0.9229067316460616,
+     "acc_informative": 0.8808403441228195
+    },
+    "abstain_10pct": {
+     "coverage": 0.8999895355268862,
+     "acc": 0.9584904406757139,
+     "acc_informative": 0.9320803556355861
+    },
+    "abstain_20pct": {
+     "coverage": 0.7999940203010778,
+     "acc": 0.9815936016743282,
+     "acc_informative": 0.9675629093416064
+    },
+    "abstain_30pct": {
+     "coverage": 0.6999985050752695,
+     "acc": 0.9940630005339028,
+     "acc_informative": 0.9884552195728431
+    }
+   }
+  },
+  "note": "Relevance = size of the saving (High >=10% of energy, Medium >=3%), a rule applied to SIMULATED savings, so this measures re-learning a rule from visible features, not agreement with real assessors. Heat pump, solar and boiler are near-constant classes, so the headline numbers are 'informative_measures_only'. The ceiling is set by hidden simulator state (thermostat setting, 'assumed' walls that are really insulated); metered-usage features recover part of it, and the monthly-shape features (per-home slope of use against heating degree days, base load, winter/summer ratio) recover more because they reflect the home's true heat-loss response. 'with_abstention' keeps the ~80% most confident predictions (threshold fitted on val) and returns 'needs survey' for the rest. It does NOT predict what the EPC recommends (that is the model below)."
+ },
+ "epc_recommendation_model": {
+  "val": {
+   "cavity_wall_insulation": {
+    "n": 1786,
+    "base_rate": 0.982,
+    "auc": 0.804,
+    "informative": false
+   },
+   "condensing_boiler": {
+    "n": 9,
+    "base_rate": 1.0,
+    "auc": null,
+    "informative": false
+   },
+   "double_glazing": {
+    "n": 1428,
+    "base_rate": 0.502,
+    "auc": 0.952,
+    "informative": true
+   },
+   "floor_insulation": {
+    "n": 9238,
+    "base_rate": 0.841,
+    "auc": 0.935,
+    "informative": true
+   },
+   "heat_pump": {
+    "n": 8432,
+    "base_rate": 0.006,
+    "auc": 0.997,
+    "informative": false
+   },
+   "loft_insulation": {
+    "n": 2789,
+    "base_rate": 0.272,
+    "auc": 0.962,
+    "informative": true
+   },
+   "smart_controls": {
+    "n": 14880,
+    "base_rate": 0.065,
+    "auc": 0.878,
+    "informative": true
+   },
+   "solar_pv": {
+    "n": 8019,
+    "base_rate": 0.977,
+    "auc": 0.997,
+    "informative": false
+   },
+   "solid_wall_insulation": {
+    "n": 5581,
+    "base_rate": 0.927,
+    "auc": 0.981,
+    "informative": true
+   }
+  },
+  "test": {
+   "cavity_wall_insulation": {
+    "n": 1776,
+    "base_rate": 0.975,
+    "auc": 0.87,
+    "informative": false
+   },
+   "condensing_boiler": {
+    "n": 9,
+    "base_rate": 1.0,
+    "auc": null,
+    "informative": false
+   },
+   "double_glazing": {
+    "n": 1479,
+    "base_rate": 0.505,
+    "auc": 0.961,
+    "informative": true
+   },
+   "floor_insulation": {
+    "n": 9481,
+    "base_rate": 0.838,
+    "auc": 0.926,
+    "informative": true
+   },
+   "heat_pump": {
+    "n": 8677,
+    "base_rate": 0.004,
+    "auc": 0.999,
+    "informative": false
+   },
+   "loft_insulation": {
+    "n": 2914,
+    "base_rate": 0.272,
+    "auc": 0.967,
+    "informative": true
+   },
+   "smart_controls": {
+    "n": 14948,
+    "base_rate": 0.065,
+    "auc": 0.887,
+    "informative": true
+   },
+   "solar_pv": {
+    "n": 8308,
+    "base_rate": 0.978,
+    "auc": 1.0,
+    "informative": false
+   },
+   "solid_wall_insulation": {
+    "n": 5670,
+    "base_rate": 0.913,
+    "auc": 0.989,
+    "informative": true
+   }
+  },
+  "geo_test": {
+   "cavity_wall_insulation": {
+    "n": 1119,
+    "base_rate": 0.983,
+    "auc": 0.755,
+    "informative": false
+   },
+   "condensing_boiler": {
+    "n": 11,
+    "base_rate": 1.0,
+    "auc": null,
+    "informative": false
+   },
+   "double_glazing": {
+    "n": 1019,
+    "base_rate": 0.455,
+    "auc": 0.967,
+    "informative": true
+   },
+   "floor_insulation": {
+    "n": 12071,
+    "base_rate": 0.799,
+    "auc": 0.904,
+    "informative": true
+   },
+   "heat_pump": {
+    "n": 12876,
+    "base_rate": 0.003,
+    "auc": 1.0,
+    "informative": false
+   },
+   "loft_insulation": {
+    "n": 3860,
+    "base_rate": 0.251,
+    "auc": 0.97,
+    "informative": true
+   },
+   "smart_controls": {
+    "n": 17081,
+    "base_rate": 0.07,
+    "auc": 0.885,
+    "informative": true
+   },
+   "solar_pv": {
+    "n": 11928,
+    "base_rate": 0.939,
+    "auc": 0.998,
+    "informative": true
+   },
+   "solid_wall_insulation": {
+    "n": 6928,
+    "base_rate": 0.97,
+    "auc": 0.841,
+    "informative": false
+   }
+  },
+  "note": "Real label (RdSAP software output) but RdSAP is rule-based on the same fields, and several measures are near-always (base rate >0.95) or near-never recommended, so only rows with informative=true are meaningful. Pooled AUC is deliberately not reported (it is inflated by measure identity)."
+ },
+ "value_model": {
+  "rating_premium_trainonly": {
+   "pct_per_10_sap": 1.8767130191272186,
+   "spec_A_ml_partialled_pct_per_10_sap": 1.7724249151298777,
+   "spec_B_outcode_fe_pct_per_10_sap": 2.411359790036194,
+   "spec_C_minimal_controls_pct_per_10_sap": 2.437266470793409,
+   "spec_D_city_cluster_bootstrap_pct_per_10_sap": 0.8935634875534282,
+   "ci95_pct_per_10_sap": [
+    -0.5099544147069257,
+    3.6370624490199788
+   ],
+   "n_sales": 3225
+  },
+  "rating_premium_production_train_plus_val": {
+   "pct_per_10_sap": 2.0103994549348414,
+   "spec_A_ml_partialled_pct_per_10_sap": 1.7273180944201938,
+   "spec_B_outcode_fe_pct_per_10_sap": 2.5157450862904662,
+   "spec_C_minimal_controls_pct_per_10_sap": 2.6398325097988007,
+   "spec_D_city_cluster_bootstrap_pct_per_10_sap": 1.1657930895832225,
+   "ci95_pct_per_10_sap": [
+    -0.17787320742234103,
+    3.8082007268456897
+   ],
+   "n_sales": 3849
+  },
+  "dataset_reference_premium_DATA_md": "4.2% per 10 SAP (95% CI 3.1-5.3), fitted on ALL 5,187 rated sales incl. held-out homes",
+  "val": {
+   "n": 2919,
+   "median_ape_pct": 13.537144583304,
+   "baseline_outcode_pm2_median_ape_pct": 16.367779813576217,
+   "baseline_hpi_council_type_average_median_ape_pct": 25.350732297106948,
+   "bias_pct": 3.286511372892273,
+   "within_split_rank_spearman": 0.9097686273796577,
+   "level_corrected_median_ape_pct": 13.389947568914042
+  },
+  "test": {
+   "n": 2900,
+   "median_ape_pct": 13.730932889390191,
+   "baseline_outcode_pm2_median_ape_pct": 16.806138091721813,
+   "baseline_hpi_council_type_average_median_ape_pct": 25.285235744452173,
+   "bias_pct": 3.7977471953799724,
+   "within_split_rank_spearman": 0.9045879791821014,
+   "level_corrected_median_ape_pct": 13.4163908748968
+  },
+  "geo_test": {
+   "n": 2679,
+   "median_ape_pct": 29.612034857214297,
+   "baseline_outcode_pm2_median_ape_pct": 64.05701338387192,
+   "baseline_hpi_council_type_average_median_ape_pct": 36.63436000000001,
+   "bias_pct": 7.88234432624164,
+   "within_split_rank_spearman": 0.5908903372085885,
+   "level_corrected_median_ape_pct": 29.795869682520166
+  },
+  "note": "Price LEVEL model: predicts log price RELATIVE to the council's public UK HPI average for the home type (July 2026, greenhome/reference/council_hpi_2026-07.csv), from size, type, age and location relative to the council centre. Without that market-level anchor, home features alone could not tell the model that Liverpool is cheaper than every training city (median error 48%, ranking near random); with it, error on the unseen city is much lower but still higher than in known cities, so treat the level as indicative. HPI values are council averages, not data about any held-out home. The product uses the model for the RELATIVE rating premium; the baseline value is the dataset's current_value_estimate. The rating premium is itself heterogeneous: see premium_by_council_train and heldout_premium_check. The dataset's 4.2% is fitted on all sales including Liverpool/Cardiff, which have higher premiums than the training councils, hence our lower train-only estimate; the range includes a council-level cluster bootstrap to reflect this.",
+  "premium_by_council_train": {
+   "Barnet": {
+    "n": 255,
+    "pct_per_10_sap": -0.99
+   },
+   "Birmingham": {
+    "n": 1002,
+    "pct_per_10_sap": 2.23
+   },
+   "Bristol, City of": {
+    "n": 562,
+    "pct_per_10_sap": -1.33
+   },
+   "Cardiff": {
+    "n": 417,
+    "pct_per_10_sap": 7.46
+   },
+   "Croydon": {
+    "n": 315,
+    "pct_per_10_sap": -4.0
+   },
+   "Manchester": {
+    "n": 465,
+    "pct_per_10_sap": 2.88
+   },
+   "Newcastle upon Tyne": {
+    "n": 319,
+    "pct_per_10_sap": -1.2
+   }
+  },
+  "heldout_premium_check": {
+   "val": {
+    "n_rated_sales": 660,
+    "premium_pct_per_10_sap": -2.04,
+    "inside_our_train_only_range": false
+   },
+   "test": {
+    "n_rated_sales": 708,
+    "premium_pct_per_10_sap": -0.25,
+    "inside_our_train_only_range": true
+   },
+   "geo_test": {
+    "n_rated_sales": 717,
+    "premium_pct_per_10_sap": 7.75,
+    "inside_our_train_only_range": false
+   },
+   "note": "INDEPENDENT test of the value range: does the premium actually observed in each held-out set (real sales) fall inside the range fitted on train only? The dataset-label midpoint is not used as ground truth because it was fitted on all sales including these held-out ones."
+  }
+ },
+ "calibration": {
+  "sap_gain_scale": 0.7630056285337131,
+  "uncertainty_scale": {
+   "elec": 1.0,
+   "gas": 2.0,
+   "imp": 1.75,
+   "carbon": 1.75
+  },
+  "n_sap_homes": 3931,
+  "n_mc_homes": 1188,
+  "fitted_on": "train split only"
+ },
+ "engine_vs_reference": {
+  "val": {
+   "n": 15080,
+   "elec_saving_mae_kwh": 186.32425783861692,
+   "gas_saving_mae_kwh": 331.04144116038043,
+   "gas_saving_mean_true_kwh": 7359.471286472149,
+   "elec_saving_mean_true_kwh": -1209.0602785145888,
+   "carbon_mae_kg": 51.754502811598705,
+   "carbon_mean_true_kg": 1110.0797082228116,
+   "improvement_pct_mae_pp": 2.2995832357169994,
+   "improvement_rank_spearman": 0.9654492058354914,
+   "improvement_nohp_rank_spearman": 0.9218392657845252,
+   "baseline_rank_by_epc_rating_spearman": 0.4263041150809347,
+   "baseline_constant_mae_pp": 29.06898994494312,
+   "vs_epc_potential_improvement_spearman": 0.7630977693307867,
+   "engine_dSAP_mean": 5.916385221794431,
+   "epc_dSAP_mean": 8.678183023872679,
+   "engine_vs_epc_dSAP_corr": 0.7180720655005661,
+   "uplift_mid_mae_pp_vs_label": 2.6426179154819858,
+   "uplift_label_mid_inside_range": 0.2309681697612732
+  },
+  "test": {
+   "n": 15214,
+   "elec_saving_mae_kwh": 192.21876066740322,
+   "gas_saving_mae_kwh": 338.75337676056387,
+   "gas_saving_mean_true_kwh": 7507.764887603523,
+   "elec_saving_mean_true_kwh": -1238.8702510845274,
+   "carbon_mae_kg": 52.7002096299391,
+   "carbon_mean_true_kg": 1131.3814907322203,
+   "improvement_pct_mae_pp": 2.293927298031736,
+   "improvement_rank_spearman": 0.9656091778717382,
+   "improvement_nohp_rank_spearman": 0.9186787186979658,
+   "baseline_rank_by_epc_rating_spearman": 0.40382924671131243,
+   "baseline_constant_mae_pp": 28.91179117605064,
+   "vs_epc_potential_improvement_spearman": 0.7449702670825826,
+   "engine_dSAP_mean": 6.003852328070473,
+   "epc_dSAP_mean": 8.77106612330748,
+   "engine_vs_epc_dSAP_corr": 0.6741884560427657,
+   "uplift_mid_mae_pp_vs_label": 2.661448055526527,
+   "uplift_label_mid_inside_range": 0.23675561982384646
+  },
+  "geo_test": {
+   "n": 17051,
+   "elec_saving_mae_kwh": 203.15902884683678,
+   "gas_saving_mae_kwh": 324.15119613587996,
+   "gas_saving_mean_true_kwh": 7985.187320391766,
+   "elec_saving_mean_true_kwh": -1341.06550935429,
+   "carbon_mae_kg": 55.089698455278636,
+   "carbon_mean_true_kg": 1198.7507477567299,
+   "improvement_pct_mae_pp": 2.6337541798428337,
+   "improvement_rank_spearman": 0.9267958243020447,
+   "improvement_nohp_rank_spearman": 0.89382717400626,
+   "baseline_rank_by_epc_rating_spearman": 0.2936295206349911,
+   "baseline_constant_mae_pp": 26.825119166465072,
+   "vs_epc_potential_improvement_spearman": 0.7781134383703155,
+   "engine_dSAP_mean": 6.584328432056986,
+   "epc_dSAP_mean": 8.870212890739547,
+   "engine_vs_epc_dSAP_corr": 0.7321416432604996,
+   "uplift_mid_mae_pp_vs_label": 2.5744344723439188,
+   "uplift_label_mid_inside_range": 0.23054366312826227
+  }
+ },
+ "per_measure_alone": {
+  "val": {
+   "cavity_wall_insulation": {
+    "n": 1746.0,
+    "gas_mae_kwh": 144.7,
+    "gas_true_mean_kwh": 877.5,
+    "elec_mae_kwh": 14.3,
+    "elec_true_mean_kwh": 27.6
+   },
+   "condensing_boiler": {
+    "n": 9.0,
+    "gas_mae_kwh": 176.2,
+    "gas_true_mean_kwh": 4147.0,
+    "elec_mae_kwh": 0.0,
+    "elec_true_mean_kwh": 0.0
+   },
+   "double_glazing": {
+    "n": 1399.0,
+    "gas_mae_kwh": 29.6,
+    "gas_true_mean_kwh": 723.8,
+    "elec_mae_kwh": 7.1,
+    "elec_true_mean_kwh": 32.1
+   },
+   "floor_insulation": {
+    "n": 9071.0,
+    "gas_mae_kwh": 21.1,
+    "gas_true_mean_kwh": 492.0,
+    "elec_mae_kwh": 1.9,
+    "elec_true_mean_kwh": 8.3
+   },
+   "heat_pump": {
+    "n": 8281.0,
+    "gas_mae_kwh": 492.9,
+    "gas_true_mean_kwh": 12818.5,
+    "elec_mae_kwh": 154.5,
+    "elec_true_mean_kwh": -3818.7
+   },
+   "loft_insulation": {
+    "n": 2731.0,
+    "gas_mae_kwh": 21.3,
+    "gas_true_mean_kwh": 494.5,
+    "elec_mae_kwh": 1.7,
+    "elec_true_mean_kwh": 8.9
+   },
+   "smart_controls": {
+    "n": 14603.0,
+    "gas_mae_kwh": 183.3,
+    "gas_true_mean_kwh": 484.1,
+    "elec_mae_kwh": 13.9,
+    "elec_true_mean_kwh": 23.2
+   },
+   "solar_pv": {
+    "n": 7695.0,
+    "gas_mae_kwh": 0.0,
+    "gas_true_mean_kwh": 0.0,
+    "elec_mae_kwh": 157.8,
+    "elec_true_mean_kwh": 870.0
+   },
+   "solid_wall_insulation": {
+    "n": 5476.0,
+    "gas_mae_kwh": 315.0,
+    "gas_true_mean_kwh": 1907.8,
+    "elec_mae_kwh": 20.7,
+    "elec_true_mean_kwh": 57.3
+   }
+  },
+  "test": {
+   "cavity_wall_insulation": {
+    "n": 1740.0,
+    "gas_mae_kwh": 123.9,
+    "gas_true_mean_kwh": 922.5,
+    "elec_mae_kwh": 13.1,
+    "elec_true_mean_kwh": 39.5
+   },
+   "condensing_boiler": {
+    "n": 9.0,
+    "gas_mae_kwh": 141.1,
+    "gas_true_mean_kwh": 3032.4,
+    "elec_mae_kwh": 0.0,
+    "elec_true_mean_kwh": 0.0
+   },
+   "double_glazing": {
+    "n": 1451.0,
+    "gas_mae_kwh": 29.4,
+    "gas_true_mean_kwh": 712.5,
+    "elec_mae_kwh": 8.2,
+    "elec_true_mean_kwh": 37.4
+   },
+   "floor_insulation": {
+    "n": 9292.0,
+    "gas_mae_kwh": 21.7,
+    "gas_true_mean_kwh": 492.5,
+    "elec_mae_kwh": 2.0,
+    "elec_true_mean_kwh": 9.3
+   },
+   "heat_pump": {
+    "n": 8503.0,
+    "gas_mae_kwh": 497.8,
+    "gas_true_mean_kwh": 12871.9,
+    "elec_mae_kwh": 153.6,
+    "elec_true_mean_kwh": -3844.7
+   },
+   "loft_insulation": {
+    "n": 2852.0,
+    "gas_mae_kwh": 21.0,
+    "gas_true_mean_kwh": 481.7,
+    "elec_mae_kwh": 1.6,
+    "elec_true_mean_kwh": 8.5
+   },
+   "smart_controls": {
+    "n": 14662.0,
+    "gas_mae_kwh": 188.8,
+    "gas_true_mean_kwh": 490.7,
+    "elec_mae_kwh": 13.9,
+    "elec_true_mean_kwh": 24.1
+   },
+   "solar_pv": {
+    "n": 7970.0,
+    "gas_mae_kwh": 0.0,
+    "gas_true_mean_kwh": 0.0,
+    "elec_mae_kwh": 159.1,
+    "elec_true_mean_kwh": 870.6
+   },
+   "solid_wall_insulation": {
+    "n": 5566.0,
+    "gas_mae_kwh": 333.7,
+    "gas_true_mean_kwh": 1887.2,
+    "elec_mae_kwh": 24.2,
+    "elec_true_mean_kwh": 61.2
+   }
+  },
+  "geo_test": {
+   "cavity_wall_insulation": {
+    "n": 1097.0,
+    "gas_mae_kwh": 134.7,
+    "gas_true_mean_kwh": 873.2,
+    "elec_mae_kwh": 4.5,
+    "elec_true_mean_kwh": 15.6
+   },
+   "condensing_boiler": {
+    "n": 10.0,
+    "gas_mae_kwh": 90.7,
+    "gas_true_mean_kwh": 2556.3,
+    "elec_mae_kwh": 0.0,
+    "elec_true_mean_kwh": 0.0
+   },
+   "double_glazing": {
+    "n": 1000.0,
+    "gas_mae_kwh": 25.0,
+    "gas_true_mean_kwh": 611.2,
+    "elec_mae_kwh": 6.8,
+    "elec_true_mean_kwh": 35.6
+   },
+   "floor_insulation": {
+    "n": 11839.0,
+    "gas_mae_kwh": 18.3,
+    "gas_true_mean_kwh": 403.3,
+    "elec_mae_kwh": 0.9,
+    "elec_true_mean_kwh": 4.5
+   },
+   "heat_pump": {
+    "n": 12638.0,
+    "gas_mae_kwh": 390.3,
+    "gas_true_mean_kwh": 10533.5,
+    "elec_mae_kwh": 121.3,
+    "elec_true_mean_kwh": -3151.8
+   },
+   "loft_insulation": {
+    "n": 3786.0,
+    "gas_mae_kwh": 18.7,
+    "gas_true_mean_kwh": 431.4,
+    "elec_mae_kwh": 1.2,
+    "elec_true_mean_kwh": 7.8
+   },
+   "smart_controls": {
+    "n": 16764.0,
+    "gas_mae_kwh": 178.3,
+    "gas_true_mean_kwh": 465.2,
+    "elec_mae_kwh": 8.3,
+    "elec_true_mean_kwh": 13.9
+   },
+   "solar_pv": {
+    "n": 11001.0,
+    "gas_mae_kwh": 0.0,
+    "gas_true_mean_kwh": 0.0,
+    "elec_mae_kwh": 125.4,
+    "elec_true_mean_kwh": 827.8
+   },
+   "solid_wall_insulation": {
+    "n": 6814.0,
+    "gas_mae_kwh": 288.7,
+    "gas_true_mean_kwh": 1663.2,
+    "elec_mae_kwh": 13.8,
+    "elec_true_mean_kwh": 36.8
+   }
+  }
+ },
+ "independent_epc_check": {
+  "val": {
+   "n_homes": 8397,
+   "engine_dSAP_mean": 8.345307553529576,
+   "epc_dSAP_mean": 8.379183041562463,
+   "dSAP_corr": 0.7028670322767524,
+   "dSAP_mae": 2.924102572286449,
+   "dSAP_spearman": 0.7468000823375172
+  },
+  "test": {
+   "n_homes": 8539,
+   "engine_dSAP_mean": 8.42802072781326,
+   "epc_dSAP_mean": 8.406604988874575,
+   "dSAP_corr": 0.6857144264187068,
+   "dSAP_mae": 2.9766925874154544,
+   "dSAP_spearman": 0.7281363260885743
+  },
+  "geo_test": {
+   "n_homes": 11565,
+   "engine_dSAP_mean": 9.012108950678712,
+   "epc_dSAP_mean": 8.377777777777778,
+   "dSAP_corr": 0.7003013828777113,
+   "dSAP_mae": 2.9705668615088388,
+   "dSAP_spearman": 0.736109702227585
+  }
+ },
+ "monte_carlo_coverage": {
+  "val": {
+   "n": 1994,
+   "target_P10_P90": 0.8,
+   "elec_saving": 0.8034102306920762,
+   "gas_saving": 0.820962888665998,
+   "improvement_pct": 0.8279839518555667,
+   "carbon": 0.8269809428284854,
+   "median_gas_band_width_pct_of_true": NaN
+  },
+  "test": {
+   "n": 2000,
+   "target_P10_P90": 0.8,
+   "elec_saving": 0.843,
+   "gas_saving": 0.7975,
+   "improvement_pct": 0.8725,
+   "carbon": 0.8665,
+   "median_gas_band_width_pct_of_true": NaN
+  },
+  "geo_test": {
+   "n": 1999,
+   "target_P10_P90": 0.8,
+   "elec_saving": 0.8209104552276139,
+   "gas_saving": 0.7983991995997999,
+   "improvement_pct": 0.840920460230115,
+   "carbon": 0.8509254627313657,
+   "median_gas_band_width_pct_of_true": NaN
+  }
+ },
+ "runtime_s": 1290
+}

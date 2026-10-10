@@ -1,0 +1,59 @@
+--- a/data/build.py
++++ b/data/build.py
+@@ -14,6 +14,7 @@
+ 
+ from gen import energy as E
+ from gen import epc
++from gen import telemetry
+ from gen.constants import SEED
+ from gen.paths import HIDDEN, OUT
+ 
+@@ -39,6 +40,7 @@
+     rng = np.random.default_rng(seed)
+     hdd = E.monthly_hdd()
+     comp, hid, deliv = E.simulate_annual(props, rng)
++    props = telemetry.add_thermostat_reported(props, hid, seed)   # own random stream: nothing else in the build changes
+     comp, desnz_info = E.desnz_anchor(props, comp)
+     comp = E.add_solar(props, comp, rng)
+     eu, faults = E.monthly(props, comp, hdd, rng)
+--- a/data/validate.py
++++ b/data/validate.py
+@@ -133,6 +133,21 @@
+ check("no UPRN or street address in shipped files", not leaked, f"offending files: {leaked}" if leaked else "none (UPRN/address only in hidden/crosswalk)")
+ check("simulated energy rows tagged", (eu["source"] == "simulated").all(), "energy_usage.source == 'simulated'")
+ 
++# ---------------------------------------------------------------- 7 optional thermostat signal
++lines += ["", "## 7. Optional thermostat signal", ""]
++if "setpoint_reported_c" in p:
++    hs = pd.read_parquet(HIDDEN / "hidden_state.parquet")[["property_id", "setpoint_c"]]
++    t = p[["property_id", "setpoint_reported_c"]].merge(hs, on="property_id")
++    cov = t["setpoint_reported_c"].notna().mean()
++    got = t.dropna()
++    err = got["setpoint_reported_c"] - got["setpoint_c"]
++    check("thermostat signal covers about 30% of homes", 0.25 <= cov <= 0.35, f"{cov:.1%} of homes have setpoint_reported_c, the rest are NaN")
++    check("thermostat signal is a noisy report, not a copy of the hidden setpoint", 0.5 <= err.std() <= 0.9 and abs(err.mean()) < 0.1 and (err.abs() > 0).mean() > 0.5,
++          f"error sd {err.std():.2f} C, mean {err.mean():+.2f} C; corr with hidden setpoint {np.corrcoef(got['setpoint_reported_c'], got['setpoint_c'])[0, 1]:.2f}")
++    check("thermostat values are plausible", got["setpoint_reported_c"].between(14, 26).all(), f"range {got['setpoint_reported_c'].min():.1f} to {got['setpoint_reported_c'].max():.1f} C")
++else:
++    lines.append("- (no setpoint_reported_c column in this build)")
++
+ lines += ["", f"**{len(R) - len(fails)}/{len(R)} checks passed.**" + (f" Failed: {fails}" if fails else "")]
+ (OUT / "validation_report.md").write_text("\n".join(lines) + "\n")
+ (OUT / "validation_report.json").write_text(json.dumps(R, indent=2))
+--- a/data/DATA.md
++++ b/data/DATA.md
+@@ -134,3 +134,14 @@
+ - Only 19% of homes match a sale, so 81% of current values are model estimates. Most past sales have no known rating at sale, because the EPC extract covers 2025–26 only.
+ - Relevance labels from EPC recommendations are rule-based, computed from the same fields we use as features.
+ - Condensing-boiler status is inferred from the EPC efficiency rating, and almost all gas boilers are rated Good, so the boiler upgrade is rarely feasible.
++
++
++## Optional thermostat signal (`setpoint_reported_c`)
++
++A noisy, partial report of the home's usual heating temperature, as a household or a smart thermostat could supply. **Simulated.**
++
++- Generated in `gen/telemetry.py`: hidden setpoint + N(0, 0.7 C), rounded to 0.5 C, clipped to 14-26 C, for a random 30% of homes; NaN for the rest (never zero).
++- It is an input only. No label is derived from it, and `hidden/` is still never a feature source.
++- It uses its own random stream (seed, 20261011), so every other output of a seeded build is unchanged.
++- It makes the thermostat-driven part of the retrofit savings (smart controls, and part of wall insulation) partly predictable. **Any accuracy gain from it is a property of the simulator's design, not evidence about real homes; report results with and without it.**
++- Checks: `validate.py` section 7 (coverage, noise level, plausible range).

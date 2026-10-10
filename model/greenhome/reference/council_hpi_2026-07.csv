@@ -1,0 +1,11 @@
+local_authority,avg_price,detached,semi_detached,terraced,flat_maisonette,ref_month,source
+Barnet,600560,1610998,850442,634437,372014,2026-07,https://landregistry.data.gov.uk/data/ukhpi/region/barnet/month/2026-07.json
+Birmingham,234257,443346,275144,221903,144814,2026-07,https://landregistry.data.gov.uk/data/ukhpi/region/birmingham/month/2026-07.json
+"Bristol, City of",352262,689391,447013,383538,241393,2026-07,https://landregistry.data.gov.uk/data/ukhpi/region/city-of-bristol/month/2026-07.json
+Camden,815159,3645110,2117585,1554868,671443,2026-07,https://landregistry.data.gov.uk/data/ukhpi/region/camden/month/2026-07.json
+Cardiff,272252,519113,324859,262241,160574,2026-07,https://landregistry.data.gov.uk/data/ukhpi/region/cardiff/month/2026-07.json
+City of London,710652,,,,709939,2026-07,https://landregistry.data.gov.uk/data/ukhpi/region/city-of-london/month/2026-07.json
+Croydon,390041,837514,535706,396579,253660,2026-07,https://landregistry.data.gov.uk/data/ukhpi/region/croydon/month/2026-07.json
+Liverpool,189036,398405,239834,179418,129558,2026-07,https://landregistry.data.gov.uk/data/ukhpi/region/liverpool/month/2026-07.json
+Manchester,252309,479953,329518,254936,195305,2026-07,https://landregistry.data.gov.uk/data/ukhpi/region/manchester/month/2026-07.json
+Newcastle upon Tyne,207547,397344,238190,207914,128296,2026-07,https://landregistry.data.gov.uk/data/ukhpi/region/newcastle-upon-tyne/month/2026-07.json
