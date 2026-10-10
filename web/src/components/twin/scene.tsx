@@ -6,7 +6,7 @@ import { CameraControls, ContactShadows, Environment, Lightformer, PerformanceMo
 import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import * as THREE from "three";
 import type { Element, Geometry } from "@/lib/twin/types";
-import { House, STOREY_H, focusFor, type HouseDetail, type Highlight, type Parts, type ViewMode } from "./house";
+import { House, focusFor, frameRadius, type HouseDetail, type Highlight, type Parts, type ViewMode } from "./house";
 
 export type TwinSceneProps = {
   geometry: Geometry;
@@ -96,11 +96,7 @@ function Rig({ geometry, focus, autoRotate, interactive, focusDistance = 1 }: Pi
     const hHalf = Math.atan(Math.tan(vHalf) * aspect);
     const offset = new THREE.Vector3(x - tx, y - ty, z - tz);
     if (!focus) {
-      const isFlat = geometry.builtForm === "flat";
-      const storeys = isFlat ? (geometry.isTopFloor ? 3 : 2.5) : geometry.storeys;
-      const H = storeys * STOREY_H + 2;
-      const attached = geometry.builtForm === "detached" || isFlat ? 0 : geometry.width * 0.6;
-      const r = 0.5 * Math.hypot(geometry.width + attached, geometry.depth, H);
+      const r = frameRadius(geometry);
       offset.setLength((r / Math.sin(Math.min(vHalf, hHalf))) * 0.92);
     } else {
       offset.multiplyScalar(Math.max(1, Math.tan(vHalf) / Math.tan(hHalf)) * 0.85 * focusDistance);

@@ -4,13 +4,39 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { AnimatePresence, LayoutGroup, motion, useDragControls } from "motion/react";
 import { Html } from "@react-three/drei";
 import { toast } from "sonner";
-import { ArrowLeft, ArrowRight, Camera, Check, ChevronDown, FileText, Loader2, Map as MapIcon, MapPin, Mic, Minus, PenLine, Plus, Sparkles, TriangleAlert, Type, type LucideIcon } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  BrickWall,
+  Camera,
+  Check,
+  ChevronDown,
+  Eye,
+  EyeOff,
+  FileText,
+  Flame,
+  Grid2x2,
+  House,
+  Loader2,
+  Map as MapIcon,
+  MapPin,
+  Mic,
+  Minus,
+  PenLine,
+  Plus,
+  Ruler,
+  Sparkles,
+  Sun,
+  TriangleAlert,
+  Type,
+  type LucideIcon,
+} from "lucide-react";
 import { geometryFromRecord } from "@/lib/twin/from-record";
-import { FIELDS, optionLabel, type ExtractedField, type ExtractionResult, type FieldKey, type FieldSource } from "@/lib/extract/fields";
+import { applies, FIELDS, isFlatLike, optionLabel, type ExtractedField, type ExtractionResult, type FieldKey, type FieldSource, type FieldValue } from "@/lib/extract/fields";
 import type { Geometry } from "@/lib/twin/types";
 import { cn } from "@/lib/utils";
 import { confirmHome } from "./actions";
-import { STEPS, detailOf, recordOf, stepAnchor } from "./steps";
+import { STEPS, detailOf, recordOf, stepAnchor, type StepId } from "./steps";
 import type { StageView } from "./capture-flow";
 
 type Source = FieldSource | "you";
@@ -26,6 +52,9 @@ const SOURCE_ICON: Record<Source, LucideIcon> = {
   default: Sparkles,
   you: PenLine,
 };
+
+const STEP_ICON: Record<StepId, LucideIcon> = { shape: Ruler, walls: BrickWall, roof: House, windows: Grid2x2, heating: Flame, power: Sun };
+const HINTS_KEY = "ght:review-hints";
 
 const DEF = Object.fromEntries(FIELDS.map((f) => [f.key, f])) as Record<FieldKey, (typeof FIELDS)[number]>;
 const SUMMARY = STEPS.length;
@@ -51,12 +80,19 @@ export function ReviewStep({ homeId, extraction, onView }: { homeId: string; ext
   const [nickname, setNickname] = useState("My home");
   const [saving, startSaving] = useTransition();
   const drag = useDragControls();
+  const [hints, setHints] = useState(() => {
+    try {
+      return localStorage.getItem(HINTS_KEY) !== "off";
+    } catch {
+      return true;
+    }
+  });
 
   const record = useMemo(() => recordOf(fields), [fields]);
   const geometry = useMemo(() => geometryFromRecord(record), [record]);
   const detail = useMemo(() => detailOf(record), [record]);
-  const toCheck = STEPS.map((s) => s.fields.filter((k) => needsCheck(fields[k])).length);
-  const toCheckKey = toCheck.join();
+  const shown = STEPS.map((s) => s.fields.filter((k) => applies(k, record)));
+  const toCheck = shown.map((keys) => keys.filter((k) => needsCheck(fields[k])).length);
   const step = STEPS[index];
 
   function go(i: number) {
@@ -65,16 +101,35 @@ export function ReviewStep({ homeId, extraction, onView }: { homeId: string; ext
     setIndex([i, i > index ? 1 : -1]);
   }
 
-  const markers = useMemo(
-    () => <Hotspots geometry={geometry} counts={toCheckKey.split(",").map(Number)} current={index} onSelect={(i) => setIndex(([cur]) => [i, i > cur ? 1 : -1])} />,
-    [geometry, toCheckKey, index],
-  );
+  const markers = useMemo(() => {
+    if (!hints) return null;
+    const counts = STEPS.map((st) => st.fields.filter((k) => applies(k, record) && needsCheck(fields[k])).length);
+    return <Hotspots geometry={geometry} counts={counts} current={index} onSelect={(i) => setIndex(([cur]) => [i, i > cur ? 1 : -1])} />;
+  }, [geometry, record, fields, index, hints]);
+
+  function toggleHints() {
+    setHints((h) => {
+      try {
+        localStorage.setItem(HINTS_KEY, h ? "off" : "on");
+      } catch {}
+      return !h;
+    });
+  }
   useEffect(() => {
     onView({ geometry, detail, focus: step?.focus ?? null, isolate: step?.focus ?? null, autoRotate: !step, interactive: true, focusDistance: 1.7, markers });
   }, [geometry, detail, step, markers, onView]);
 
-  function set(key: FieldKey, value: string | number) {
-    setFields((f) => ({ ...f, [key]: { value, confidence: 1, source: "you", evidence: "You set this" } }));
+  function set(key: FieldKey, value: FieldValue) {
+    const mine = (v: FieldValue): FieldState => ({ value: v, confidence: 1, source: "you", evidence: "You set this" });
+    setFields((f) => {
+      const next = { ...f, [key]: mine(value) };
+      // Flats and maisonettes are always part of a block; leaving one needs a house form back.
+      if (key === "propertyType") {
+        if (isFlatLike({ propertyType: value as string })) next.builtForm = mine("flat");
+        else if (f.builtForm.value === "flat") next.builtForm = mine("semi");
+      }
+      return next;
+    });
   }
 
   function confirm() {
@@ -88,14 +143,21 @@ export function ReviewStep({ homeId, extraction, onView }: { homeId: string; ext
   return (
     <div className="flex min-h-0 flex-1 flex-col">
       <LayoutGroup>
-        <nav className="flex gap-1 overflow-x-auto px-3 pb-1 [scrollbar-width:none]">
-          {[...STEPS.map((s) => s.label), "Done"].map((label, i) => (
-            <button key={label} onClick={() => go(i)} className={cn("relative shrink-0 px-3 py-2 text-[13px] transition-colors", i === index ? "text-foreground" : "text-muted-foreground")}>
-              {label}
-              {toCheck[i] > 0 && <span className="absolute right-1 top-1.5 size-1.5 rounded-full bg-amber" />}
-              {i === index && <motion.span layoutId="review-tab" className="absolute inset-x-2 bottom-0 h-0.5 rounded-full bg-volt" transition={{ type: "spring", stiffness: 600, damping: 40 }} />}
-            </button>
-          ))}
+        <nav aria-label="Review steps" className="grid grid-cols-7 px-3">
+          {[...STEPS, null].map((st, i) => {
+            const Icon = st ? STEP_ICON[st.id] : Check;
+            const label = st?.label ?? "Done";
+            const current = i === index;
+            return (
+              <button key={label} onClick={() => go(i)} aria-label={label} aria-current={current ? "step" : undefined} className="relative flex flex-col items-center gap-1 pb-2.5 pt-1">
+                <Icon className={cn("size-[18px] transition-colors", current ? "text-foreground" : i < index ? "text-foreground/60" : "text-muted-foreground/60")} />
+                <span className={cn("text-[10px] leading-none transition-colors", current ? "text-foreground" : "text-muted-foreground/70")}>{label}</span>
+                <span className={cn("absolute inset-x-1.5 bottom-0 h-0.5 rounded-full", i < index ? "bg-foreground/25" : "bg-surface-2")} />
+                {current && <motion.span layoutId="review-tab" className="absolute inset-x-1.5 bottom-0 h-0.5 rounded-full bg-volt" transition={{ type: "spring", stiffness: 600, damping: 40 }} />}
+                {toCheck[i] > 0 && <span className="absolute right-2 top-0.5 size-1.5 rounded-full bg-amber" />}
+              </button>
+            );
+          })}
         </nav>
       </LayoutGroup>
 
@@ -126,7 +188,12 @@ export function ReviewStep({ homeId, extraction, onView }: { homeId: string; ext
           >
             {step ? (
               <>
-                <h2 className="text-2xl font-semibold tracking-tight">{step.label}</h2>
+                <div className="flex items-center justify-between gap-3">
+                  <h2 className="text-2xl font-semibold tracking-tight">{step.label}</h2>
+                  <button onClick={toggleHints} aria-pressed={hints} className="flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs text-muted-foreground ring-1 ring-hairline">
+                    {hints ? <Eye className="size-3.5" /> : <EyeOff className="size-3.5" />} Markers
+                  </button>
+                </div>
                 <p className="mt-1 text-sm text-muted-foreground">
                   {toCheck[index] > 0 ? `${toCheck[index]} to check. A quick look makes your results much sharper.` : "Looks solid. Tap anything to change it."}
                 </p>
@@ -138,8 +205,9 @@ export function ReviewStep({ homeId, extraction, onView }: { homeId: string; ext
                       {c.message}
                     </p>
                   ))}
-                <div className="mt-4 overflow-hidden rounded-3xl bg-surface ring-1 ring-hairline">
-                  {step.fields.map((key, i) => (
+                {shown[index].length === 0 && <p className="mt-4 rounded-2xl bg-surface px-4 py-3 text-sm text-muted-foreground ring-1 ring-hairline">Another home sits above yours, so there&apos;s no roof of your own to check.</p>}
+                <div className="mt-4 overflow-hidden rounded-3xl bg-surface ring-1 ring-hairline empty:hidden">
+                  {shown[index].map((key, i) => (
                     <FieldRow
                       key={key}
                       fieldKey={key}
@@ -189,7 +257,7 @@ export function ReviewStep({ homeId, extraction, onView }: { homeId: string; ext
   );
 }
 
-function FieldRow({ fieldKey, field: f, first, open, onToggle, onChange }: { fieldKey: FieldKey; field: FieldState; first: boolean; open: boolean; onToggle: () => void; onChange: (v: string | number) => void }) {
+function FieldRow({ fieldKey, field: f, first, open, onToggle, onChange }: { fieldKey: FieldKey; field: FieldState; first: boolean; open: boolean; onToggle: () => void; onChange: (v: FieldValue) => void }) {
   const def = DEF[fieldKey];
   const t = tier(f.confidence, f.source);
   const Icon = SOURCE_ICON[f.source];
@@ -210,24 +278,27 @@ function FieldRow({ fieldKey, field: f, first, open, onToggle, onChange }: { fie
                 {f.evidence}
                 {f.source !== "you" && <span className="tabular"> · {Math.round(f.confidence * 100)}% confidence</span>}
               </p>
-              {def.kind === "enum" ? (
+              {def.kind !== "number" ? (
                 <div className="flex flex-wrap gap-2">
-                  {def.options.map((o) => (
-                    <button
-                      key={o.value}
-                      onClick={() => {
-                        buzz();
-                        onChange(o.value);
-                      }}
-                      className={cn(
-                        "flex items-center gap-1 rounded-full px-3 py-1.5 text-sm ring-1 transition-colors",
-                        f.value === o.value ? "bg-foreground text-background ring-foreground" : "ring-hairline hover:bg-surface-2",
-                      )}
-                    >
-                      {f.value === o.value && <Check className="size-3.5" />}
-                      {o.label}
-                    </button>
-                  ))}
+                  {def.kind === "multi" && <p className="w-full text-[11px] text-muted-foreground">Pick all that apply.</p>}
+                  {def.options.map((o) => {
+                    const list = Array.isArray(f.value) ? f.value : [];
+                    const on = def.kind === "multi" ? list.includes(o.value) : f.value === o.value;
+                    return (
+                      <button
+                        key={o.value}
+                        aria-pressed={on}
+                        onClick={() => {
+                          buzz();
+                          onChange(def.kind === "multi" ? (on ? list.filter((v) => v !== o.value) : [...list, o.value]) : o.value);
+                        }}
+                        className={cn("flex items-center gap-1 rounded-full px-3 py-1.5 text-sm ring-1 transition-colors", on ? "bg-foreground text-background ring-foreground" : "ring-hairline hover:bg-surface-2")}
+                      >
+                        {on && <Check className="size-3.5" />}
+                        {o.label}
+                      </button>
+                    );
+                  })}
                 </div>
               ) : (
                 <Stepper value={Number(f.value)} min={def.min} max={def.max} step={"step" in def ? def.step : 1} unit={"unit" in def ? def.unit : undefined} onChange={onChange} />
@@ -264,19 +335,22 @@ function Summary({ fields, nickname, onNickname, onJump, models }: { fields: Rec
 
 /** Amber markers on the model for parts that still have guesses; tapping one jumps to that step. */
 function Hotspots({ geometry, counts, current, onSelect }: { geometry: Geometry; counts: number[]; current: number; onSelect: (i: number) => void }) {
-  return STEPS.map((s, i) =>
-    counts[i] > 0 && i !== current ? (
+  // The shape step has no single spot on the house; its tab dot is enough.
+  return STEPS.map((s, i) => {
+    if (s.id === "shape" || counts[i] === 0 || i === current) return null;
+    const Icon = STEP_ICON[s.id];
+    return (
       <Html key={s.id} position={stepAnchor(s.id, geometry)} center zIndexRange={[10, 0]}>
         <button
           onClick={() => onSelect(i)}
           aria-label={`Check ${s.label.toLowerCase()}`}
-          className="grid size-7 place-items-center rounded-full bg-amber text-[11px] font-semibold text-black shadow-lg ring-4 ring-amber/25 animate-in zoom-in-50"
+          className="grid size-7 place-items-center rounded-full bg-amber text-black shadow-lg ring-4 ring-amber/25 animate-in zoom-in-50"
         >
-          {counts[i]}
+          <Icon className="size-3.5" />
         </button>
       </Html>
-    ) : null,
-  );
+    );
+  });
 }
 
 function Stepper({ value, min, max, step = 1, unit, onChange }: { value: number; min: number; max: number; step?: number; unit?: string; onChange: (v: number) => void }) {

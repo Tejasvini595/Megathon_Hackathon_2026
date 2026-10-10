@@ -1,4 +1,4 @@
-import type { Conflict, ExtractedField, ExtractionResult, FieldKey, FieldSource } from "./fields";
+import type { Conflict, ExtractedField, ExtractionResult, FieldKey, FieldSource, FieldValue, PropertyRecord } from "./fields";
 
 export type ExtractInput = {
   kind: "PHOTO" | "TEXT" | "PLAN" | "VOICE" | "POSTCODE";
@@ -15,10 +15,12 @@ export type ExtractInput = {
  */
 export type Extractor = (inputs: ExtractInput[]) => Promise<ExtractionResult>;
 
-const DEFAULTS: Record<FieldKey, string | number> = {
+const DEFAULTS: Record<FieldKey, FieldValue> = {
   propertyType: "house",
   builtForm: "semi",
   storeys: 2,
+  flatLevel: "mid",
+  blockStoreys: 4,
   ageBand: "1930_1949",
   floorAreaM2: 85,
   bedrooms: 3,
@@ -28,6 +30,7 @@ const DEFAULTS: Record<FieldKey, string | number> = {
   loftInsulationMm: 100,
   glazing: "double",
   heating: "gas_boiler",
+  secondaryHeating: [],
   controls: "thermostat_trvs",
   solarPv: "no",
 };
@@ -76,11 +79,29 @@ const RULES: Rule[] = [
   { field: "roofType", re: /hip(ped)? roof/i, value: "hip", conf: 0.9, why: "mentions a hipped roof" },
   { field: "roofType", re: /pitched roof|gable/i, value: "gable", conf: 0.9, why: "mentions a pitched roof" },
   { field: "roofType", re: /flat roof/i, value: "flat", conf: 0.9, why: "mentions a flat roof" },
-  { field: "roofType", re: /\b(top[- ]floor|penthouse|under the roof|top level|upper floor)\b/i, value: "flat", conf: 0.92, why: "top floor flats have a roof above, not another dwelling" },
-  { field: "roofType", re: /\b(ground[- ]floor)\b/i, value: "dwelling_above", conf: 0.95, why: "ground floor flat has homes above" },
+  { field: "flatLevel", re: /\b(top[- ]floor|penthouse|top level)\b/i, value: "top", conf: 0.92, why: "says top floor" },
+  { field: "flatLevel", re: /\b(ground[- ]floor|basement|lower[- ]ground)\b/i, value: "ground", conf: 0.92, why: "says ground floor" },
+  { field: "flatLevel", re: /\b(first|second|third|middle|\d+(st|nd|rd|th))[- ]floor\b/i, value: "mid", conf: 0.75, why: "names a middle floor" },
+  { field: "blockStoreys", re: /\b(\d{1,2})[- ]stor(e)?y (block|building)/i, value: (m) => Number(m[1]), conf: 0.9, why: "states the block height" },
 ];
 
-const field = (value: string | number, confidence: number, source: FieldSource, evidence: string, quote?: string): ExtractedField => ({ value, confidence, source, evidence, quote });
+/** Secondary heaters can co-exist, so every match adds to the list. */
+const SECONDARY: { value: string; re: RegExp; why: string }[] = [
+  { value: "wood_stove", re: /\b(wood|log|multi[- ]fuel)[- ]?(burner|stove)\b/i, why: "mentions a stove" },
+  { value: "gas_fire", re: /\bgas fire\b/i, why: "mentions a gas fire" },
+  { value: "open_fire", re: /\bopen fire(place)?\b/i, why: "mentions an open fire" },
+  { value: "electric_heaters", re: /\b(plug[- ]in|portable|electric) (heaters?|fires?|radiators?)\b/i, why: "mentions electric heaters" },
+];
+
+/** Fills fields missing from older saved records and maps retired values, so every record has every field. */
+export function normaliseRecord(r: Partial<PropertyRecord>): PropertyRecord {
+  const out = { ...DEFAULTS, ...r } as PropertyRecord;
+  if (out.roofType === "dwelling_above") Object.assign(out, { roofType: "flat", flatLevel: r.flatLevel ?? "mid" });
+  if (!Array.isArray(out.secondaryHeating)) out.secondaryHeating = [];
+  return out;
+}
+
+const field = (value: FieldValue, confidence: number, source: FieldSource, evidence: string, quote?: string): ExtractedField => ({ value, confidence, source, evidence, quote });
 
 export const rulesExtractor: Extractor = async (inputs) => {
   const fields = Object.fromEntries(
@@ -108,17 +129,25 @@ export const rulesExtractor: Extractor = async (inputs) => {
       const value = typeof r.value === "function" ? r.value(m) : r.value;
       if (r.conf >= fields[r.field].confidence) fields[r.field] = field(value, r.conf, source, `${source === "voice" ? "Voice note" : "Your description"} ${r.why}`, m[0]);
     }
+    const extra = SECONDARY.map((h) => ({ ...h, m: input.text!.match(h.re) })).filter((h) => h.m);
+    if (extra.length) {
+      const prior = Array.isArray(fields.secondaryHeating.value) && fields.secondaryHeating.source !== "default" ? fields.secondaryHeating.value : [];
+      const value = [...new Set([...prior, ...extra.map((h) => h.value)])];
+      fields.secondaryHeating = field(value, 0.85, source, `Your description ${extra.map((h) => h.why).join(", ")}`, extra[0].m![0]);
+    }
   }
 
   // Keep the record internally consistent.
   if (fields.propertyType.value === "flat" && fields.builtForm.source === "default")
     fields.builtForm = field("flat", 0.8, fields.propertyType.source, "Flats are part of a block");
-  if (fields.propertyType.value === "flat" && fields.roofType.source === "default")
-    fields.roofType = field("dwelling_above", 0.5, "default", "Most flats have another home above");
-  if (fields.propertyType.value === "bungalow" && fields.storeys.source === "default")
-    fields.storeys = field(1, 0.85, fields.propertyType.source, "Bungalows are single storey");
-  if (fields.solarPv.value === "yes" && fields.roofType.value === "dwelling_above")
-    fields.solarPv = field("no", 0.4, "default", "No roof of your own for panels");
+  if (fields.propertyType.value === "maisonette" && fields.builtForm.source === "default")
+    fields.builtForm = field("flat", 0.8, fields.propertyType.source, "Maisonettes are part of a larger building");
+  if (fields.propertyType.value === "flat" && fields.storeys.source === "default")
+    fields.storeys = field(1, 0.8, fields.propertyType.source, "Most flats are on one floor");
+  if (fields.propertyType.value === "maisonette" && fields.storeys.source === "default")
+    fields.storeys = field(2, 0.8, fields.propertyType.source, "Maisonettes usually span two floors");
+  if (fields.propertyType.value === "bungalow")
+    fields.storeys = field(1, 0.95, fields.propertyType.source, "Bungalows are single storey");
 
   const conflicts: Conflict[] = [];
   if (fields.wallType.value === "solid" && fields.ageBand.value === "2012_plus")

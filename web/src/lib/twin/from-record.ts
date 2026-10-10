@@ -6,8 +6,10 @@ export function geometryFromRecord(r: Partial<PropertyRecord>): Geometry {
   const type = String(r.propertyType ?? "house");
   const isFlat = type === "flat" || type === "maisonette" || r.builtForm === "flat";
   const builtForm = (isFlat ? "flat" : (r.builtForm as BuiltForm) ?? "semi") as BuiltForm;
-  const storeys = isFlat ? 1 : Number(r.storeys ?? (type === "bungalow" ? 1 : 2));
-  const isTopFloor = isFlat && r.roofType !== "dwelling_above";
+  const storeys = type === "bungalow" ? 1 : Number(r.storeys ?? (type === "maisonette" ? 2 : isFlat ? 1 : 2));
+  const blockStoreys = Math.max(storeys + (r.flatLevel === "mid" ? 2 : 1), Number(r.blockStoreys ?? 4));
+  const floorIndex = r.flatLevel === "ground" ? 0 : r.flatLevel === "top" ? blockStoreys - storeys : Math.max(1, Math.floor((blockStoreys - storeys) / 2));
+  const isTopFloor = isFlat && r.flatLevel === "top";
   const area = Number(r.floorAreaM2 ?? 85);
   const footprint = area / Math.max(1, storeys);
   const depth = Math.max(6, Math.min(11, Math.sqrt(footprint) * 1.05));
@@ -24,5 +26,6 @@ export function geometryFromRecord(r: Partial<PropertyRecord>): Geometry {
     hasHeatPump: r.heating === "heat_pump",
     chimney: !isFlat && ["pre1900", "1900_1929", "1930_1949", "1950_1966"].includes(String(r.ageBand)),
     isTopFloor,
+    ...(isFlat && { blockStoreys, floorIndex }),
   };
 }

@@ -32,6 +32,9 @@ export type Geometry = {
   hasHeatPump: boolean;
   chimney: boolean;
   isTopFloor?: boolean;
+  /** Flats: floors in the whole building, and the floor (0 = ground) the home starts on. */
+  blockStoreys?: number;
+  floorIndex?: number;
 };
 
 /** A P10–P50–P90 band. Savings are estimates, never guarantees. */

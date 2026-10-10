@@ -16,6 +16,28 @@ export type HouseDetail = { wallType?: string; wallInsulation?: string; loftInsu
 
 export const STOREY_H = 2.7;
 export const PLINTH_H = 0.35;
+const ROOF_OVERHANG = 0.35;
+
+/**
+ * Vertical layout of the home. Houses stand on the ground; a flat is `storeys` tall, starts on
+ * `floorIndex` and sits in a block of `blockStoreys` (drawn as ghosts above and below).
+ */
+export function houseLayout(g: Geometry) {
+  const isFlat = g.builtForm === "flat";
+  const storeys = Math.max(1, Math.min(4, Math.round(g.storeys) || 1));
+  // Tall blocks are drawn at most 8 floors high; the home keeps its relative place (top stays top).
+  const rawBlock = Math.max(storeys, Math.round(g.blockStoreys ?? 3));
+  const rawFloor = g.floorIndex ?? (g.isTopFloor ? rawBlock - storeys : Math.min(1, rawBlock - storeys));
+  const blockStoreys = isFlat ? Math.min(8, rawBlock) : storeys;
+  const top = rawFloor + storeys >= rawBlock;
+  const floorIndex = !isFlat ? 0 : top ? blockStoreys - storeys : Math.max(0, Math.min(blockStoreys - storeys - 1, Math.round((rawFloor * blockStoreys) / rawBlock)));
+  const baseY = PLINTH_H + floorIndex * STOREY_H;
+  const bodyH = storeys * STOREY_H;
+  const topY = baseY + bodyH;
+  const hasRoofAbove = !isFlat || floorIndex + storeys >= blockStoreys;
+  const roofRise = !hasRoofAbove || g.roof === "flat" ? 0 : (g.depth / 2 + ROOF_OVERHANG) * 0.72;
+  return { isFlat, storeys, blockStoreys, floorIndex, baseY, bodyH, topY, blockTopY: PLINTH_H + blockStoreys * STOREY_H, hasRoofAbove, roofRise };
+}
 
 const FROST = new THREE.Color("#2f8cff");
 const AMBER = new THREE.Color("#ffb020");
@@ -188,17 +210,10 @@ type HouseProps = {
 };
 
 export function House({ geometry: g, heatLoss, mode, highlight = null, heatRef, isolate = null, parts = {}, scan = false, detail }: HouseProps) {
-  const isFlat = g.builtForm === "flat";
-  const isTopFloor = Boolean(g.isTopFloor);
-  const storeys = isFlat ? 1 : Math.max(1, Math.min(4, g.storeys));
+  const { isFlat, storeys, floorIndex, baseY, bodyH, topY, blockTopY, hasRoofAbove, roofRise } = houseLayout(g);
   const W = g.width;
   const D = g.depth;
-  const bodyH = storeys * STOREY_H;
-  const baseY = isFlat ? (isTopFloor ? 2 * STOREY_H + PLINTH_H : STOREY_H + PLINTH_H) : PLINTH_H;
-  const topY = baseY + bodyH;
-  const over = 0.35;
-  const hasRoofAbove = !isFlat || isTopFloor;
-  const roofRise = !hasRoofAbove || g.roof === "flat" ? 0 : (D / 2 + over) * 0.72;
+
 
   const maxShare = heatRef ?? Math.max(...Object.values(heatLoss), 0.0001);
   const heat = (e: Element) => heatLoss[e] / maxShare;
@@ -210,19 +225,19 @@ export function House({ geometry: g, heatLoss, mode, highlight = null, heatRef, 
 
   const gableGeom = useMemo(() => {
     const shape = new THREE.Shape();
-    shape.moveTo(-(D / 2 + over), 0);
-    shape.lineTo(D / 2 + over, 0);
+    shape.moveTo(-(D / 2 + ROOF_OVERHANG), 0);
+    shape.lineTo(D / 2 + ROOF_OVERHANG, 0);
     shape.lineTo(0, roofRise);
     shape.closePath();
-    const geom = new THREE.ExtrudeGeometry(shape, { depth: W + over * 2, bevelEnabled: false });
-    geom.translate(0, 0, -(W + over * 2) / 2);
+    const geom = new THREE.ExtrudeGeometry(shape, { depth: W + ROOF_OVERHANG * 2, bevelEnabled: false });
+    geom.translate(0, 0, -(W + ROOF_OVERHANG * 2) / 2);
     return geom;
   }, [D, W, roofRise]);
 
   const hipGeom = useMemo(() => {
     const geom = new THREE.ConeGeometry(1, roofRise, 4, 1);
     geom.rotateY(Math.PI / 4);
-    geom.scale((W / 2 + over) / Math.SQRT1_2, 1, (D / 2 + over) / Math.SQRT1_2);
+    geom.scale((W / 2 + ROOF_OVERHANG) / Math.SQRT1_2, 1, (D / 2 + ROOF_OVERHANG) / Math.SQRT1_2);
     geom.translate(0, roofRise / 2, 0);
     return geom;
   }, [D, W, roofRise]);
@@ -236,7 +251,7 @@ export function House({ geometry: g, heatLoss, mode, highlight = null, heatRef, 
       const y = baseY + f * STOREY_H + STOREY_H * 0.55;
       for (let i = 0; i < n; i++) {
         const x = -W / 2 + ((i + 0.5) * W) / n;
-        if (!(f === 0 && !isFlat && i === n - 1)) out.push({ pos: [x, y, D / 2 + 0.02], rotY: 0, w: ww, h: 1.3 });
+        if (!(f === 0 && floorIndex === 0 && i === n - 1)) out.push({ pos: [x, y, D / 2 + 0.02], rotY: 0, w: ww, h: 1.3 });
         out.push({ pos: [x, y, -D / 2 - 0.02], rotY: Math.PI, w: ww, h: 1.3 });
       }
       if (g.builtForm === "detached") {
@@ -245,31 +260,27 @@ export function House({ geometry: g, heatLoss, mode, highlight = null, heatRef, 
       }
     }
     return out;
-  }, [g.windowsPerFloor, g.builtForm, storeys, baseY, W, D, isFlat]);
+  }, [g.windowsPerFloor, g.builtForm, storeys, baseY, W, D, floorIndex]);
 
   const n = Math.max(1, g.windowsPerFloor);
   const doorX = -W / 2 + ((n - 0.5) * W) / n;
 
   // Neighbours: attached homes and the rest of a block of flats are drawn as ghosts.
-  const ghostH = (isFlat ? (isTopFloor ? 2 * STOREY_H : 3 * STOREY_H) : bodyH) + PLINTH_H + roofRise * 0.6;
+  const ghostH = (isFlat ? blockTopY : bodyH + PLINTH_H) + roofRise * 0.6;
   const ghosts: { size: [number, number, number]; position: [number, number, number] }[] = [];
   if (g.builtForm === "semi" || g.builtForm === "end_terrace" || g.builtForm === "mid_terrace")
     ghosts.push({ size: [W, ghostH, D], position: [-W - 0.01, ghostH / 2, 0] });
   if (g.builtForm === "mid_terrace") ghosts.push({ size: [W, ghostH, D], position: [W + 0.01, ghostH / 2, 0] });
   if (g.builtForm === "end_terrace") ghosts.push({ size: [W, ghostH, D], position: [-2 * W - 0.02, ghostH / 2, 0] });
   if (isFlat) {
-    if (isTopFloor) {
-      const lowerH = 2 * STOREY_H + PLINTH_H;
-      ghosts.push({ size: [W + 0.02, lowerH, D + 0.02], position: [0, lowerH / 2, 0] });
-    } else {
-      ghosts.push({ size: [W + 0.02, STOREY_H + PLINTH_H, D + 0.02], position: [0, (STOREY_H + PLINTH_H) / 2, 0] });
-      ghosts.push({ size: [W + 0.02, STOREY_H, D + 0.02], position: [0, topY + STOREY_H / 2, 0] });
-    }
+    const lowerH = baseY - PLINTH_H;
+    if (lowerH > 0) ghosts.push({ size: [W + 0.02, lowerH, D + 0.02], position: [0, lowerH / 2, 0] });
+    if (blockTopY > topY) ghosts.push({ size: [W + 0.02, blockTopY - topY, D + 0.02], position: [0, (topY + blockTopY) / 2, 0] });
   }
 
   const heatPumpPos = systemAnchor(g);
 
-  const slope = Math.atan2(roofRise, D / 2 + over);
+  const slope = Math.atan2(roofRise, D / 2 + ROOF_OVERHANG);
   const panelCols = Math.max(2, Math.floor((W - 0.8) / 1.05));
   const pitched = hasRoofAbove && g.roof !== "flat";
 
@@ -287,7 +298,7 @@ export function House({ geometry: g, heatLoss, mode, highlight = null, heatRef, 
           <Edges threshold={30} color={mode === "thermal" ? "#ffffff" : "#8a8f98"} transparent opacity={0.18} />
         </mesh>
 
-        {!isFlat && (
+        {floorIndex === 0 && (
           <mesh material={mat.door} position={[doorX, baseY + 1.05, D / 2 + 0.03]}>
             <boxGeometry args={[0.95, 2.1, 0.06]} />
           </mesh>
@@ -354,7 +365,7 @@ export function House({ geometry: g, heatLoss, mode, highlight = null, heatRef, 
       )}
 
       <Appear show={built.solar && g.hasSolar && pitched}>
-        <group position={[0, topY + roofRise / 2 + 0.06, (D / 2 + over) / 2]} rotation={[slope, 0, 0]}>
+        <group position={[0, topY + roofRise / 2 + 0.06, (D / 2 + ROOF_OVERHANG) / 2]} rotation={[slope, 0, 0]}>
           {Array.from({ length: 2 * panelCols }, (_, i) => {
             const r = Math.floor(i / panelCols);
             const c = i % panelCols;
@@ -367,8 +378,9 @@ export function House({ geometry: g, heatLoss, mode, highlight = null, heatRef, 
         </group>
       </Appear>
 
-      <Appear show={built.solar && g.hasSolar && !pitched && hasRoofAbove}>
-        <group position={[0, topY + 0.35, 0]} rotation={[0.22, 0, 0]}>
+      {/* Flat roofs, including the block's roof above a flat (shared panels). */}
+      <Appear show={built.solar && g.hasSolar && !pitched}>
+        <group position={[0, (hasRoofAbove ? topY : blockTopY) + 0.35, 0]} rotation={[0.22, 0, 0]}>
           {Array.from({ length: 2 * panelCols }, (_, i) => {
             const r = Math.floor(i / panelCols);
             const c = i % panelCols;
@@ -399,17 +411,15 @@ export function House({ geometry: g, heatLoss, mode, highlight = null, heatRef, 
 
 /** Where the camera goes when an element is in focus. [camera xyz, target xyz] */
 export function focusFor(el: Highlight | undefined, g: Geometry): [number, number, number, number, number, number] {
-  const isFlat = g.builtForm === "flat";
-  const isTopFloor = Boolean(g.isTopFloor);
-  const baseY = isFlat ? (isTopFloor ? 2 * STOREY_H + PLINTH_H : STOREY_H + PLINTH_H) : PLINTH_H;
-  const bodyH = (isFlat ? 1 : Math.max(1, Math.min(4, g.storeys))) * STOREY_H;
+  const { baseY, bodyH, topY, isFlat, hasRoofAbove, blockTopY } = houseLayout(g);
   const centerY = baseY + bodyH / 2;
-  const topY = baseY + bodyH;
+  // A flat below the top floor has no roof of its own; the block's roof is where panels would go.
+  const roofY = isFlat && !hasRoofAbove ? blockTopY : topY;
 
   switch (el) {
     case "roof":
     case "roof_pv":
-      return [5, topY + 7, 11, 0, topY, 0];
+      return [5, roofY + 7, 11, 0, roofY, 0];
     case "walls":
       return [13, centerY, 7, 0, centerY, 0];
     case "windows":
@@ -425,6 +435,14 @@ export function focusFor(el: Highlight | undefined, g: Geometry): [number, numbe
     default:
       return [11, centerY + 3.2, 14, 0, centerY, 0];
   }
+}
+
+/** Radius of the sphere the default camera fits: the home, attached neighbours, and a floor of block either side of a flat. */
+export function frameRadius(g: Geometry) {
+  const { isFlat, bodyH } = houseLayout(g);
+  const H = isFlat ? bodyH + 2 * STOREY_H : bodyH + 2;
+  const attached = g.builtForm === "detached" || isFlat ? 0 : g.width * 0.6;
+  return 0.5 * Math.hypot(g.width + attached, g.depth, H);
 }
 
 /** Where the heating system sits: beside the house, or behind it when there is no free side wall. */

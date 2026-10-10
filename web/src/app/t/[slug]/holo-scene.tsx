@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, type RefObject } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { ContactShadows, Environment, Lightformer } from "@react-three/drei";
 import * as THREE from "three";
-import { House, STOREY_H, focusFor } from "@/components/twin/house";
+import { House, focusFor, frameRadius } from "@/components/twin/house";
 import type { Element, Geometry } from "@/lib/twin/types";
 import { createHoloMaterial } from "./holo-material";
 
@@ -56,10 +56,7 @@ function Rig({ geometry, heatLoss, tilt, reduced, active, material }: Pick<HoloS
 
   const { offset, target } = useMemo(() => {
     const [x, y, z, tx, ty, tz] = focusFor(null, geometry);
-    const isFlat = geometry.builtForm === "flat";
-    const storeys = isFlat ? (geometry.isTopFloor ? 3 : 2.5) : geometry.storeys;
-    const attached = geometry.builtForm === "detached" || isFlat ? 0 : geometry.width * 0.6;
-    const r = 0.5 * Math.hypot(geometry.width + attached, geometry.depth, storeys * STOREY_H + 2);
+    const r = frameRadius(geometry);
     const vHalf = THREE.MathUtils.degToRad(camera.fov / 2);
     const hHalf = Math.atan(Math.tan(vHalf) * (size.width / Math.max(1, size.height)));
     const offset = new THREE.Vector3(x - tx, y - ty, z - tz).setLength((r / Math.sin(Math.min(vHalf, hHalf))) * 1.2);
