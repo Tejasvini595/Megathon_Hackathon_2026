@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { FileText } from "lucide-react";
 import { optionLabel, FIELDS, type ExtractionResult } from "@/lib/extract/fields";
-import { geometryFromRecord } from "@/lib/twin/from-record";
+import { geometryFromRecord, type FootprintSize } from "@/lib/twin/from-record";
 import { cn } from "@/lib/utils";
 import { STEPS, detailOf, partsUpTo, recordOf } from "./steps";
 import type { StageView } from "./capture-flow";
@@ -16,6 +16,7 @@ type Props = {
   hasPlan: boolean;
   onView: (v: StageView) => void;
   onDone: () => void;
+  footprint?: FootprintSize;
 };
 
 const labelOf = Object.fromEntries(FIELDS.map((f) => [f.key, f.label]));
@@ -24,7 +25,7 @@ const labelOf = Object.fromEntries(FIELDS.map((f) => [f.key, f.label]));
  * The house assembles part by part from what the extraction found, while the words that support
  * each finding light up in the user's own description.
  */
-export function Analysing({ result, text, photoUrl, hasPlan, onView, onDone }: Props) {
+export function Analysing({ result, text, photoUrl, hasPlan, onView, onDone, footprint }: Props) {
   const reduce = useReducedMotion();
   const [built, setBuilt] = useState(0);
   const finished = built >= STEPS.length;
@@ -35,7 +36,7 @@ export function Analysing({ result, text, photoUrl, hasPlan, onView, onDone }: P
     return () => clearTimeout(t);
   }, [result, built, finished, reduce, onDone]);
 
-  const geometry = useMemo(() => geometryFromRecord(result ? recordOf(result.fields) : {}), [result]);
+  const geometry = useMemo(() => geometryFromRecord(result ? recordOf(result.fields) : {}, footprint), [result, footprint]);
   useEffect(() => {
     onView({ geometry, parts: partsUpTo(built), scan: true, autoRotate: true, interactive: false, detail: result ? detailOf(recordOf(result.fields)) : undefined });
   }, [geometry, built, result, onView]);

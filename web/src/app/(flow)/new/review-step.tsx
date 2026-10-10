@@ -31,7 +31,7 @@ import {
   Type,
   type LucideIcon,
 } from "lucide-react";
-import { geometryFromRecord } from "@/lib/twin/from-record";
+import { geometryFromRecord, type FootprintSize } from "@/lib/twin/from-record";
 import { applies, FIELDS, isFlatLike, optionLabel, type ExtractedField, type ExtractionResult, type FieldKey, type FieldSource, type FieldValue } from "@/lib/extract/fields";
 import type { Geometry } from "@/lib/twin/types";
 import { cn } from "@/lib/utils";
@@ -73,7 +73,20 @@ const buzz = () => navigator.vibrate?.(8);
  * Character-creator style review: one part of the house per step, the camera flies to it and the
  * rest of the house fades. Controls answer instantly; the camera catches up on its own.
  */
-export function ReviewStep({ homeId, extraction, onView, initialNickname = "My home" }: { homeId: string; extraction: ExtractionResult; onView: (v: StageView) => void; initialNickname?: string }) {
+export function ReviewStep({
+  homeId,
+  extraction,
+  onView,
+  initialNickname = "My home",
+  footprint,
+}: {
+  homeId: string;
+  extraction: ExtractionResult;
+  onView: (v: StageView) => void;
+  initialNickname?: string;
+  /** The real outline from the map, when the user picked their building. */
+  footprint?: FootprintSize;
+}) {
   const [fields, setFields] = useState<Record<FieldKey, FieldState>>(extraction.fields);
   const [[index, dir], setIndex] = useState<[number, number]>([0, 0]);
   const [open, setOpen] = useState(() => new Set(FIELDS.map((f) => f.key).filter((k) => needsCheck(extraction.fields[k]))));
@@ -89,7 +102,7 @@ export function ReviewStep({ homeId, extraction, onView, initialNickname = "My h
   });
 
   const record = useMemo(() => recordOf(fields), [fields]);
-  const geometry = useMemo(() => geometryFromRecord(record), [record]);
+  const geometry = useMemo(() => geometryFromRecord(record, footprint), [record, footprint]);
   const detail = useMemo(() => detailOf(record), [record]);
   const shown = STEPS.map((s) => s.fields.filter((k) => applies(k, record)));
   const toCheck = shown.map((keys) => keys.filter((k) => needsCheck(fields[k])).length);

@@ -10,7 +10,7 @@ import { ArrowRight, ArrowUp, Camera, Check, FileText, ImagePlus, Map as MapIcon
 import { preloadTwinScene, TwinCanvas } from "@/components/twin/twin-canvas";
 import type { TwinSceneProps } from "@/components/twin/scene";
 import { useDictation } from "@/hooks/use-dictation";
-import { geometryFromRecord } from "@/lib/twin/from-record";
+import { geometryFromRecord, type FootprintSize } from "@/lib/twin/from-record";
 import { MOCK_TWIN } from "@/lib/twin/mock";
 import { cn } from "@/lib/utils";
 import type { ExtractionResult } from "@/lib/extract/fields";
@@ -49,7 +49,7 @@ export function CaptureFlow() {
   const [picked, setPicked] = useState<PickedHome | null>(null);
   const [photos, setPhotos] = useState<File[]>([]);
   const [plans, setPlans] = useState<File[]>([]);
-  const [result, setResult] = useState<{ homeId: string; extraction: ExtractionResult } | null>(null);
+  const [result, setResult] = useState<{ homeId: string; extraction: ExtractionResult; footprint?: FootprintSize } | null>(null);
   const [view, setView] = useState<StageView | null>(null);
   const [, startTransition] = useTransition();
   const router = useRouter();
@@ -312,6 +312,7 @@ export function CaptureFlow() {
           <motion.div key="analysing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex min-h-0 flex-1 flex-col">
             <Analysing
               result={result?.extraction ?? null}
+              footprint={result?.footprint}
               text={[text.trim(), ...voice].filter(Boolean).join(". ")}
               photoUrl={photoUrls[0]}
               hasPlan={plans.length > 0}
@@ -323,7 +324,7 @@ export function CaptureFlow() {
 
         {step === "review" && result && (
           <motion.div key="review" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex min-h-0 flex-1 flex-col">
-            <ReviewStep homeId={result.homeId} extraction={result.extraction} onView={setView} />
+            <ReviewStep homeId={result.homeId} extraction={result.extraction} footprint={result.footprint} onView={setView} />
           </motion.div>
         )}
       </AnimatePresence>

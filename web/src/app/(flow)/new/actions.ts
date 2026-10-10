@@ -8,6 +8,7 @@ import { requireUser } from "@/lib/dal";
 import { extract, type ExtractInput } from "@/lib/extract";
 import { isUkPostcode } from "@/lib/geo/postcode";
 import { describeStreet } from "@/lib/geo/street";
+import { footprintSize, type FootprintSize } from "@/lib/twin/from-record";
 import type { ExtractionResult } from "@/lib/extract/fields";
 import { confirmSchema } from "@/lib/extract/schema";
 import { prisma } from "@/lib/prisma";
@@ -15,7 +16,7 @@ import { saveUpload } from "@/lib/storage";
 
 const MAX_FILE = 15 * 1024 * 1024;
 
-export type CaptureResult = { ok: true; homeId: string; extraction: ExtractionResult } | { ok: false; error: string };
+export type CaptureResult = { ok: true; homeId: string; extraction: ExtractionResult; footprint?: FootprintSize } | { ok: false; error: string };
 
 /** Free-form capture: any mix of description, voice transcript, photos, plans and an optional postcode. */
 export async function createHome(form: FormData): Promise<CaptureResult> {
@@ -62,7 +63,7 @@ export async function createHome(form: FormData): Promise<CaptureResult> {
     select: { id: true },
   });
 
-  return { ok: true, homeId: home.id, extraction };
+  return { ok: true, homeId: home.id, extraction, footprint: footprintSize(footprint) };
 }
 
 /**
