@@ -11,6 +11,7 @@ import type { Element, TwinState } from "@/lib/twin/types";
 import { cn } from "@/lib/utils";
 import { HomeStage } from "./home-stage";
 import { ScoreRing } from "./score-ring";
+import { ShareButton } from "./share-button";
 
 export const metadata: Metadata = { title: "Home" };
 
@@ -31,7 +32,7 @@ const ELEMENTS: { key: Element; label: string }[] = [
 ];
 
 async function HomeContent() {
-  const { user, twin } = await getActiveHome();
+  const { user, home, twin } = await getActiveHome();
   if (!twin) return <EmptyHome name={user.name} />;
   const next = twin.retrofits[0];
 
@@ -46,10 +47,13 @@ async function HomeContent() {
             </h1>
             <p className="text-xs text-muted-foreground">{[twin.postcode, twin.epcBand && `EPC ${twin.epcBand}`].filter(Boolean).join(" · ") || "No postcode"}</p>
           </div>
-          <div className="glass mt-3 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs">
-            <span className="size-1.5 rounded-full" style={{ background: scoreTone(twin.score) }} />
-            <span className="tabular font-medium">{twin.score}</span>
-            <span className="text-muted-foreground">{twin.scoreClass}</span>
+          <div className="mt-3 flex items-center gap-2">
+            <div className="glass flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs">
+              <span className="size-1.5 rounded-full" style={{ background: scoreTone(twin.score) }} />
+              <span className="tabular font-medium">{twin.score}</span>
+              <span className="text-muted-foreground">{twin.scoreClass}</span>
+            </div>
+            <ShareButton sharedPath={home.shareSlug ? `/t/${home.shareSlug}` : null} />
           </div>
         </header>
       </section>

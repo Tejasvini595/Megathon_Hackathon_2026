@@ -1,10 +1,11 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ChevronRight, LogOut, Plus } from "lucide-react";
+import { ChevronRight, Link2Off, LogOut, Plus } from "lucide-react";
 import { PageSkeleton } from "@/components/app/page-skeleton";
 import { requireUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
+import { unshareHome } from "../home/share-actions";
 import { signOutAction } from "./actions";
 
 export const metadata: Metadata = { title: "You" };
@@ -20,6 +21,7 @@ export default function Page() {
 async function Loader() {
   const user = await requireUser();
   const homes = await prisma.home.findMany({ where: { userId: user.id }, orderBy: { updatedAt: "desc" } });
+  const shared = homes.find((h) => h.status === "CONFIRMED");
   return (
     <div className="px-5 pt-safe pb-40">
       <div className="flex items-center gap-4 pt-6">
@@ -50,6 +52,18 @@ async function Loader() {
           <Plus className="size-4 text-volt" /> Add a home
         </Link>
       </div>
+
+      {shared?.shareSlug && (
+        <form action={unshareHome} className="mt-3 flex items-center gap-3 rounded-3xl bg-surface px-4 py-3.5 ring-1 ring-hairline">
+          <div className="min-w-0 flex-1">
+            <p className="text-sm font-medium">Twin card is public</p>
+            <p className="truncate text-xs text-muted-foreground">/t/{shared.shareSlug}</p>
+          </div>
+          <button type="submit" className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-destructive ring-1 ring-hairline">
+            <Link2Off className="size-3.5" /> Stop sharing
+          </button>
+        </form>
+      )}
 
       <h2 className="mb-2 mt-8 px-1 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Memory</h2>
       <div className="rounded-3xl border border-dashed hairline p-5 text-sm text-muted-foreground">
