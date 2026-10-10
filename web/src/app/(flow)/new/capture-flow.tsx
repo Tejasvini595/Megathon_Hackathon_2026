@@ -1,17 +1,25 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition, type ReactNode } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { toast } from "sonner";
 import { ArrowRight, ArrowUp, Camera, FileText, ImagePlus, MapPin, Mic, Square, X } from "lucide-react";
+import { preloadTwinScene, TwinCanvas } from "@/components/twin/twin-canvas";
+import type { TwinSceneProps } from "@/components/twin/scene";
 import { useDictation } from "@/hooks/use-dictation";
+import { geometryFromRecord } from "@/lib/twin/from-record";
+import { MOCK_TWIN } from "@/lib/twin/mock";
 import { cn } from "@/lib/utils";
 import type { ExtractionResult } from "@/lib/extract/fields";
 import { createHome } from "./actions";
 import { Analysing } from "./analysing";
 import { downscaleImage } from "./downscale";
 import { ReviewStep } from "./review-step";
+import { partsUpTo } from "./steps";
+
+/** What the shared 3D stage shows; the analysing and review steps drive it. */
+export type StageView = Omit<TwinSceneProps, "heatLoss" | "mode" | "children"> & { markers?: ReactNode };
 
 type Step = "compose" | "analysing" | "review";
 
@@ -25,8 +33,6 @@ const EXAMPLES = [
 const SAMPLE =
   "1930s semi-detached, 3 bed, about 85 m2. Mostly single glazing, gas combi boiler, 50mm loft insulation, cavity walls with no insulation. Programmer and TRVs.";
 
-const MIN_ANALYSIS_MS = 3600;
-
 export function CaptureFlow() {
   const [step, setStep] = useState<Step>("compose");
   const [text, setText] = useState("");
@@ -36,7 +42,12 @@ export function CaptureFlow() {
   const [photos, setPhotos] = useState<File[]>([]);
   const [plans, setPlans] = useState<File[]>([]);
   const [result, setResult] = useState<{ homeId: string; extraction: ExtractionResult } | null>(null);
+  const [view, setView] = useState<StageView | null>(null);
   const [, startTransition] = useTransition();
+
+  // Fetch the 3D chunk while the user is still typing, so the stage appears instantly.
+  useEffect(preloadTwinScene, []);
+  const toReview = useCallback(() => setStep("review"), []);
 
   const photoUrls = useMemo(() => photos.map((f) => URL.createObjectURL(f)), [photos]);
   useEffect(() => () => photoUrls.forEach((u) => URL.revokeObjectURL(u)), [photoUrls]);
@@ -52,6 +63,8 @@ export function CaptureFlow() {
   function analyse() {
     if (!hasInput) return;
     dictation.stop();
+    setResult(null);
+    setView({ geometry: geometryFromRecord({}), parts: partsUpTo(0), scan: true, autoRotate: true, interactive: false });
     setStep("analysing");
     const form = new FormData();
     form.set("text", text);
@@ -59,15 +72,11 @@ export function CaptureFlow() {
     form.set("postcode", postcode);
     photos.forEach((f) => form.append("photos", f));
     plans.forEach((f) => form.append("plans", f));
-    const started = Date.now();
     startTransition(async () => {
       try {
         const res = await createHome(form);
-        // Let the analysis animation breathe even when extraction answers instantly.
-        await new Promise((r) => setTimeout(r, Math.max(0, MIN_ANALYSIS_MS - (Date.now() - started))));
         if (!res.ok) throw new Error(res.error);
         setResult(res);
-        setStep("review");
       } catch (e) {
         toast.error(e instanceof Error ? e.message : "Something went wrong");
         setStep("compose");
@@ -76,8 +85,8 @@ export function CaptureFlow() {
   }
 
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-md flex-col">
-      <header className="flex items-center justify-between px-5 pt-safe">
+    <div className={cn("mx-auto flex w-full max-w-md flex-col", step === "compose" ? "min-h-dvh" : "h-dvh overflow-hidden")}>
+      <header className={cn("z-20 flex items-center justify-between px-5 pt-safe", step !== "compose" && "absolute inset-x-0 mx-auto max-w-md")}>
         <Link href="/home" aria-label="Close" className="grid size-10 place-items-center rounded-full bg-surface ring-1 ring-hairline">
           <X className="size-4" />
         </Link>
@@ -88,6 +97,13 @@ export function CaptureFlow() {
         </div>
         <span className="size-10" />
       </header>
+
+      {step !== "compose" && view && (
+        <div className="relative h-[46dvh] shrink-0 animate-in fade-in duration-500">
+          <Stage view={view} />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-[linear-gradient(transparent,var(--background))]" />
+        </div>
+      )}
 
       <AnimatePresence mode="wait">
         {step === "compose" && (
@@ -229,18 +245,33 @@ export function CaptureFlow() {
         )}
 
         {step === "analysing" && (
-          <motion.div key="analysing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-1 flex-col px-5">
-            <Analysing durationMs={MIN_ANALYSIS_MS} photoUrl={photoUrls[0]} hasText={Boolean(text.trim() || voice.length)} hasPlan={plans.length > 0} hasPostcode={Boolean(postcode.trim())} />
+          <motion.div key="analysing" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex min-h-0 flex-1 flex-col">
+            <Analysing
+              result={result?.extraction ?? null}
+              text={[text.trim(), ...voice].filter(Boolean).join(". ")}
+              photoUrl={photoUrls[0]}
+              hasPlan={plans.length > 0}
+              onView={setView}
+              onDone={toReview}
+            />
           </motion.div>
         )}
 
         {step === "review" && result && (
-          <motion.div key="review" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex flex-1 flex-col">
-            <ReviewStep homeId={result.homeId} extraction={result.extraction} />
+          <motion.div key="review" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex min-h-0 flex-1 flex-col">
+            <ReviewStep homeId={result.homeId} extraction={result.extraction} onView={setView} />
           </motion.div>
         )}
       </AnimatePresence>
     </div>
+  );
+}
+
+function Stage({ view: { markers, ...view } }: { view: StageView }) {
+  return (
+    <TwinCanvas className="absolute inset-0" heatLoss={MOCK_TWIN.heatLoss} mode="normal" {...view}>
+      {markers}
+    </TwinCanvas>
   );
 }
 

@@ -6,7 +6,8 @@ import { cn } from "@/lib/utils";
 import type { TwinSceneProps } from "./scene";
 
 // three.js needs the browser; render a quiet placeholder on the server and while the chunk loads.
-const TwinScene = dynamic(() => import("./scene"), {
+const loadScene = () => import("./scene");
+const TwinScene = dynamic(loadScene, {
   ssr: false,
   loading: () => <Placeholder />,
 });
@@ -17,6 +18,11 @@ function Placeholder() {
       <div className="size-40 rounded-full bg-[radial-gradient(circle,var(--volt-dim),transparent_70%)] animate-breathe" />
     </div>
   );
+}
+
+/** Start downloading the 3D chunk early, e.g. while the user is still typing. */
+export function preloadTwinScene() {
+  void loadScene();
 }
 
 let webglSupport: boolean | null = null;

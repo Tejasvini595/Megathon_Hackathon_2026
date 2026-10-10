@@ -41,6 +41,8 @@ export type ExtractedField = {
   source: FieldSource;
   /** Short human-readable reason, e.g. "uPVC frames visible on all front windows". */
   evidence: string;
+  /** The exact words in the user's text that support this value, so the UI can point at them. */
+  quote?: string;
 };
 
 export type Conflict = { field: FieldKey; message: string };

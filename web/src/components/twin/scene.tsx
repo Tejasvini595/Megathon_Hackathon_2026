@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { CameraControls, ContactShadows, Environment, Lightformer, PerformanceMonitor } from "@react-three/drei";
 import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import * as THREE from "three";
 import type { Element, Geometry } from "@/lib/twin/types";
-import { House, STOREY_H, focusFor, type Highlight, type ViewMode } from "./house";
+import { House, STOREY_H, focusFor, type HouseDetail, type Highlight, type Parts, type ViewMode } from "./house";
 
 export type TwinSceneProps = {
   geometry: Geometry;
@@ -16,6 +16,15 @@ export type TwinSceneProps = {
   autoRotate?: boolean;
   interactive?: boolean;
   heatRef?: number;
+  /** Pull the camera further back for focused shots (1 = the default close-up). */
+  focusDistance?: number;
+  /** Fade everything but this part (the camera still follows `focus`). */
+  isolate?: Highlight;
+  parts?: Parts;
+  scan?: boolean;
+  detail?: HouseDetail;
+  /** Extra scene content, e.g. hotspot markers. */
+  children?: ReactNode;
 };
 
 const BG = "#0b0d10";
@@ -68,13 +77,14 @@ function ResumeKick({ active }: { active: boolean }) {
   return null;
 }
 
-function Rig({ geometry, focus, autoRotate, interactive }: Pick<TwinSceneProps, "geometry" | "focus" | "autoRotate" | "interactive">) {
+function Rig({ geometry, focus, autoRotate, interactive, focusDistance = 1 }: Pick<TwinSceneProps, "geometry" | "focus" | "autoRotate" | "interactive" | "focusDistance">) {
   const controls = useRef<CameraControls>(null);
   const idleSince = useRef(0);
   const userActive = useRef(false);
   const initialized = useRef(false);
   const size = useThree((st) => st.size);
   const fov = useThree((st) => (st.camera as THREE.PerspectiveCamera).fov);
+  const [reduced] = useState(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 
   useEffect(() => {
     const c = controls.current;
@@ -93,12 +103,12 @@ function Rig({ geometry, focus, autoRotate, interactive }: Pick<TwinSceneProps, 
       const r = 0.5 * Math.hypot(geometry.width + attached, geometry.depth, H);
       offset.setLength((r / Math.sin(Math.min(vHalf, hHalf))) * 0.92);
     } else {
-      offset.multiplyScalar(Math.max(1, Math.tan(vHalf) / Math.tan(hHalf)) * 0.85);
+      offset.multiplyScalar(Math.max(1, Math.tan(vHalf) / Math.tan(hHalf)) * 0.85 * focusDistance);
     }
     const animate = initialized.current;
     initialized.current = true;
     c.setLookAt(tx + offset.x, ty + offset.y, tz + offset.z, tx, ty, tz, animate);
-  }, [focus, geometry, size.width, size.height, fov]);
+  }, [focus, geometry, size.width, size.height, fov, focusDistance]);
 
   useEffect(() => {
     const c = controls.current;
@@ -132,7 +142,7 @@ function Rig({ geometry, focus, autoRotate, interactive }: Pick<TwinSceneProps, 
       minPolarAngle={0.35}
       maxPolarAngle={1.42}
       truckSpeed={0}
-      smoothTime={0.6}
+      smoothTime={reduced ? 0 : 0.6}
       draggingSmoothTime={0.15}
     />
   );
@@ -152,6 +162,12 @@ export default function TwinScene({
   autoRotate = false,
   interactive = true,
   heatRef,
+  focusDistance,
+  isolate,
+  parts,
+  scan,
+  detail,
+  children,
   active,
   onContextLost,
 }: TwinSceneProps & { active: boolean; onContextLost: () => void }) {
@@ -196,12 +212,23 @@ export default function TwinScene({
         <Lightformer form="ring" intensity={1.5} position={[6, 8, -6]} scale={3} color="#e8fff5" />
       </Environment>
 
-      <House geometry={geometry} heatLoss={heatLoss} mode={mode} highlight={focus} heatRef={heatRef} />
+      <House
+        geometry={geometry}
+        heatLoss={heatLoss}
+        mode={mode}
+        highlight={isolate ? null : focus}
+        heatRef={heatRef}
+        isolate={isolate}
+        parts={parts}
+        scan={scan}
+        detail={detail}
+      />
+      {children}
 
       <GroundGlow thermal={thermal} />
       <ContactShadows key={shadowKey} frames={1} position={[0, 0.002, 0]} opacity={0.6} scale={24} blur={2.4} far={10} resolution={256} color="#000000" />
 
-      <Rig geometry={geometry} focus={focus} autoRotate={autoRotate} interactive={interactive} />
+      <Rig geometry={geometry} focus={focus} autoRotate={autoRotate} interactive={interactive} focusDistance={focusDistance} />
 
       {fancy && (
         <EffectComposer multisampling={0}>

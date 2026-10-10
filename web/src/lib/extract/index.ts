@@ -80,7 +80,7 @@ const RULES: Rule[] = [
   { field: "roofType", re: /\b(ground[- ]floor)\b/i, value: "dwelling_above", conf: 0.95, why: "ground floor flat has homes above" },
 ];
 
-const field = (value: string | number, confidence: number, source: FieldSource, evidence: string): ExtractedField => ({ value, confidence, source, evidence });
+const field = (value: string | number, confidence: number, source: FieldSource, evidence: string, quote?: string): ExtractedField => ({ value, confidence, source, evidence, quote });
 
 export const rulesExtractor: Extractor = async (inputs) => {
   const fields = Object.fromEntries(
@@ -106,7 +106,7 @@ export const rulesExtractor: Extractor = async (inputs) => {
       if (!m) continue;
       seen.add(r.field);
       const value = typeof r.value === "function" ? r.value(m) : r.value;
-      if (r.conf >= fields[r.field].confidence) fields[r.field] = field(value, r.conf, source, `${source === "voice" ? "Voice note" : "Your description"} ${r.why}`);
+      if (r.conf >= fields[r.field].confidence) fields[r.field] = field(value, r.conf, source, `${source === "voice" ? "Voice note" : "Your description"} ${r.why}`, m[0]);
     }
   }
 
