@@ -15,7 +15,9 @@ bun run db:postcodes ../data/raw/postcodes/postcodes.csv   # 48k postcodes from 
 bun run db:buildings "M14 4AJ" "BS6 5AB"                   # optional: pre-fetch OSM buildings for demo postcodes
 bun run db:seed                 # demo user demo@ght.dev / demo12345 with three confirmed homes (idempotent)
 bun run dev                      # http://localhost:3000, open with phone-sized devtools
-bun test src                     # unit tests (footprint geometry)
+bun test src                     # unit tests (footprint geometry, eval scoring)
+bun run e2e                      # Playwright suite on its own dev server (port 3500, needs the DB; fresh user per test)
+bun run eval:extract             # extraction baseline on 25 hand-written descriptions -> src/lib/extract/eval/results.md
 ```
 
 Set `ENGINE_URL` to the Python engine to replace the preview numbers (see "Engine contract" below).

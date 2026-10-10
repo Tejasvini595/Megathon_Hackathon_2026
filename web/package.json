@@ -16,7 +16,9 @@
     "db:seed": "bun scripts/seed-demo.ts",
     "db:postcodes": "bun scripts/import-postcodes.ts",
     "db:buildings": "bun --conditions react-server scripts/prewarm-buildings.ts",
-    "test": "bun test src"
+    "test": "bun test src",
+    "e2e": "playwright test",
+    "eval:extract": "bun src/lib/extract/eval/run.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "7.10.0",
@@ -43,6 +45,7 @@
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@playwright/test": "1.56.1",
     "@tailwindcss/turbopack": "^4",
     "@types/bun": "^1.4.2",
     "@types/node": "^20",
