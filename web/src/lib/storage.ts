@@ -1,5 +1,5 @@
 import "server-only";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { randomUUID } from "node:crypto";
 
@@ -17,4 +17,12 @@ export async function saveUpload(file: File): Promise<string> {
 export async function readUpload(key: string): Promise<Buffer> {
   if (!/^[0-9a-f-]{36}\.[a-z0-9]{1,5}$/.test(key)) throw new Error("bad key");
   return readFile(path.join(ROOT, key));
+}
+
+export async function deleteUploads(keys: string[]): Promise<void> {
+  await Promise.all(
+    keys
+      .filter((k) => /^[0-9a-f-]{36}\.[a-z0-9]{1,5}$/.test(k))
+      .map((k) => rm(path.join(ROOT, k), { force: true })),
+  );
 }

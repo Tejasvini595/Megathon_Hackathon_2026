@@ -73,11 +73,11 @@ const buzz = () => navigator.vibrate?.(8);
  * Character-creator style review: one part of the house per step, the camera flies to it and the
  * rest of the house fades. Controls answer instantly; the camera catches up on its own.
  */
-export function ReviewStep({ homeId, extraction, onView }: { homeId: string; extraction: ExtractionResult; onView: (v: StageView) => void }) {
+export function ReviewStep({ homeId, extraction, onView, initialNickname = "My home" }: { homeId: string; extraction: ExtractionResult; onView: (v: StageView) => void; initialNickname?: string }) {
   const [fields, setFields] = useState<Record<FieldKey, FieldState>>(extraction.fields);
   const [[index, dir], setIndex] = useState<[number, number]>([0, 0]);
   const [open, setOpen] = useState(() => new Set(FIELDS.map((f) => f.key).filter((k) => needsCheck(extraction.fields[k]))));
-  const [nickname, setNickname] = useState("My home");
+  const [nickname, setNickname] = useState(initialNickname);
   const [saving, startSaving] = useTransition();
   const drag = useDragControls();
   const [hints, setHints] = useState(() => {
