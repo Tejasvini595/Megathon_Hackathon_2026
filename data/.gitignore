@@ -1,0 +1,14 @@
+# Datasets: never commit (raw downloads, generated outputs, evaluation-only data)
+raw/
+out/
+hidden/
+scratch/
+*.csv
+*.parquet
+*.xlsx
+*.zip
+
+# Python / uv
+.venv/
+__pycache__/
+*.pyc
