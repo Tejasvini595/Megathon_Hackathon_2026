@@ -138,14 +138,16 @@ type HouseProps = {
 
 export function House({ geometry: g, heatLoss, mode, highlight = null, heatRef }: HouseProps) {
   const isFlat = g.builtForm === "flat";
+  const isTopFloor = Boolean(g.isTopFloor);
   const storeys = isFlat ? 1 : Math.max(1, Math.min(4, g.storeys));
   const W = g.width;
   const D = g.depth;
   const bodyH = storeys * STOREY_H;
-  const baseY = isFlat ? STOREY_H + PLINTH_H : PLINTH_H; // flats sit on a ghost floor below
+  const baseY = isFlat ? (isTopFloor ? 2 * STOREY_H + PLINTH_H : STOREY_H + PLINTH_H) : PLINTH_H;
   const topY = baseY + bodyH;
   const over = 0.35;
-  const roofRise = g.roof === "flat" || isFlat ? 0 : (D / 2 + over) * 0.72;
+  const hasRoofAbove = !isFlat || isTopFloor;
+  const roofRise = !hasRoofAbove || g.roof === "flat" ? 0 : (D / 2 + over) * 0.72;
 
   const maxShare = heatRef ?? Math.max(...Object.values(heatLoss), 0.0001);
   const heat = (e: Element) => heatLoss[e] / maxShare;
@@ -197,15 +199,20 @@ export function House({ geometry: g, heatLoss, mode, highlight = null, heatRef }
   const doorX = -W / 2 + ((n - 0.5) * W) / n;
 
   // Neighbours: attached homes and the rest of a block of flats are drawn as ghosts.
-  const ghostH = (isFlat ? 3 * STOREY_H : bodyH) + PLINTH_H + roofRise * 0.6;
+  const ghostH = (isFlat ? (isTopFloor ? 2 * STOREY_H : 3 * STOREY_H) : bodyH) + PLINTH_H + roofRise * 0.6;
   const ghosts: { size: [number, number, number]; position: [number, number, number] }[] = [];
   if (g.builtForm === "semi" || g.builtForm === "end_terrace" || g.builtForm === "mid_terrace")
     ghosts.push({ size: [W, ghostH, D], position: [-W - 0.01, ghostH / 2, 0] });
   if (g.builtForm === "mid_terrace") ghosts.push({ size: [W, ghostH, D], position: [W + 0.01, ghostH / 2, 0] });
   if (g.builtForm === "end_terrace") ghosts.push({ size: [W, ghostH, D], position: [-2 * W - 0.02, ghostH / 2, 0] });
   if (isFlat) {
-    ghosts.push({ size: [W + 0.02, STOREY_H + PLINTH_H, D + 0.02], position: [0, (STOREY_H + PLINTH_H) / 2, 0] });
-    ghosts.push({ size: [W + 0.02, STOREY_H, D + 0.02], position: [0, topY + STOREY_H / 2, 0] });
+    if (isTopFloor) {
+      const lowerH = 2 * STOREY_H + PLINTH_H;
+      ghosts.push({ size: [W + 0.02, lowerH, D + 0.02], position: [0, lowerH / 2, 0] });
+    } else {
+      ghosts.push({ size: [W + 0.02, STOREY_H + PLINTH_H, D + 0.02], position: [0, (STOREY_H + PLINTH_H) / 2, 0] });
+      ghosts.push({ size: [W + 0.02, STOREY_H, D + 0.02], position: [0, topY + STOREY_H / 2, 0] });
+    }
   }
 
   const heatPumpPos: [number, number, number] =
@@ -213,7 +220,7 @@ export function House({ geometry: g, heatLoss, mode, highlight = null, heatRef }
 
   const slope = Math.atan2(roofRise, D / 2 + over);
   const panelCols = Math.max(2, Math.floor((W - 0.8) / 1.05));
-  const pitched = !isFlat && g.roof !== "flat";
+  const pitched = hasRoofAbove && g.roof !== "flat";
 
   return (
     <group>
@@ -228,7 +235,7 @@ export function House({ geometry: g, heatLoss, mode, highlight = null, heatRef }
 
       {pitched && g.roof === "gable" && <mesh material={mat.roof} geometry={gableGeom} position={[0, topY, 0]} rotation={[0, -Math.PI / 2, 0]} />}
       {pitched && g.roof === "hip" && <mesh material={mat.roof} geometry={hipGeom} position={[0, topY, 0]} />}
-      {!pitched && (
+      {hasRoofAbove && !pitched && (
         <mesh material={mat.roof} position={[0, topY + 0.12, 0]}>
           <boxGeometry args={[W + 0.2, 0.24, D + 0.2]} />
         </mesh>
@@ -284,6 +291,20 @@ export function House({ geometry: g, heatLoss, mode, highlight = null, heatRef }
         </group>
       </Appear>
 
+      <Appear show={g.hasSolar && !pitched && hasRoofAbove}>
+        <group position={[0, topY + 0.35, 0]} rotation={[0.22, 0, 0]}>
+          {Array.from({ length: 2 * panelCols }, (_, i) => {
+            const r = Math.floor(i / panelCols);
+            const c = i % panelCols;
+            return (
+              <mesh key={i} material={panelMaterial} position={[(c - (panelCols - 1) / 2) * 1.05, 0, (r - 0.5) * 1.7]}>
+                <boxGeometry args={[1.0, 0.05, 1.65]} />
+              </mesh>
+            );
+          })}
+        </group>
+      </Appear>
+
       <Appear show={g.hasHeatPump} position={heatPumpPos}>
         <mesh material={pumpMaterial}>
           <boxGeometry args={[1.0, 0.8, 0.42]} />
@@ -302,22 +323,28 @@ export function House({ geometry: g, heatLoss, mode, highlight = null, heatRef }
 
 /** Where the camera goes when an element is in focus. [camera xyz, target xyz] */
 export function focusFor(el: Highlight | undefined, g: Geometry): [number, number, number, number, number, number] {
-  const H = (g.builtForm === "flat" ? 2 : g.storeys) * STOREY_H;
+  const isFlat = g.builtForm === "flat";
+  const isTopFloor = Boolean(g.isTopFloor);
+  const baseY = isFlat ? (isTopFloor ? 2 * STOREY_H + PLINTH_H : STOREY_H + PLINTH_H) : PLINTH_H;
+  const bodyH = (isFlat ? 1 : Math.max(1, Math.min(4, g.storeys))) * STOREY_H;
+  const centerY = baseY + bodyH / 2;
+  const topY = baseY + bodyH;
+
   switch (el) {
     case "roof":
     case "roof_pv":
-      return [5, H + 10, 11, 0, H, 0];
+      return [5, topY + 7, 11, 0, topY, 0];
     case "walls":
-      return [13, H * 0.55, 7, 0, H * 0.45, 0];
+      return [13, centerY, 7, 0, centerY, 0];
     case "windows":
-      return [1.5, H * 0.55, 14, 0, H * 0.5, 0];
+      return [1.5, centerY, 14, 0, centerY, 0];
     case "floor":
-      return [9, 1.2, 10, 0, 0.4, 0];
+      return [9, baseY + 0.8, 10, 0, baseY, 0];
     case "draughts":
-      return [-3, 2.5, 11, 0, 1.4, 0];
+      return [-3, baseY + 1.5, 11, 0, baseY + 1, 0];
     case "system":
       return [10, 3, 4, 2, 1, 0];
     default:
-      return [11, H * 0.9 + 3, 14, 0, H * 0.45, 0];
+      return [11, centerY + 3.2, 14, 0, centerY, 0];
   }
 }

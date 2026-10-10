@@ -73,8 +73,11 @@ const RULES: Rule[] = [
   { field: "solarPv", re: /solar|photovoltaic|\bpv\b/i, value: "yes", conf: 0.85, why: "mentions solar" },
   { field: "loftInsulationMm", re: /(\d{2,3})\s*mm/i, value: (m) => Number(m[1]), conf: 0.9, why: "states loft insulation depth" },
   { field: "loftInsulationMm", re: /no loft insulation|loft (is )?(not|un)insulated/i, value: 0, conf: 0.85, why: "says no loft insulation" },
-  { field: "roofType", re: /flat roof/i, value: "flat", conf: 0.9, why: "mentions a flat roof" },
   { field: "roofType", re: /hip(ped)? roof/i, value: "hip", conf: 0.9, why: "mentions a hipped roof" },
+  { field: "roofType", re: /pitched roof|gable/i, value: "gable", conf: 0.9, why: "mentions a pitched roof" },
+  { field: "roofType", re: /flat roof/i, value: "flat", conf: 0.9, why: "mentions a flat roof" },
+  { field: "roofType", re: /\b(top[- ]floor|penthouse|under the roof|top level|upper floor)\b/i, value: "flat", conf: 0.92, why: "top floor flats have a roof above, not another dwelling" },
+  { field: "roofType", re: /\b(ground[- ]floor)\b/i, value: "dwelling_above", conf: 0.95, why: "ground floor flat has homes above" },
 ];
 
 const field = (value: string | number, confidence: number, source: FieldSource, evidence: string): ExtractedField => ({ value, confidence, source, evidence });

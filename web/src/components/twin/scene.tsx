@@ -72,6 +72,7 @@ function Rig({ geometry, focus, autoRotate, interactive }: Pick<TwinSceneProps, 
   const controls = useRef<CameraControls>(null);
   const idleSince = useRef(0);
   const userActive = useRef(false);
+  const initialized = useRef(false);
   const size = useThree((st) => st.size);
   const fov = useThree((st) => (st.camera as THREE.PerspectiveCamera).fov);
 
@@ -85,14 +86,18 @@ function Rig({ geometry, focus, autoRotate, interactive }: Pick<TwinSceneProps, 
     const hHalf = Math.atan(Math.tan(vHalf) * aspect);
     const offset = new THREE.Vector3(x - tx, y - ty, z - tz);
     if (!focus) {
-      const H = (geometry.builtForm === "flat" ? 3 : geometry.storeys) * STOREY_H + 2;
-      const attached = geometry.builtForm === "detached" ? 0 : geometry.width * 0.6;
+      const isFlat = geometry.builtForm === "flat";
+      const storeys = isFlat ? (geometry.isTopFloor ? 3 : 2.5) : geometry.storeys;
+      const H = storeys * STOREY_H + 2;
+      const attached = geometry.builtForm === "detached" || isFlat ? 0 : geometry.width * 0.6;
       const r = 0.5 * Math.hypot(geometry.width + attached, geometry.depth, H);
       offset.setLength((r / Math.sin(Math.min(vHalf, hHalf))) * 0.92);
     } else {
       offset.multiplyScalar(Math.max(1, Math.tan(vHalf) / Math.tan(hHalf)) * 0.85);
     }
-    c.setLookAt(tx + offset.x, ty + offset.y, tz + offset.z, tx, ty, tz, true);
+    const animate = initialized.current;
+    initialized.current = true;
+    c.setLookAt(tx + offset.x, ty + offset.y, tz + offset.z, tx, ty, tz, animate);
   }, [focus, geometry, size.width, size.height, fov]);
 
   useEffect(() => {
@@ -155,7 +160,7 @@ export default function TwinScene({
   const [dpr, setDpr] = useState(() => Math.min(window.devicePixelRatio, 1.75));
   const [fancy, setFancy] = useState(true);
   const frameloop = !active ? "never" : autoRotate || thermal ? "always" : "demand";
-  const shadowKey = `${geometry.builtForm}-${geometry.width}-${geometry.depth}-${geometry.storeys}`;
+  const shadowKey = `${geometry.builtForm}-${geometry.width}-${geometry.depth}-${geometry.storeys}-${geometry.isTopFloor ? "top" : "std"}`;
 
   return (
     <Canvas

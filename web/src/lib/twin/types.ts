@@ -31,6 +31,7 @@ export type Geometry = {
   hasSolar: boolean;
   hasHeatPump: boolean;
   chimney: boolean;
+  isTopFloor?: boolean;
 };
 
 /** A P10–P50–P90 band. Savings are estimates, never guarantees. */

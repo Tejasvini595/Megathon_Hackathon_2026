@@ -7,6 +7,7 @@ export function geometryFromRecord(r: Partial<PropertyRecord>): Geometry {
   const isFlat = type === "flat" || type === "maisonette" || r.builtForm === "flat";
   const builtForm = (isFlat ? "flat" : (r.builtForm as BuiltForm) ?? "semi") as BuiltForm;
   const storeys = isFlat ? 1 : Number(r.storeys ?? (type === "bungalow" ? 1 : 2));
+  const isTopFloor = isFlat && r.roofType !== "dwelling_above";
   const area = Number(r.floorAreaM2 ?? 85);
   const footprint = area / Math.max(1, storeys);
   const depth = Math.max(6, Math.min(11, Math.sqrt(footprint) * 1.05));
@@ -22,5 +23,6 @@ export function geometryFromRecord(r: Partial<PropertyRecord>): Geometry {
     hasSolar: r.solarPv === "yes",
     hasHeatPump: r.heating === "heat_pump",
     chimney: !isFlat && ["pre1900", "1900_1929", "1930_1949", "1950_1966"].includes(String(r.ageBand)),
+    isTopFloor,
   };
 }
