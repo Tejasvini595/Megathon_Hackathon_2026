@@ -1,0 +1,96 @@
+{
+ "rules_tuned_set": {
+  "n": 56,
+  "exact_match": 1.0,
+  "by_kind": {
+   "plain": {
+    "n": 12,
+    "exact_match": 1.0
+   },
+   "generic": {
+    "n": 5,
+    "exact_match": 1.0
+   },
+   "everything": {
+    "n": 9,
+    "exact_match": 1.0
+   },
+   "negation": {
+    "n": 8,
+    "exact_match": 1.0
+   },
+   "colloquial": {
+    "n": 11,
+    "exact_match": 1.0
+   },
+   "unsupported": {
+    "n": 6,
+    "exact_match": 1.0
+   },
+   "unclear": {
+    "n": 5,
+    "exact_match": 1.0
+   }
+  },
+  "unsupported_recall": 1.0,
+  "failures": []
+ },
+ "rules_tuned_set_2": {
+  "n": 15,
+  "exact_match": 1.0,
+  "by_kind": {
+   "tuned-2": {
+    "n": 15,
+    "exact_match": 1.0
+   }
+  },
+  "unsupported_recall": 1.0,
+  "failures": []
+ },
+ "rules_held_out_2": {
+  "n": 15,
+  "exact_match": 0.8,
+  "by_kind": {
+   "held-out-2": {
+    "n": 15,
+    "exact_match": 0.8
+   }
+  },
+  "unsupported_recall": null,
+  "failures": [
+   {
+    "kind": "held-out-2",
+    "text": "skip everything except solar",
+    "got": [
+     "double_glazing",
+     "loft_insulation"
+    ],
+    "gold": [
+     "solar_pv"
+    ]
+   },
+   {
+    "kind": "held-out-2",
+    "text": "can we see what new windows and insulating the roof does",
+    "got": [
+     "double_glazing"
+    ],
+    "gold": [
+     "double_glazing",
+     "loft_insulation"
+    ]
+   },
+   {
+    "kind": "held-out-2",
+    "text": "add panels, and leave the heat pump out",
+    "got": [
+     "heat_pump",
+     "solar_pv"
+    ],
+    "gold": [
+     "solar_pv"
+    ]
+   }
+  ]
+ }
+}
