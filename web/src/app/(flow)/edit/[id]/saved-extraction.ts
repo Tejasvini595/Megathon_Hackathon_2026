@@ -1,4 +1,5 @@
-import { FIELDS, type ExtractedField, type ExtractionResult, type FieldKey } from "@/lib/extract/fields";
+import { normaliseRecord } from "@/lib/extract";
+import { FIELDS, type ExtractedField, type ExtractionResult, type FieldKey, type FieldValue, type PropertyRecord } from "@/lib/extract/fields";
 
 type Saved = { models: string[]; fields: unknown; conflicts: unknown } | null;
 
@@ -8,16 +9,18 @@ type Saved = { models: string[]; fields: unknown; conflicts: unknown } | null;
  * still agrees with the record, otherwise the field is marked a plain default the user can change.
  * A draft with no record shows the extraction as it was, guesses included.
  */
-export function savedExtraction(record: Record<string, unknown> | null, latest: Saved): ExtractionResult | null {
+export function savedExtraction(saved: Record<string, unknown> | null, latest: Saved): ExtractionResult | null {
   const extracted = (latest?.fields ?? null) as Partial<Record<FieldKey, ExtractedField>> | null;
-  if (!record && !extracted) return null;
+  if (!saved && !extracted) return null;
+  // Older homes predate some fields; fill them with the usual defaults.
+  const record = saved ? normaliseRecord(saved as Partial<PropertyRecord>) : null;
+  const defaults = normaliseRecord({});
   const fields = {} as Record<FieldKey, ExtractedField>;
   for (const { key } of FIELDS) {
     const old = extracted?.[key];
-    const value = record?.[key] as string | number | undefined;
+    const value: FieldValue | undefined = record?.[key];
     if (value === undefined) {
-      if (!old) return null;
-      fields[key] = old;
+      fields[key] = old ?? { value: defaults[key], confidence: 0.35, source: "default", evidence: "Typical for UK homes; please check" };
     } else if (old && String(old.value) === String(value)) {
       fields[key] = { ...old, confidence: 1 };
     } else {
