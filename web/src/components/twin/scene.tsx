@@ -6,6 +6,7 @@ import { CameraControls, ContactShadows, Environment, Lightformer, PerformanceMo
 import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import * as THREE from "three";
 import type { Element, Geometry } from "@/lib/twin/types";
+import { SunLayer, type SunView } from "./sun-layer";
 import { House, focusFor, frameRadius, type HouseDetail, type Highlight, type Parts, type ViewMode } from "./house";
 
 export type TwinSceneProps = {
@@ -23,6 +24,8 @@ export type TwinSceneProps = {
   parts?: Parts;
   scan?: boolean;
   detail?: HouseDetail;
+  /** Sun-path view: light from the sun's position, its path, a compass and a flat shadow. */
+  sun?: SunView;
   /** Extra scene content, e.g. hotspot markers. */
   children?: ReactNode;
 };
@@ -163,6 +166,7 @@ export default function TwinScene({
   parts,
   scan,
   detail,
+  sun,
   children,
   active,
   onContextLost,
@@ -198,9 +202,15 @@ export default function TwinScene({
       <color attach="background" args={[BG]} />
       <fog attach="fog" args={[BG, 40, 90]} />
 
-      <ambientLight intensity={thermal ? 0.08 : 0.35} />
-      <directionalLight position={[8, 14, 6]} intensity={thermal ? 0.25 : 2.2} />
-      <directionalLight position={[-10, 6, -8]} intensity={thermal ? 0.1 : 0.6} color="#9fc3ff" />
+      {sun ? (
+        <SunLayer sun={sun} geometry={geometry} />
+      ) : (
+        <>
+          <ambientLight intensity={thermal ? 0.08 : 0.35} />
+          <directionalLight position={[8, 14, 6]} intensity={thermal ? 0.25 : 2.2} />
+        </>
+      )}
+      <directionalLight position={[-10, 6, -8]} intensity={thermal ? 0.1 : sun ? 0.25 : 0.6} color="#9fc3ff" />
 
       <Environment resolution={128} frames={1}>
         <Lightformer form="rect" intensity={2} position={[0, 6, 8]} scale={[12, 4, 1]} />
