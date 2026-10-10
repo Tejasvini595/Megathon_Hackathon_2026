@@ -1,0 +1,12 @@
+# The dataset is built by data/build.py (see README) and is not committed
+dataset/*
+!dataset/.gitkeep
+!dataset/docs.md
+
+# Generated caches and local state
+reports/cache/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+.venv/

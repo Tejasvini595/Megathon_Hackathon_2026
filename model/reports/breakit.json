@@ -1,0 +1,19 @@
+{
+ "n_homes": 5,
+ "n_cases": 50,
+ "pass_rate": 1.0,
+ "by_kind": {
+  "missing_usage": 1.0,
+  "short_history": 1.0,
+  "rating_A_but_huge_use": 1.0,
+  "rating_F_but_tiny_use": 1.0,
+  "gas_use_no_gas_supply": 1.0,
+  "impossible_floor_area": 1.0,
+  "community_heating": 1.0,
+  "flat_asks_heat_pump": 1.0,
+  "no_value_estimate": 1.0,
+  "zero_baseline": 1.0
+ },
+ "failures": [],
+ "clean_homes_flag_rate": 0.006
+}

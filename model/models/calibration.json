@@ -1,0 +1,12 @@
+{
+ "sap_gain_scale": 0.7630056285337131,
+ "uncertainty_scale": {
+  "elec": 1.0,
+  "gas": 2.0,
+  "imp": 1.75,
+  "carbon": 1.75
+ },
+ "n_sap_homes": 3931,
+ "n_mc_homes": 1188,
+ "fitted_on": "train split only"
+}
