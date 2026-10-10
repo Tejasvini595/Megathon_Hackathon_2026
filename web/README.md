@@ -29,7 +29,8 @@ Set `ENGINE_URL` to the Python engine to replace the preview numbers (see "Engin
 | `/home` | Twin hero (drag to orbit, Home/Thermal toggle), score ring, where-heat-goes bars (tap one to fly the camera there), stats, performance gap, key issues, next step, score breakdown |
 | `/plan` | Ordered retrofit plan; the Today/After plan toggle animates the solar panels and heat pump into place and cools the thermal view; per-fuel savings (negative = increase), carbon, value range |
 | `/ask` | Voice-first "talk to your house" (Web Speech API dictation). The reply is a placeholder until the LLM layer is wired |
-| `/energy`, `/you` | Energy tiles; profile, homes, share status, memory placeholder, sign out |
+| `/edit/[id]` | Edit a saved home (or continue a draft) with the same step-by-step review |
+| `/energy`, `/you` | Energy tiles; profile, homes (edit, rename, delete), share status, memory placeholder, sign out |
 | `/t/[slug]` | Public "twin card" (share from `/home`): holographic house that tilts with the phone or pointer, live score from the engine, no address or postcode |
 
 ## Where things live
@@ -64,6 +65,12 @@ prisma/schema.prisma                 auth models + Home, HomeInput, Extraction, 
 - There is one material per house part, not one per mesh. The vignette is CSS.
 - Don't put `backdrop-filter` over the canvas: the browser would re-blur it every frame.
 - If WebGL is unavailable or the context is lost, a static fallback replaces the canvas.
+
+## Record notes
+
+- Flats and maisonettes record `flatLevel` (ground / mid / top) and `blockStoreys`; their own `storeys` can be more than 1. Fields that don't apply (e.g. loft insulation for a flat with a home above) are hidden by `when` in `fields.ts`.
+- `secondaryHeating` is multi-select (a home can have a stove and a gas fire); the main heating stays single because the engine models one primary system.
+- `normaliseRecord` fills fields missing from homes saved before a field existed.
 
 ## Engine contract
 
