@@ -54,15 +54,18 @@ function useHouseMaterials(mode: ViewMode, heat: (e: Element) => number, highlig
     return out;
   }, []);
   const tmp = useMemo(() => ({ color: new THREE.Color(), emissive: new THREE.Color(), base: new THREE.Color() }), []);
+  // Own time accumulator for the highlight pulse rather than R3F's clock (THREE.Clock is deprecated).
+  const time = useRef(0);
 
   /* eslint-disable react-hooks/immutability -- three.js materials are meant to be mutated per frame (R3F pattern) */
   useFrame((state, delta) => {
     const k = 1 - Math.exp(-delta * 6);
+    time.current += delta;
     let moving = false;
     for (const s of SLOTS) {
       const m = materials[s.slot];
       const lit = highlight === s.element;
-      const pulse = lit ? 0.5 + 0.5 * Math.sin(state.clock.elapsedTime * 4) : 0;
+      const pulse = lit ? 0.5 + 0.5 * Math.sin(time.current * 4) : 0;
       const h = heat(s.element) * (s.heatScale ?? 1);
       tmp.base.set(s.base);
       let intensity: number;
