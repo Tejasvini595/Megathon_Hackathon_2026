@@ -1,11 +1,11 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { ChevronRight, Plus } from "lucide-react";
+import { ChevronRight, LogOut, Plus } from "lucide-react";
 import { PageSkeleton } from "@/components/app/page-skeleton";
-import { SignOutButton } from "@/components/app/sign-out-button";
 import { requireUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
+import { signOutAction } from "./actions";
 
 export const metadata: Metadata = { title: "You" };
 
@@ -56,9 +56,11 @@ async function Loader() {
         Preferences and constraints you mention (renting, listed building, no heat pump, budget) will appear here and shape your plan.
       </div>
 
-      <div className="mt-8">
-        <SignOutButton />
-      </div>
+      <form action={signOutAction} className="mt-8">
+        <button type="submit" className="flex w-full items-center gap-3 rounded-2xl bg-surface px-4 py-3.5 text-left text-sm text-destructive ring-1 ring-hairline">
+          <LogOut className="size-4" /> Sign out
+        </button>
+      </form>
     </div>
   );
 }

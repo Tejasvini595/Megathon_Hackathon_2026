@@ -1,23 +1,20 @@
 "use client";
 
-import { Suspense, useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { CameraControls, ContactShadows, Environment, Lightformer } from "@react-three/drei";
-import { Bloom, EffectComposer, Vignette } from "@react-three/postprocessing";
+import { CameraControls, ContactShadows, Environment, Lightformer, PerformanceMonitor } from "@react-three/drei";
+import { Bloom, EffectComposer } from "@react-three/postprocessing";
 import * as THREE from "three";
 import type { Element, Geometry } from "@/lib/twin/types";
-import { House, STOREY_H, focusFor, type ViewMode } from "./house";
-
-export type Focus = Element | "system" | "roof_pv" | null;
+import { House, STOREY_H, focusFor, type Highlight, type ViewMode } from "./house";
 
 export type TwinSceneProps = {
   geometry: Geometry;
   heatLoss: Record<Element, number>;
   mode: ViewMode;
-  focus?: Focus;
+  focus?: Highlight;
   autoRotate?: boolean;
   interactive?: boolean;
-  className?: string;
   heatRef?: number;
 };
 
@@ -27,22 +24,24 @@ const BG = "#0b0d10";
 function GroundGlow({ thermal }: { thermal: boolean }) {
   const texture = useMemo(() => {
     const c = document.createElement("canvas");
-    c.width = c.height = 256;
+    c.width = c.height = 128;
     const ctx = c.getContext("2d")!;
-    const g = ctx.createRadialGradient(128, 128, 0, 128, 128, 128);
+    const g = ctx.createRadialGradient(64, 64, 0, 64, 64, 64);
     g.addColorStop(0, "rgba(255,255,255,0.55)");
     g.addColorStop(0.45, "rgba(255,255,255,0.12)");
     g.addColorStop(1, "rgba(255,255,255,0)");
     ctx.fillStyle = g;
-    ctx.fillRect(0, 0, 256, 256);
+    ctx.fillRect(0, 0, 128, 128);
     return new THREE.CanvasTexture(c);
   }, []);
   const mat = useRef<THREE.MeshBasicMaterial>(null);
   const target = useMemo(() => new THREE.Color(), []);
-  useFrame((_, dt) => {
-    if (!mat.current) return;
+  useFrame((state, dt) => {
+    const m = mat.current;
+    if (!m) return;
     target.set(thermal ? "#ff5a2a" : "#3dffb0");
-    mat.current.color.lerp(target, 1 - Math.exp(-dt * 4));
+    m.color.lerp(target, 1 - Math.exp(-dt * 4));
+    if (Math.abs(m.color.r - target.r) + Math.abs(m.color.g - target.g) > 0.004) state.invalidate();
   });
   return (
     <group>
@@ -50,10 +49,9 @@ function GroundGlow({ thermal }: { thermal: boolean }) {
         <planeGeometry args={[26, 26]} />
         <meshBasicMaterial ref={mat} map={texture} transparent opacity={0.22} depthWrite={false} toneMapped={false} />
       </mesh>
-      {/* thin orbit rings, Tesla-app style */}
       {[7.5, 10.5].map((r) => (
         <mesh key={r} rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
-          <ringGeometry args={[r, r + 0.025, 128]} />
+          <ringGeometry args={[r, r + 0.025, 96]} />
           <meshBasicMaterial color="#ffffff" transparent opacity={0.07} depthWrite={false} />
         </mesh>
       ))}
@@ -65,7 +63,6 @@ function Rig({ geometry, focus, autoRotate, interactive }: Pick<TwinSceneProps, 
   const controls = useRef<CameraControls>(null);
   const idleSince = useRef(0);
   const userActive = useRef(false);
-
   const size = useThree((st) => st.size);
   const fov = useThree((st) => (st.camera as THREE.PerspectiveCamera).fov);
 
@@ -77,13 +74,12 @@ function Rig({ geometry, focus, autoRotate, interactive }: Pick<TwinSceneProps, 
     const aspect = size.width / Math.max(1, size.height);
     const vHalf = THREE.MathUtils.degToRad(fov / 2);
     const hHalf = Math.atan(Math.tan(vHalf) * aspect);
-    const half = Math.min(vHalf, hHalf);
     const offset = new THREE.Vector3(x - tx, y - ty, z - tz);
     if (!focus) {
       const H = (geometry.builtForm === "flat" ? 3 : geometry.storeys) * STOREY_H + 2;
       const attached = geometry.builtForm === "detached" ? 0 : geometry.width * 0.6;
       const r = 0.5 * Math.hypot(geometry.width + attached, geometry.depth, H);
-      offset.setLength((r / Math.sin(half)) * 0.92);
+      offset.setLength((r / Math.sin(Math.min(vHalf, hHalf))) * 0.92);
     } else {
       offset.multiplyScalar(Math.max(1, Math.tan(vHalf) / Math.tan(hHalf)) * 0.85);
     }
@@ -128,55 +124,75 @@ function Rig({ geometry, focus, autoRotate, interactive }: Pick<TwinSceneProps, 
   );
 }
 
-export default function TwinScene({ geometry, heatLoss, mode, focus = null, autoRotate = true, interactive = true, className, heatRef }: TwinSceneProps) {
+/**
+ * Rendering budget: no shadow maps (one baked contact shadow instead), capped DPR that drops if
+ * the frame rate does, bloom only while the device keeps up, and an on-demand frame loop unless
+ * something animates continuously (auto-rotate, thermal embers). `active=false` stops rendering
+ * entirely when the canvas is off-screen or the tab is hidden.
+ */
+export default function TwinScene({
+  geometry,
+  heatLoss,
+  mode,
+  focus = null,
+  autoRotate = false,
+  interactive = true,
+  heatRef,
+  active,
+  onContextLost,
+}: TwinSceneProps & { active: boolean; onContextLost: () => void }) {
   const thermal = mode === "thermal";
   const [x, y, z] = focusFor(null, geometry);
+  const [dpr, setDpr] = useState(() => Math.min(window.devicePixelRatio, 1.75));
+  const [fancy, setFancy] = useState(true);
+  const frameloop = !active ? "never" : autoRotate || thermal ? "always" : "demand";
+  const shadowKey = `${geometry.builtForm}-${geometry.width}-${geometry.depth}-${geometry.storeys}`;
+
   return (
     <Canvas
-      className={className}
-      shadows
-      dpr={[1, 2]}
+      frameloop={frameloop}
+      dpr={dpr}
       camera={{ position: [x, y, z], fov: 32, near: 0.1, far: 200 }}
-      gl={{ antialias: true, powerPreference: "high-performance" }}
+      gl={{ antialias: true, powerPreference: "high-performance", stencil: false }}
       style={{ touchAction: interactive ? "none" : "auto" }}
+      onCreated={({ gl }) => {
+        gl.domElement.addEventListener("webglcontextlost", (e) => {
+          e.preventDefault();
+          onContextLost();
+        });
+      }}
     >
+      <PerformanceMonitor
+        onDecline={() => {
+          setDpr(1);
+          setFancy(false);
+        }}
+      />
       <color attach="background" args={[BG]} />
       <fog attach="fog" args={[BG, 40, 90]} />
 
       <ambientLight intensity={thermal ? 0.08 : 0.35} />
-      <directionalLight
-        position={[8, 14, 6]}
-        intensity={thermal ? 0.25 : 2.2}
-        castShadow
-        shadow-mapSize={[2048, 2048]}
-        shadow-normalBias={0.04}
-        shadow-camera-left={-12}
-        shadow-camera-right={12}
-        shadow-camera-top={12}
-        shadow-camera-bottom={-12}
-        shadow-bias={-0.0004}
-      />
+      <directionalLight position={[8, 14, 6]} intensity={thermal ? 0.25 : 2.2} />
       <directionalLight position={[-10, 6, -8]} intensity={thermal ? 0.1 : 0.6} color="#9fc3ff" />
 
-      <Suspense fallback={null}>
-        <Environment resolution={256} frames={1}>
-          <Lightformer form="rect" intensity={2} position={[0, 6, 8]} scale={[12, 4, 1]} />
-          <Lightformer form="rect" intensity={1} position={[-8, 3, 0]} rotation-y={Math.PI / 2} scale={[8, 3, 1]} color="#bcd4ff" />
-          <Lightformer form="ring" intensity={1.5} position={[6, 8, -6]} scale={3} color="#e8fff5" />
-        </Environment>
-      </Suspense>
+      <Environment resolution={128} frames={1}>
+        <Lightformer form="rect" intensity={2} position={[0, 6, 8]} scale={[12, 4, 1]} />
+        <Lightformer form="rect" intensity={1} position={[-8, 3, 0]} rotation-y={Math.PI / 2} scale={[8, 3, 1]} color="#bcd4ff" />
+        <Lightformer form="ring" intensity={1.5} position={[6, 8, -6]} scale={3} color="#e8fff5" />
+      </Environment>
 
       <House geometry={geometry} heatLoss={heatLoss} mode={mode} highlight={focus} heatRef={heatRef} />
 
       <GroundGlow thermal={thermal} />
-      <ContactShadows position={[0, 0.002, 0]} opacity={thermal ? 0.2 : 0.65} scale={24} blur={2.4} far={10} resolution={512} color="#000000" />
+      <ContactShadows key={shadowKey} frames={1} position={[0, 0.002, 0]} opacity={0.6} scale={24} blur={2.4} far={10} resolution={256} color="#000000" />
 
       <Rig geometry={geometry} focus={focus} autoRotate={autoRotate} interactive={interactive} />
 
-      <EffectComposer multisampling={4}>
-        <Bloom mipmapBlur intensity={thermal ? 0.7 : 0.4} luminanceThreshold={0.9} luminanceSmoothing={0.2} />
-        <Vignette eskil={false} offset={0.25} darkness={0.7} />
-      </EffectComposer>
+      {fancy && (
+        <EffectComposer multisampling={0}>
+          <Bloom mipmapBlur levels={5} intensity={thermal ? 0.7 : 0.4} luminanceThreshold={0.9} luminanceSmoothing={0.2} />
+        </EffectComposer>
+      )}
     </Canvas>
   );
 }

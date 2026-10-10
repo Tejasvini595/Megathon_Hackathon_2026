@@ -1,121 +1,124 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import { useFrame } from "@react-three/fiber";
+import { useFrame, useThree } from "@react-three/fiber";
 import { Edges, Sparkles } from "@react-three/drei";
 import * as THREE from "three";
 import type { Element, Geometry } from "@/lib/twin/types";
 
 export type ViewMode = "normal" | "thermal";
+export type Highlight = Element | "system" | "roof_pv" | null;
 
 export const STOREY_H = 2.7;
 export const PLINTH_H = 0.35;
 
-const CLAY = new THREE.Color("#e9e6df");
-const CLAY_ROOF = new THREE.Color("#3a3d44");
-const THERMAL_BASE = new THREE.Color("#0d1117");
 const FROST = new THREE.Color("#2f8cff");
 const AMBER = new THREE.Color("#ffb020");
 const EMBER = new THREE.Color("#ff3b1f");
-const WARM_WINDOW = new THREE.Color("#ffcf8a");
-const GLASS = new THREE.Color("#121a26");
-const DOOR = new THREE.Color("#2b3f3a");
+const THERMAL_BASE = new THREE.Color("#0d1117");
 const VOLT = new THREE.Color("#3dffb0");
+const WARM_WINDOW = new THREE.Color("#ffcf8a");
 
 /** Heat share (relative to the leakiest element) -> frost blue -> amber -> ember red. */
-export function thermalColor(t: number, out = new THREE.Color()) {
+function thermalColor(t: number, out: THREE.Color) {
   const x = THREE.MathUtils.clamp(t, 0, 1);
   return x < 0.5 ? out.copy(FROST).lerp(AMBER, x / 0.5) : out.copy(AMBER).lerp(EMBER, (x - 0.5) / 0.5);
 }
 
-type SurfaceProps = {
-  mode: ViewMode;
-  heat: number; // 0-1, relative heat loss
-  base: THREE.Color;
-  highlighted?: boolean;
-  glass?: boolean;
-};
+type Slot = "walls" | "roof" | "floor" | "windows" | "door" | "chimney";
 
-/** A material that eases between the clay look and the thermal look every frame. */
-function useSurfaceMaterial({ mode, heat, base, highlighted, glass }: SurfaceProps) {
-  const material = useMemo(
-    () =>
-      glass
-        ? new THREE.MeshPhysicalMaterial({ roughness: 0.08, metalness: 0.2, clearcoat: 1, color: "#1b2330" })
-        : new THREE.MeshStandardMaterial({ roughness: 0.85, metalness: 0.02, color: base }),
-    [glass, base],
-  );
-  // three.js materials are mutable by design; keep it in a ref so per-frame easing stays outside React.
-  const ref = useRef(material);
-  useEffect(() => {
-    ref.current = material;
-  }, [material]);
-  const targetColor = useMemo(() => new THREE.Color(), []);
-  const targetEmissive = useMemo(() => new THREE.Color(), []);
+const SLOTS: { slot: Slot; element: Element; base: string; glass?: boolean; heatScale?: number }[] = [
+  { slot: "walls", element: "walls", base: "#e9e6df" },
+  { slot: "roof", element: "roof", base: "#3a3d44" },
+  { slot: "floor", element: "floor", base: "#3a3d44" },
+  { slot: "windows", element: "windows", base: "#121a26", glass: true },
+  { slot: "door", element: "draughts", base: "#2b3f3a" },
+  { slot: "chimney", element: "roof", base: "#e9e6df", heatScale: 0.6 },
+];
 
+/**
+ * One material per house part (not per mesh), eased toward the clay or thermal look in a single
+ * frame callback. Requests a new frame only while something is still changing, so the canvas can
+ * run on demand.
+ */
+function useHouseMaterials(mode: ViewMode, heat: (e: Element) => number, highlight: Highlight) {
+  const materials = useMemo(() => {
+    const out = {} as Record<Slot, THREE.MeshStandardMaterial>;
+    for (const s of SLOTS)
+      out[s.slot] = new THREE.MeshStandardMaterial({
+        color: s.base,
+        roughness: s.glass ? 0.1 : 0.85,
+        metalness: s.glass ? 0.4 : 0.02,
+        envMapIntensity: s.glass ? 1.6 : 1,
+      });
+    return out;
+  }, []);
+  const tmp = useMemo(() => ({ color: new THREE.Color(), emissive: new THREE.Color(), base: new THREE.Color() }), []);
+
+  /* eslint-disable react-hooks/immutability -- three.js materials are meant to be mutated per frame (R3F pattern) */
   useFrame((state, delta) => {
     const k = 1 - Math.exp(-delta * 6);
-    const pulse = highlighted ? 0.5 + 0.5 * Math.sin(state.clock.elapsedTime * 4) : 0;
-    let intensity: number;
-    if (mode === "thermal") {
-      // Tint the diffuse too so lighting still reads the shape, like a real thermal camera.
-      thermalColor(heat, targetEmissive);
-      targetColor.copy(THERMAL_BASE).lerp(targetEmissive, 0.35);
-      intensity = 0.18 + heat * 0.75 + pulse * 0.6;
-    } else {
-      targetColor.copy(glass ? GLASS : base);
-      if (glass) {
-        targetEmissive.copy(WARM_WINDOW);
-        intensity = 0.07 + pulse * 0.6;
+    let moving = false;
+    for (const s of SLOTS) {
+      const m = materials[s.slot];
+      const lit = highlight === s.element;
+      const pulse = lit ? 0.5 + 0.5 * Math.sin(state.clock.elapsedTime * 4) : 0;
+      const h = heat(s.element) * (s.heatScale ?? 1);
+      tmp.base.set(s.base);
+      let intensity: number;
+      if (mode === "thermal") {
+        // Tint the diffuse too so lighting still reads the shape, like a real thermal camera.
+        thermalColor(h, tmp.emissive);
+        tmp.color.copy(THERMAL_BASE).lerp(tmp.emissive, 0.35);
+        intensity = 0.18 + h * 0.75 + pulse * 0.6;
       } else {
-        targetEmissive.copy(VOLT);
-        intensity = pulse * 0.45;
+        tmp.color.copy(tmp.base);
+        tmp.emissive.copy(s.glass ? WARM_WINDOW : VOLT);
+        intensity = (s.glass ? 0.07 : 0) + pulse * 0.5;
       }
+      const before = m.emissiveIntensity;
+      m.color.lerp(tmp.color, k);
+      m.emissive.lerp(tmp.emissive, k);
+      m.emissiveIntensity += (intensity - m.emissiveIntensity) * k;
+      if (lit || Math.abs(before - intensity) > 0.002 || !m.color.equals(tmp.color)) moving = true;
+      if (Math.abs(m.color.r - tmp.color.r) + Math.abs(m.color.g - tmp.color.g) + Math.abs(m.color.b - tmp.color.b) < 0.002) m.color.copy(tmp.color);
     }
-    const m = ref.current;
-    m.color.lerp(targetColor, k);
-    m.emissive.lerp(targetEmissive, k);
-    m.emissiveIntensity += (intensity - m.emissiveIntensity) * k;
+    if (moving) state.invalidate();
   });
-  return material;
-}
-
-function Surface({
-  children,
-  ...props
-}: SurfaceProps & { children: React.ReactNode } & Omit<React.ComponentProps<"mesh">, "material">) {
-  const { mode, heat, base, highlighted, glass, ...meshProps } = props;
-  const material = useSurfaceMaterial({ mode, heat, base, highlighted, glass });
-  return (
-    <mesh material={material} castShadow receiveShadow {...meshProps}>
-      {children}
-    </mesh>
-  );
+  /* eslint-enable react-hooks/immutability */
+  return materials;
 }
 
 /** Eases a group's scale between 0 and 1 so retrofits "grow" into place. */
 function Appear({ show, children, ...props }: { show: boolean; children: React.ReactNode } & React.ComponentProps<"group">) {
   const ref = useRef<THREE.Group>(null);
-  useFrame((_, delta) => {
+  useFrame((state, delta) => {
     const g = ref.current;
     if (!g) return;
-    const target = show ? 1 : 0.0001;
+    const target = show ? 1 : 0;
     const s = g.scale.x + (target - g.scale.x) * (1 - Math.exp(-delta * 7));
-    g.scale.setScalar(s);
+    const done = Math.abs(target - s) < 0.002;
+    g.scale.setScalar(done ? Math.max(target, 0.0001) : Math.max(s, 0.0001));
     g.visible = s > 0.01;
+    if (!done) state.invalidate();
   });
   return (
-    <group ref={ref} scale={show ? 1 : 0.0001} {...props}>
+    <group ref={ref} scale={show ? 1 : 0.0001} visible={show} {...props}>
       {children}
     </group>
   );
 }
 
+const ghostMaterial = new THREE.MeshBasicMaterial({ color: "#9aa4b2", transparent: true, opacity: 0.035, depthWrite: false });
+const frameMaterial = new THREE.MeshStandardMaterial({ color: "#f6f4ef", roughness: 0.6 });
+const panelMaterial = new THREE.MeshStandardMaterial({ color: "#0f1d3a", metalness: 0.7, roughness: 0.2 });
+const pumpMaterial = new THREE.MeshStandardMaterial({ color: "#d9dde3", roughness: 0.4, metalness: 0.3 });
+const fanMaterial = new THREE.MeshStandardMaterial({ color: "#20252c", roughness: 0.9 });
+
 function Ghost({ size, position }: { size: [number, number, number]; position: [number, number, number] }) {
   return (
-    <mesh position={position}>
+    <mesh position={position} material={ghostMaterial}>
       <boxGeometry args={size} />
-      <meshBasicMaterial color="#9aa4b2" transparent opacity={0.035} depthWrite={false} />
       <Edges color="#5b6573" />
     </mesh>
   );
@@ -125,12 +128,12 @@ type HouseProps = {
   geometry: Geometry;
   heatLoss: Record<Element, number>;
   mode: ViewMode;
-  highlight?: Element | "system" | "roof_pv" | null;
+  highlight?: Highlight;
   /** Normalise heat against this share instead of the current maximum (to compare before/after). */
   heatRef?: number;
 };
 
-export function House({ geometry: g, heatLoss, mode, highlight, heatRef }: HouseProps) {
+export function House({ geometry: g, heatLoss, mode, highlight = null, heatRef }: HouseProps) {
   const isFlat = g.builtForm === "flat";
   const storeys = isFlat ? 1 : Math.max(1, Math.min(4, g.storeys));
   const W = g.width;
@@ -143,7 +146,10 @@ export function House({ geometry: g, heatLoss, mode, highlight, heatRef }: House
 
   const maxShare = heatRef ?? Math.max(...Object.values(heatLoss), 0.0001);
   const heat = (e: Element) => heatLoss[e] / maxShare;
-  const hl = (e: Element | "system" | "roof_pv") => highlight === e;
+  const mat = useHouseMaterials(mode, heat, highlight);
+  // On-demand canvas: kick a frame whenever inputs change; the easing then keeps itself going.
+  const invalidate = useThree((st) => st.invalidate);
+  useEffect(() => invalidate(), [invalidate, mode, highlight, heatLoss, heatRef, g]);
 
   const gableGeom = useMemo(() => {
     const shape = new THREE.Shape();
@@ -168,13 +174,13 @@ export function House({ geometry: g, heatLoss, mode, highlight, heatRef }: House
   const windows = useMemo(() => {
     const out: { pos: [number, number, number]; rotY: number; w: number; h: number }[] = [];
     const n = Math.max(1, g.windowsPerFloor);
+    const ww = Math.min(1.25, (W / n) * 0.6);
     for (let f = 0; f < storeys; f++) {
       const y = baseY + f * STOREY_H + STOREY_H * 0.55;
       for (let i = 0; i < n; i++) {
         const x = -W / 2 + ((i + 0.5) * W) / n;
-        const isDoorSlot = f === 0 && !isFlat && i === n - 1;
-        if (!isDoorSlot) out.push({ pos: [x, y, D / 2 + 0.02], rotY: 0, w: Math.min(1.25, (W / n) * 0.6), h: 1.3 });
-        out.push({ pos: [x, y, -D / 2 - 0.02], rotY: Math.PI, w: Math.min(1.25, (W / n) * 0.6), h: 1.3 });
+        if (!(f === 0 && !isFlat && i === n - 1)) out.push({ pos: [x, y, D / 2 + 0.02], rotY: 0, w: ww, h: 1.3 });
+        out.push({ pos: [x, y, -D / 2 - 0.02], rotY: Math.PI, w: ww, h: 1.3 });
       }
       if (g.builtForm === "detached") {
         out.push({ pos: [W / 2 + 0.02, y, 0], rotY: Math.PI / 2, w: 1.0, h: 1.2 });
@@ -184,90 +190,74 @@ export function House({ geometry: g, heatLoss, mode, highlight, heatRef }: House
     return out;
   }, [g.windowsPerFloor, g.builtForm, storeys, baseY, W, D, isFlat]);
 
-  const doorX = -W / 2 + ((Math.max(1, g.windowsPerFloor) - 0.5) * W) / Math.max(1, g.windowsPerFloor);
+  const n = Math.max(1, g.windowsPerFloor);
+  const doorX = -W / 2 + ((n - 0.5) * W) / n;
 
   // Neighbours: attached homes and the rest of a block of flats are drawn as ghosts.
-  const neighbourH = (isFlat ? 3 * STOREY_H : bodyH) + PLINTH_H;
+  const ghostH = (isFlat ? 3 * STOREY_H : bodyH) + PLINTH_H + roofRise * 0.6;
   const ghosts: { size: [number, number, number]; position: [number, number, number] }[] = [];
   if (g.builtForm === "semi" || g.builtForm === "end_terrace" || g.builtForm === "mid_terrace")
-    ghosts.push({ size: [W, neighbourH + roofRise * 0.6, D], position: [-W - 0.01, (neighbourH + roofRise * 0.6) / 2, 0] });
-  if (g.builtForm === "mid_terrace")
-    ghosts.push({ size: [W, neighbourH + roofRise * 0.6, D], position: [W + 0.01, (neighbourH + roofRise * 0.6) / 2, 0] });
-  if (g.builtForm === "end_terrace")
-    ghosts.push({ size: [W, neighbourH + roofRise * 0.6, D], position: [-2 * W - 0.02, (neighbourH + roofRise * 0.6) / 2, 0] });
+    ghosts.push({ size: [W, ghostH, D], position: [-W - 0.01, ghostH / 2, 0] });
+  if (g.builtForm === "mid_terrace") ghosts.push({ size: [W, ghostH, D], position: [W + 0.01, ghostH / 2, 0] });
+  if (g.builtForm === "end_terrace") ghosts.push({ size: [W, ghostH, D], position: [-2 * W - 0.02, ghostH / 2, 0] });
   if (isFlat) {
     ghosts.push({ size: [W + 0.02, STOREY_H + PLINTH_H, D + 0.02], position: [0, (STOREY_H + PLINTH_H) / 2, 0] });
     ghosts.push({ size: [W + 0.02, STOREY_H, D + 0.02], position: [0, topY + STOREY_H / 2, 0] });
   }
 
   const heatPumpPos: [number, number, number] =
-    g.builtForm === "mid_terrace" || g.builtForm === "flat" ? [0, 0.45, -D / 2 - 0.7] : [W / 2 + 0.9, 0.45, D * 0.15];
+    g.builtForm === "mid_terrace" || isFlat ? [0, 0.45, -D / 2 - 0.7] : [W / 2 + 0.9, 0.45, D * 0.15];
 
   const slope = Math.atan2(roofRise, D / 2 + over);
-  const panelRows = 2;
   const panelCols = Math.max(2, Math.floor((W - 0.8) / 1.05));
+  const pitched = !isFlat && g.roof !== "flat";
 
   return (
     <group>
-      {/* floor slab / plinth */}
-      <Surface mode={mode} heat={heat("floor")} base={CLAY_ROOF} highlighted={hl("floor")} position={[0, baseY - PLINTH_H / 2, 0]}>
+      <mesh material={mat.floor} position={[0, baseY - PLINTH_H / 2, 0]}>
         <boxGeometry args={[W + 0.12, PLINTH_H, D + 0.12]} />
-      </Surface>
+      </mesh>
 
-      {/* walls */}
-      <Surface mode={mode} heat={heat("walls")} base={CLAY} highlighted={hl("walls")} position={[0, baseY + bodyH / 2, 0]}>
+      <mesh material={mat.walls} position={[0, baseY + bodyH / 2, 0]}>
         <boxGeometry args={[W, bodyH, D]} />
         <Edges threshold={30} color={mode === "thermal" ? "#ffffff" : "#8a8f98"} transparent opacity={0.18} />
-      </Surface>
+      </mesh>
 
-      {/* roof */}
-      {!isFlat && g.roof === "gable" && (
-        <Surface mode={mode} heat={heat("roof")} base={CLAY_ROOF} highlighted={hl("roof")} geometry={gableGeom} position={[0, topY, 0]} rotation={[0, -Math.PI / 2, 0]}>
-          {null}
-        </Surface>
-      )}
-      {!isFlat && g.roof === "hip" && (
-        <Surface mode={mode} heat={heat("roof")} base={CLAY_ROOF} highlighted={hl("roof")} geometry={hipGeom} position={[0, topY, 0]}>
-          {null}
-        </Surface>
-      )}
-      {(isFlat || g.roof === "flat") && (
-        <Surface mode={mode} heat={heat("roof")} base={CLAY_ROOF} highlighted={hl("roof")} position={[0, topY + 0.12, 0]}>
+      {pitched && g.roof === "gable" && <mesh material={mat.roof} geometry={gableGeom} position={[0, topY, 0]} rotation={[0, -Math.PI / 2, 0]} />}
+      {pitched && g.roof === "hip" && <mesh material={mat.roof} geometry={hipGeom} position={[0, topY, 0]} />}
+      {!pitched && (
+        <mesh material={mat.roof} position={[0, topY + 0.12, 0]}>
           <boxGeometry args={[W + 0.2, 0.24, D + 0.2]} />
-        </Surface>
+        </mesh>
       )}
 
-      {/* chimney */}
-      {g.chimney && !isFlat && g.roof !== "flat" && (
-        <Surface mode={mode} heat={heat("roof") * 0.6} base={CLAY} position={[-W * 0.28, topY + roofRise * 0.75, -D * 0.12]}>
+      {g.chimney && pitched && (
+        <mesh material={mat.chimney} position={[-W * 0.28, topY + roofRise * 0.75, -D * 0.12]}>
           <boxGeometry args={[0.6, roofRise * 0.9 + 0.6, 0.6]} />
-        </Surface>
+        </mesh>
       )}
 
-      {/* windows */}
       {windows.map((w, i) => (
         <group key={i} position={w.pos} rotation={[0, w.rotY, 0]}>
-          <mesh position={[0, 0, -0.005]}>
+          <mesh material={frameMaterial} position={[0, 0, -0.005]} visible={mode === "normal"}>
             <planeGeometry args={[w.w + 0.16, w.h + 0.16]} />
-            <meshStandardMaterial color={mode === "thermal" ? "#0a0d12" : "#f6f4ef"} roughness={0.6} />
           </mesh>
-          <Surface mode={mode} heat={heat("windows")} base={CLAY} glass highlighted={hl("windows")} position={[0, 0, 0.005]}>
+          <mesh material={mat.windows} position={[0, 0, 0.005]}>
             <planeGeometry args={[w.w, w.h]} />
-          </Surface>
+          </mesh>
         </group>
       ))}
 
-      {/* front door: draughts leak around it */}
       {!isFlat && (
-        <Surface mode={mode} heat={heat("draughts")} base={DOOR} highlighted={hl("draughts")} position={[doorX, baseY + 1.05, D / 2 + 0.03]}>
+        <mesh material={mat.door} position={[doorX, baseY + 1.05, D / 2 + 0.03]}>
           <boxGeometry args={[0.95, 2.1, 0.06]} />
-        </Surface>
+        </mesh>
       )}
 
       {/* draughts as rising embers in thermal view */}
       {mode === "thermal" && (
         <Sparkles
-          count={Math.round(10 + heat("draughts") * 50)}
+          count={Math.round(10 + heat("draughts") * 40)}
           scale={[W + 1.2, bodyH + roofRise, D + 1.2]}
           position={[0, baseY + (bodyH + roofRise) / 2, 0]}
           size={3.5}
@@ -277,36 +267,26 @@ export function House({ geometry: g, heatLoss, mode, highlight, heatRef }: House
         />
       )}
 
-      {/* solar panels on the front slope */}
-      <Appear show={g.hasSolar && !isFlat && g.roof !== "flat"}>
-        <group
-          position={[0, topY + roofRise / 2 + 0.06, (D / 2 + over) / 2]}
-          rotation={[slope, 0, 0]}
-        >
-          {Array.from({ length: panelRows * panelCols }, (_, i) => {
+      <Appear show={g.hasSolar && pitched}>
+        <group position={[0, topY + roofRise / 2 + 0.06, (D / 2 + over) / 2]} rotation={[slope, 0, 0]}>
+          {Array.from({ length: 2 * panelCols }, (_, i) => {
             const r = Math.floor(i / panelCols);
             const c = i % panelCols;
-            const x = (c - (panelCols - 1) / 2) * 1.05;
-            const z = (r - (panelRows - 1) / 2) * 1.7;
             return (
-              <mesh key={i} position={[x, 0, z]} castShadow>
+              <mesh key={i} material={panelMaterial} position={[(c - (panelCols - 1) / 2) * 1.05, 0, (r - 0.5) * 1.7]}>
                 <boxGeometry args={[1.0, 0.05, 1.65]} />
-                <meshPhysicalMaterial color="#0f1d3a" metalness={0.6} roughness={0.15} clearcoat={1} emissive={hl("roof_pv") ? "#3dffb0" : "#000"} emissiveIntensity={0.4} />
               </mesh>
             );
           })}
         </group>
       </Appear>
 
-      {/* heat pump unit */}
       <Appear show={g.hasHeatPump} position={heatPumpPos}>
-        <mesh castShadow>
+        <mesh material={pumpMaterial}>
           <boxGeometry args={[1.0, 0.8, 0.42]} />
-          <meshStandardMaterial color="#d9dde3" roughness={0.4} metalness={0.3} emissive={hl("system") ? "#3dffb0" : "#000"} emissiveIntensity={0.5} />
         </mesh>
-        <mesh position={[0.18, 0, 0.215]} rotation={[0, 0, 0]}>
-          <circleGeometry args={[0.28, 32]} />
-          <meshStandardMaterial color="#20252c" roughness={0.9} />
+        <mesh material={fanMaterial} position={[0.18, 0, 0.215]}>
+          <circleGeometry args={[0.28, 24]} />
         </mesh>
       </Appear>
 
@@ -318,7 +298,7 @@ export function House({ geometry: g, heatLoss, mode, highlight, heatRef }: House
 }
 
 /** Where the camera goes when an element is in focus. [camera xyz, target xyz] */
-export function focusFor(el: Element | "system" | "roof_pv" | null | undefined, g: Geometry): [number, number, number, number, number, number] {
+export function focusFor(el: Highlight | undefined, g: Geometry): [number, number, number, number, number, number] {
   const H = (g.builtForm === "flat" ? 2 : g.storeys) * STOREY_H;
   switch (el) {
     case "roof":

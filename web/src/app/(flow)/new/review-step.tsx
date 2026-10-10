@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useTransition } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { toast } from "sonner";
 import { Camera, Check, FileText, Loader2, MapPin, Mic, Minus, PenLine, Plus, Sparkles, TriangleAlert, Type, type LucideIcon } from "lucide-react";
@@ -9,6 +9,7 @@ import { geometryFromRecord } from "@/lib/twin/from-record";
 import { MOCK_TWIN } from "@/lib/twin/mock";
 import { FIELDS, GROUPS, optionLabel, type ExtractedField, type ExtractionResult, type FieldKey, type FieldSource, type PropertyRecord } from "@/lib/extract/fields";
 import { cn } from "@/lib/utils";
+import { confirmHome } from "./actions";
 
 type Source = FieldSource | "you";
 type FieldState = Omit<ExtractedField, "source"> & { source: Source };
@@ -30,11 +31,11 @@ function tier(conf: number, source: Source) {
   return { label: "Guess", className: "bg-surface-2 text-muted-foreground" };
 }
 
-export function ReviewStep({ homeId, extraction, onDone }: { homeId: string; extraction: ExtractionResult; onDone: () => void }) {
+export function ReviewStep({ homeId, extraction }: { homeId: string; extraction: ExtractionResult }) {
   const [fields, setFields] = useState<Record<FieldKey, FieldState>>(extraction.fields);
   const [open, setOpen] = useState<FieldKey | null>(null);
   const [nickname, setNickname] = useState("My home");
-  const [saving, setSaving] = useState(false);
+  const [saving, startSaving] = useTransition();
 
   const record = useMemo(
     () => Object.fromEntries(Object.entries(fields).map(([k, f]) => [k, f.value])) as PropertyRecord,
@@ -48,27 +49,18 @@ export function ReviewStep({ homeId, extraction, onDone }: { homeId: string; ext
     setFields((f) => ({ ...f, [key]: { value, confidence: 1, source: "you", evidence: "You set this" } }));
   }
 
-  async function confirm() {
-    setSaving(true);
-    try {
-      const res = await fetch(`/api/homes/${homeId}`, {
-        method: "PATCH",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ nickname, record }),
-      });
-      if (!res.ok) throw new Error((await res.json()).error ?? "Couldn't save");
-      toast.success("Your twin is ready");
-      onDone();
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Couldn't save");
-      setSaving(false);
-    }
+  function confirm() {
+    startSaving(async () => {
+      // Redirects to /home on success; only returns when something went wrong.
+      const res = await confirmHome(homeId, { nickname, record });
+      toast.error(res.error);
+    });
   }
 
   return (
     <div className="flex flex-1 flex-col">
       <div className="sticky top-0 z-10 h-56 bg-background">
-        <TwinCanvas geometry={geometry} heatLoss={MOCK_TWIN.heatLoss} mode="normal" className="!absolute inset-0" />
+        <TwinCanvas geometry={geometry} heatLoss={MOCK_TWIN.heatLoss} mode="normal" className="absolute inset-0" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-[linear-gradient(transparent,var(--background))]" />
       </div>
 

@@ -25,7 +25,7 @@ export function BottomNav() {
           if ("orb" in item) {
             return (
               <Link key={item.href} href={item.href} aria-label="Ask your home" className="relative -mt-7 grid place-items-center">
-                <span className="absolute size-16 rounded-full bg-volt/25 blur-xl animate-breathe" />
+                <span className="absolute size-20 animate-breathe rounded-full bg-[radial-gradient(circle,color-mix(in_oklch,var(--volt)_40%,transparent),transparent_70%)]" />
                 <span className="relative grid size-14 place-items-center rounded-full bg-[radial-gradient(circle_at_30%_25%,#d8fff0,var(--volt)_45%,#0e6b4f)] text-black shadow-[0_8px_30px_-6px_var(--volt)] ring-4 ring-background transition-transform active:scale-95">
                   <Icon className="size-6" strokeWidth={2.2} />
                 </span>

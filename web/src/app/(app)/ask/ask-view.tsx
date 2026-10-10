@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { ArrowUp, Cpu, Mic, Square } from "lucide-react";
 import { useDictation } from "@/hooks/use-dictation";
 import { cn } from "@/lib/utils";
+import { askHome } from "./actions";
 
 type Msg = { role: "user" | "assistant"; text: string; trace?: string[] };
 
@@ -13,12 +14,12 @@ const SUGGESTIONS = ["Why is my score 38?", "What if I add solar?", "Skip the he
 /**
  * Voice-first "talk to your house". Flow once wired: decision model parses the request into a typed
  * scenario -> feasibility rules -> engine reruns -> LLM explains the computed diff -> grounding check.
- * The reply below is a placeholder that shows the shape of that pipeline.
+ * Replies come from the askHome server function.
  */
-export function AskView({ nickname }: { nickname: string }) {
+export function AskView() {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
-  const [thinking, setThinking] = useState(false);
+  const [thinking, startThinking] = useTransition();
   const bottom = useRef<HTMLDivElement>(null);
   const dictation = useDictation((t) => t && send(t));
 
@@ -29,28 +30,20 @@ export function AskView({ nickname }: { nickname: string }) {
     if (!q) return;
     setInput("");
     setMessages((m) => [...m, { role: "user", text: q }]);
-    setThinking(true);
-    setTimeout(() => {
-      setMessages((m) => [
-        ...m,
-        {
-          role: "assistant",
-          text: "I'll answer this once the engine is connected. I only explain numbers the engine has calculated for your home, never my own estimates.",
-          trace: ["parse → scenario", "feasibility rules", "engine rerun", "explain", "grounding check"],
-        },
-      ]);
-      setThinking(false);
-    }, 900);
+    startThinking(async () => {
+      try {
+        const reply = await askHome(q);
+        setMessages((m) => [...m, { role: "assistant", ...reply }]);
+      } catch {
+        setMessages((m) => [...m, { role: "assistant", text: "Sorry, I couldn't reach the engine. Try again in a moment." }]);
+      }
+    });
   }
 
   const empty = messages.length === 0;
 
   return (
-    <div className="flex min-h-dvh flex-col px-5 pt-safe pb-44">
-      <header className="pt-3">
-        <p className="text-xs text-muted-foreground">Talking to</p>
-        <h1 className="text-xl font-semibold tracking-tight">{nickname}</h1>
-      </header>
+    <div className="flex flex-1 flex-col">
 
       <AnimatePresence>
         {empty && (
@@ -134,17 +127,18 @@ export function AskView({ nickname }: { nickname: string }) {
 function Orb({ active }: { active: boolean }) {
   return (
     <div className="relative grid size-56 place-items-center">
+      {/* Gradient halo instead of a blur filter: animating a filtered layer is expensive on phones. */}
       <motion.div
-        className="absolute inset-0 rounded-full bg-[conic-gradient(from_0deg,var(--volt),var(--frost),#7c5cff,var(--volt))] opacity-60 blur-2xl"
-        animate={{ rotate: 360, scale: active ? [1, 1.15, 1] : 1 }}
-        transition={{ rotate: { duration: 12, repeat: Infinity, ease: "linear" }, scale: { duration: 1.2, repeat: Infinity } }}
+        className="absolute -inset-10 rounded-full bg-[radial-gradient(circle,color-mix(in_oklch,var(--volt)_35%,transparent)_30%,color-mix(in_oklch,var(--frost)_18%,transparent)_50%,transparent_70%)]"
+        animate={{ scale: active ? [1, 1.12, 1] : 1 }}
+        transition={{ duration: 1.2, repeat: Infinity }}
       />
       <motion.div
         className="absolute inset-6 rounded-full bg-[conic-gradient(from_180deg,var(--frost),var(--volt),#c8fff0,var(--frost))]"
         animate={{ rotate: -360 }}
         transition={{ duration: 18, repeat: Infinity, ease: "linear" }}
       />
-      <div className="absolute inset-[30px] rounded-full bg-[radial-gradient(circle_at_35%_30%,rgba(255,255,255,0.55),transparent_45%),radial-gradient(circle,rgba(11,13,16,0.15),rgba(11,13,16,0.6))] backdrop-blur-xl" />
+      <div className="absolute inset-[30px] rounded-full bg-[radial-gradient(circle_at_35%_30%,rgba(255,255,255,0.55),transparent_45%),radial-gradient(circle,rgba(11,13,16,0.15),rgba(11,13,16,0.6))]" />
       <Mic className={cn("relative size-8 text-white/90 transition-transform", active && "scale-110")} />
     </div>
   );

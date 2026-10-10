@@ -53,6 +53,7 @@
   --animate-breathe: breathe 4s ease-in-out infinite;
   --animate-scan: scan 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
   --animate-shimmer: shimmer 2.2s linear infinite;
+  --animate-grow: grow 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
 
   @keyframes breathe {
     0%,
@@ -71,6 +72,12 @@
     }
     100% {
       transform: translateY(100%);
+    }
+  }
+  /* Bars grow with a compositor-only transform; set the width inline. */
+  @keyframes grow {
+    from {
+      transform: scaleX(0);
     }
   }
   @keyframes shimmer {
@@ -170,8 +177,8 @@
   /* Frosted panel used for every floating surface. */
   .glass {
     background: color-mix(in oklch, var(--card) 62%, transparent);
-    backdrop-filter: blur(24px) saturate(140%);
-    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
     border: 1px solid var(--hairline);
   }
   .hairline {
