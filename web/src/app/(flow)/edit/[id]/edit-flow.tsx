@@ -4,14 +4,14 @@ import Link from "next/link";
 import { useState } from "react";
 import { X } from "lucide-react";
 import { TwinCanvas } from "@/components/twin/twin-canvas";
-import { geometryFromRecord } from "@/lib/twin/from-record";
+import { geometryFromRecord, type FootprintSize } from "@/lib/twin/from-record";
 import { MOCK_TWIN } from "@/lib/twin/mock";
 import type { ExtractionResult } from "@/lib/extract/fields";
 import type { StageView } from "../../new/capture-flow";
 import { ReviewStep } from "../../new/review-step";
 import { partsUpTo } from "../../new/steps";
 
-export function EditFlow({ homeId, nickname, extraction, backHref }: { homeId: string; nickname: string; extraction: ExtractionResult; backHref: string }) {
+export function EditFlow({ homeId, nickname, extraction, backHref, footprint }: { homeId: string; nickname: string; extraction: ExtractionResult; backHref: string; footprint?: FootprintSize }) {
   const [{ markers, ...view }, setView] = useState<StageView>({ geometry: geometryFromRecord({}), parts: partsUpTo(0), interactive: false });
 
   return (
@@ -28,7 +28,7 @@ export function EditFlow({ homeId, nickname, extraction, backHref }: { homeId: s
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-[linear-gradient(transparent,var(--background))]" />
       </div>
       <div className="flex min-h-0 flex-1 flex-col">
-        <ReviewStep homeId={homeId} extraction={extraction} initialNickname={nickname} onView={setView} />
+        <ReviewStep homeId={homeId} extraction={extraction} initialNickname={nickname} footprint={footprint} onView={setView} />
       </div>
     </div>
   );

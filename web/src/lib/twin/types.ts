@@ -35,6 +35,8 @@ export type Geometry = {
   /** Flats: floors in the whole building, and the floor (0 = ground) the home starts on. */
   blockStoreys?: number;
   floorIndex?: number;
+  /** Compass bearing of the model's +x axis, when the real outline is known (for the sun view). */
+  xBearingDeg?: number;
 };
 
 /** A P10–P50–P90 band. Savings are estimates, never guarantees. */

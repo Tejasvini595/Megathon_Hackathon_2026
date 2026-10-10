@@ -16,8 +16,8 @@ export const getSharedTwin = cache(async (slug: string) => {
   if (!parsed.success) return null;
   const home = await prisma.home.findUnique({
     where: { shareSlug: parsed.data },
-    select: { id: true, nickname: true, record: true, status: true },
+    select: { id: true, nickname: true, record: true, status: true, footprint: true },
   });
   if (!home || home.status !== "CONFIRMED") return null;
-  return { record: home.record, twin: await getTwin({ id: home.id, nickname: home.nickname, postcode: null, record: home.record }) };
+  return { record: home.record, twin: await getTwin({ id: home.id, nickname: home.nickname, postcode: null, record: home.record, footprint: home.footprint }) };
 });

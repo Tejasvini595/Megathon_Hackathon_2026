@@ -8,6 +8,7 @@ const WALL_MAX_ANGLE_RAD = (5 * Math.PI) / 180;
 export type Measure = { widthM: number; depthM: number; bearingDeg: number; areaM2: number };
 export type Suggestion<T> = { value: T; confidence: number; evidence: string };
 export type Inference = {
+  propertyType?: Suggestion<"house" | "bungalow" | "flat">;
   builtForm?: Suggestion<"detached" | "semi" | "end_terrace" | "mid_terrace" | "flat">;
   storeys?: Suggestion<number>;
   floorAreaM2?: Suggestion<number>;
@@ -127,6 +128,16 @@ export function sharedWalls(target: Xz[], neighbours: Xz[][]): number {
 }
 
 const FLAT_TYPES = new Set(["apartments", "flats"]);
+// OSM `building=` values that say what kind of home it is ("yes" and "residential" don't).
+const HOME_TYPES: Record<string, { value: "house" | "bungalow" | "flat"; confidence: number }> = {
+  house: { value: "house", confidence: 0.7 },
+  detached: { value: "house", confidence: 0.75 },
+  semidetached_house: { value: "house", confidence: 0.75 },
+  terrace: { value: "house", confidence: 0.75 },
+  bungalow: { value: "bungalow", confidence: 0.85 },
+  apartments: { value: "flat", confidence: 0.75 },
+  flats: { value: "flat", confidence: 0.75 },
+};
 const ROOF_SHAPES = { gabled: "gable", hipped: "hip", flat: "flat" } as const;
 
 function plural(n: number, noun: string) {
@@ -135,6 +146,8 @@ function plural(n: number, noun: string) {
 
 export function inferFromFootprint(target: Xz[], neighbours: Xz[][], tags: BuildingTags): Inference {
   const out: Inference = {};
+  const kind = tags.building ? HOME_TYPES[tags.building] : undefined;
+  if (kind) out.propertyType = { ...kind, evidence: `Tagged "${tags.building}" on the map` };
   const touching = neighbours.filter((n) => n !== target && sharesWall(target, n));
 
   if (tags.building && FLAT_TYPES.has(tags.building)) {
