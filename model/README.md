@@ -40,3 +40,6 @@ The **dataset is not committed** (`dataset/` is gitignored; `dataset/docs.md` do
 3. For the optional heating-temperature signal (`setpoint_reported_c`), apply `data_patch/thermostat.patch` and add `data_patch/telemetry.py` as `data/gen/telemetry.py` before building. The model also works on a dataset without that column.
 
 `python -m greenhome.run_all` then retrains everything and rewrites `reports/`.
+
+## Documentation
+`model_implementation.md` describes the whole implementation: architecture, every execution path, all rules and constants, the decisions and their reasons, and an edge-case catalogue.
