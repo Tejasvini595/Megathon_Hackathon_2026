@@ -11,6 +11,8 @@ type TwinView = {
   setFocus: (f: Highlight) => void;
   after: boolean;
   setAfter: (a: boolean) => void;
+  isSwitching: boolean;
+  setIsSwitching: (s: boolean) => void;
 };
 
 const TwinViewContext = createContext<TwinView | null>(null);
@@ -23,7 +25,12 @@ export function TwinViewProvider({ children }: { children: React.ReactNode }) {
   const [mode, setMode] = useState<ViewMode>("normal");
   const [focus, setFocus] = useState<Highlight>(null);
   const [after, setAfter] = useState(false);
-  return <TwinViewContext value={{ mode, setMode, focus, setFocus, after, setAfter }}>{children}</TwinViewContext>;
+  const [isSwitching, setIsSwitching] = useState(false);
+  return (
+    <TwinViewContext value={{ mode, setMode, focus, setFocus, after, setAfter, isSwitching, setIsSwitching }}>
+      {children}
+    </TwinViewContext>
+  );
 }
 
 export function useTwinView() {

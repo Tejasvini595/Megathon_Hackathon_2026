@@ -1,5 +1,6 @@
 "use server";
 
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import type { Prisma } from "@/generated/prisma/client";
@@ -101,5 +102,7 @@ export async function confirmHome(homeId: string, input: z.input<typeof confirmS
     data: { status: "CONFIRMED", nickname: parsed.data.nickname, record: parsed.data.record },
   });
   if (count === 0) return { error: "That home no longer exists." };
-  redirect("/home");
+  const cookieStore = await cookies();
+  cookieStore.set("last_home_id", homeId, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
+  redirect(`/home?homeId=${homeId}`);
 }

@@ -7,7 +7,7 @@ import { shareHome, unshareHome } from "./share-actions";
 
 const canNativeShare = () => typeof navigator !== "undefined" && typeof navigator.share === "function";
 
-export function ShareButton({ sharedPath }: { sharedPath: string | null }) {
+export function ShareButton({ homeId, sharedPath }: { homeId: string; sharedPath: string | null }) {
   const [path, setPath] = useState(sharedPath);
   const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -30,14 +30,14 @@ export function ShareButton({ sharedPath }: { sharedPath: string | null }) {
 
   const create = () =>
     start(async () => {
-      const next = await shareHome();
+      const next = await shareHome(homeId);
       if (next) setPath(next);
       else toast.error("Couldn't create a link");
     });
 
   const revoke = () =>
     start(async () => {
-      await unshareHome();
+      await unshareHome(homeId);
       setPath(null);
       setOpen(false);
       toast("Link turned off");

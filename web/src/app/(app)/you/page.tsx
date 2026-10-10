@@ -4,7 +4,9 @@ import type { Metadata } from "next";
 import { ChevronRight, Link2Off, LogOut, Plus } from "lucide-react";
 import { PageSkeleton } from "@/components/app/page-skeleton";
 import { requireUser } from "@/lib/dal";
+import { getActiveHomeRow } from "@/lib/homes";
 import { prisma } from "@/lib/prisma";
+import { cn } from "@/lib/utils";
 import { unshareHome } from "../home/share-actions";
 import { signOutAction } from "./actions";
 
@@ -21,7 +23,10 @@ export default function Page() {
 async function Loader() {
   const user = await requireUser();
   const homes = await prisma.home.findMany({ where: { userId: user.id }, orderBy: { updatedAt: "desc" } });
-  const shared = homes.find((h) => h.status === "CONFIRMED");
+  const { home: activeHome } = await getActiveHomeRow();
+  const activeHomeId = activeHome?.id;
+  const shared = homes.filter((h) => h.shareSlug);
+
   return (
     <div className="px-5 pt-safe pb-40">
       <div className="flex items-center gap-4 pt-6">
@@ -36,34 +41,51 @@ async function Loader() {
 
       <h2 className="mb-2 mt-8 px-1 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Your homes</h2>
       <div className="overflow-hidden rounded-3xl bg-surface ring-1 ring-hairline">
-        {homes.map((h, i) => (
-          <div key={h.id} className={`flex items-center gap-3 px-4 py-3.5 ${i > 0 ? "border-t hairline" : ""}`}>
-            <div className="flex-1">
-              <p className="text-sm font-medium">{h.nickname}</p>
-              <p className="text-xs text-muted-foreground">
-                {h.status === "CONFIRMED" ? "Twin ready" : "Draft, not confirmed"}
-                {h.postcode ? ` · ${h.postcode}` : ""}
-              </p>
-            </div>
-            <ChevronRight className="size-4 text-muted-foreground" />
-          </div>
-        ))}
-        <Link href="/new" className={`flex items-center gap-3 px-4 py-3.5 text-sm ${homes.length ? "border-t hairline" : ""}`}>
+        {homes.map((h, i) => {
+          const isActive = h.id === activeHomeId;
+          return (
+            <Link
+              key={h.id}
+              href={`/home?homeId=${h.id}`}
+              className={cn(
+                "group flex items-center justify-between gap-3 px-4 py-3.5 transition-colors hover:bg-surface-2 active:scale-[0.99]",
+                i > 0 && "border-t hairline"
+              )}
+            >
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <p className="text-sm font-medium truncate group-hover:text-foreground transition-colors">{h.nickname}</p>
+                  {isActive && (
+                    <span className="rounded-full bg-volt/15 px-2 py-0.5 text-[10px] font-semibold text-volt">
+                      Active
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  {h.status === "CONFIRMED" ? "Twin ready" : "Draft, not confirmed"}
+                  {h.postcode ? ` · ${h.postcode}` : ""}
+                </p>
+              </div>
+              <ChevronRight className="size-4 text-muted-foreground transition-all group-hover:translate-x-0.5 group-hover:text-foreground shrink-0" />
+            </Link>
+          );
+        })}
+        <Link href="/new" className={`flex items-center gap-3 px-4 py-3.5 text-sm font-medium text-volt hover:bg-surface-2 transition-colors ${homes.length ? "border-t hairline" : ""}`}>
           <Plus className="size-4 text-volt" /> Add a home
         </Link>
       </div>
 
-      {shared?.shareSlug && (
-        <form action={unshareHome} className="mt-3 flex items-center gap-3 rounded-3xl bg-surface px-4 py-3.5 ring-1 ring-hairline">
+      {shared.map((h) => (
+        <form key={h.id} action={unshareHome.bind(null, h.id)} className="mt-3 flex items-center gap-3 rounded-3xl bg-surface px-4 py-3.5 ring-1 ring-hairline">
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium">Twin card is public</p>
-            <p className="truncate text-xs text-muted-foreground">/t/{shared.shareSlug}</p>
+            <p className="truncate text-sm font-medium">{h.nickname}: twin card is public</p>
+            <p className="truncate text-xs text-muted-foreground">/t/{h.shareSlug}</p>
           </div>
           <button type="submit" className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-destructive ring-1 ring-hairline">
             <Link2Off className="size-3.5" /> Stop sharing
           </button>
         </form>
-      )}
+      ))}
 
       <h2 className="mb-2 mt-8 px-1 text-[11px] uppercase tracking-[0.16em] text-muted-foreground">Memory</h2>
       <div className="rounded-3xl border border-dashed hairline p-5 text-sm text-muted-foreground">
