@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition, type ReactNode } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/app/confirm-dialog";
 import { ArrowRight, ArrowUp, Camera, Check, FileText, ImagePlus, Map as MapIcon, MapPin, Mic, Square, X } from "lucide-react";
 import { preloadTwinScene, TwinCanvas } from "@/components/twin/twin-canvas";
 import type { TwinSceneProps } from "@/components/twin/scene";
@@ -14,6 +16,7 @@ import { cn } from "@/lib/utils";
 import type { ExtractionResult } from "@/lib/extract/fields";
 import { createHome } from "./actions";
 import { Analysing } from "./analysing";
+import { discardDraft } from "./discard-action";
 import { downscaleImage } from "./downscale";
 import { ReviewStep } from "./review-step";
 import { partsUpTo } from "./steps";
@@ -49,6 +52,9 @@ export function CaptureFlow() {
   const [result, setResult] = useState<{ homeId: string; extraction: ExtractionResult } | null>(null);
   const [view, setView] = useState<StageView | null>(null);
   const [, startTransition] = useTransition();
+  const router = useRouter();
+  const [askDiscard, setAskDiscard] = useState(false);
+  const [discarding, startDiscard] = useTransition();
 
   // Fetch the 3D chunk while the user is still typing, so the stage appears instantly.
   useEffect(preloadTwinScene, []);
@@ -96,9 +102,15 @@ export function CaptureFlow() {
   return (
     <div className={cn("mx-auto flex w-full max-w-md flex-col", step === "compose" ? "min-h-dvh" : "h-dvh overflow-hidden")}>
       <header className={cn("z-20 flex items-center justify-between px-5 pt-safe", step !== "compose" && "absolute inset-x-0 mx-auto max-w-md")}>
-        <Link href="/home" aria-label="Close" className="grid size-10 place-items-center rounded-full bg-surface ring-1 ring-hairline">
-          <X className="size-4" />
-        </Link>
+        {result ? (
+          <button type="button" onClick={() => setAskDiscard(true)} aria-label="Close" className="grid size-10 place-items-center rounded-full bg-surface ring-1 ring-hairline">
+            <X className="size-4" />
+          </button>
+        ) : (
+          <Link href="/home" aria-label="Close" className="grid size-10 place-items-center rounded-full bg-surface ring-1 ring-hairline">
+            <X className="size-4" />
+          </Link>
+        )}
         <div className="flex gap-1.5">
           {(["compose", "analysing", "review"] as Step[]).map((s) => (
             <span key={s} className={cn("h-1 rounded-full transition-all", s === step ? "w-6 bg-foreground" : "w-1.5 bg-surface-2")} />
@@ -106,6 +118,23 @@ export function CaptureFlow() {
         </div>
         <span className="size-10" />
       </header>
+
+      <ConfirmDialog
+        open={askDiscard}
+        title="Discard this home?"
+        description="What you've added so far will be deleted."
+        confirmLabel="Discard"
+        cancelLabel="Keep editing"
+        pending={discarding}
+        onCancel={() => setAskDiscard(false)}
+        onConfirm={() =>
+          result &&
+          startDiscard(async () => {
+            await discardDraft(result.homeId);
+            router.push("/home");
+          })
+        }
+      />
 
       <AnimatePresence>
         {mapOpen && (

@@ -9,6 +9,7 @@ import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
 import { unshareHome } from "../home/share-actions";
 import { signOutAction } from "./actions";
+import { HomeMenu } from "./home-menu";
 
 export const metadata: Metadata = { title: "You" };
 
@@ -22,7 +23,7 @@ export default function Page() {
 
 async function Loader() {
   const user = await requireUser();
-  const homes = await prisma.home.findMany({ where: { userId: user.id }, orderBy: { updatedAt: "desc" } });
+  const homes = await prisma.home.findMany({ where: { userId: user.id }, include: { _count: { select: { extractions: true } } }, orderBy: { updatedAt: "desc" } });
   const { home: activeHome } = await getActiveHomeRow();
   const activeHomeId = activeHome?.id;
   const shared = homes.filter((h) => h.shareSlug);
@@ -44,30 +45,26 @@ async function Loader() {
         {homes.map((h, i) => {
           const isActive = h.id === activeHomeId;
           return (
-            <Link
-              key={h.id}
-              href={`/home?homeId=${h.id}`}
-              className={cn(
-                "group flex items-center justify-between gap-3 px-4 py-3.5 transition-colors hover:bg-surface-2 active:scale-[0.99]",
-                i > 0 && "border-t hairline"
-              )}
-            >
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-medium truncate group-hover:text-foreground transition-colors">{h.nickname}</p>
-                  {isActive && (
-                    <span className="rounded-full bg-volt/15 px-2 py-0.5 text-[10px] font-semibold text-volt">
-                      Active
-                    </span>
-                  )}
+            <div key={h.id} className={cn("flex items-center transition-colors hover:bg-surface-2", i > 0 && "border-t hairline")}>
+              <Link href={`/home?homeId=${h.id}`} className="group flex min-w-0 flex-1 items-center justify-between gap-3 py-3.5 pl-4 pr-2 active:scale-[0.99]">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-medium truncate group-hover:text-foreground transition-colors">{h.nickname}</p>
+                    {isActive && (
+                      <span className="rounded-full bg-volt/15 px-2 py-0.5 text-[10px] font-semibold text-volt">
+                        Active
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    {h.status === "CONFIRMED" ? "Twin ready" : "Draft, not confirmed"}
+                    {h.postcode ? ` · ${h.postcode}` : ""}
+                  </p>
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  {h.status === "CONFIRMED" ? "Twin ready" : "Draft, not confirmed"}
-                  {h.postcode ? ` · ${h.postcode}` : ""}
-                </p>
-              </div>
-              <ChevronRight className="size-4 text-muted-foreground transition-all group-hover:translate-x-0.5 group-hover:text-foreground shrink-0" />
-            </Link>
+                <ChevronRight className="size-4 text-muted-foreground transition-all group-hover:translate-x-0.5 group-hover:text-foreground shrink-0" />
+              </Link>
+              <HomeMenu id={h.id} nickname={h.nickname} draft={h.status !== "CONFIRMED"} editHref={h.record || h._count.extractions ? `/edit/${h.id}` : null} />
+            </div>
           );
         })}
         <Link href="/new" className={`flex items-center gap-3 px-4 py-3.5 text-sm font-medium text-volt hover:bg-surface-2 transition-colors ${homes.length ? "border-t hairline" : ""}`}>

@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/dal";
 import { getTwin } from "@/lib/engine";
+import { deleteUploads } from "@/lib/storage";
 
 /** The signed-in user and their active home (by specified homeId, or last_home_id cookie, or latest home). */
 export const getActiveHomeRow = cache(async (homeId?: string) => {
@@ -47,3 +48,15 @@ export async function getActiveHome(homeId?: string) {
   return { user, home, twin: await getTwin(home) } as const;
 }
 
+
+/** Deletes one of the user's homes (optionally only drafts) with its uploaded files. Returns false if there was no match. */
+export async function removeOwnedHome(userId: string, id: string, draftOnly = false) {
+  const home = await prisma.home.findFirst({
+    where: { id, userId, ...(draftOnly && { status: "DRAFT" as const }) },
+    select: { id: true, inputs: { select: { fileUrl: true } } },
+  });
+  if (!home) return false;
+  await prisma.home.delete({ where: { id: home.id } });
+  await deleteUploads(home.inputs.flatMap((i) => (i.fileUrl ? [i.fileUrl] : [])));
+  return true;
+}
