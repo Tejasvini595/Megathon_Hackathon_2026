@@ -13,6 +13,7 @@ podman run -d --name ght-postgres -e POSTGRES_USER=ght -e POSTGRES_PASSWORD=ght 
 bunx prisma migrate dev          # creates tables (restart `bun run dev` after a migration: the dev server caches the Prisma client)
 bun run db:postcodes ../data/raw/postcodes/postcodes.csv   # 48k postcodes from our dataset, or onspd_trimmed.csv for all 1.8M UK ones
 bun run db:buildings "M14 4AJ" "BS6 5AB"                   # optional: pre-fetch OSM buildings for demo postcodes
+bun run db:seed                 # demo user demo@ght.dev / demo12345 with three confirmed homes (idempotent)
 bun run dev                      # http://localhost:3000, open with phone-sized devtools
 bun test src                     # unit tests (footprint geometry)
 ```

@@ -13,6 +13,7 @@
     "db:studio": "prisma studio",
     "postinstall": "prisma generate",
     "typecheck": "tsc --noEmit",
+    "db:seed": "bun scripts/seed-demo.ts",
     "db:postcodes": "bun scripts/import-postcodes.ts",
     "db:buildings": "bun --conditions react-server scripts/prewarm-buildings.ts",
     "test": "bun test src"

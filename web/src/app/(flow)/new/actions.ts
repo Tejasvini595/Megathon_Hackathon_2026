@@ -8,7 +8,8 @@ import { requireUser } from "@/lib/dal";
 import { extract, type ExtractInput } from "@/lib/extract";
 import { isUkPostcode } from "@/lib/geo/postcode";
 import { describeStreet } from "@/lib/geo/street";
-import { FIELDS, type ExtractionResult } from "@/lib/extract/fields";
+import type { ExtractionResult } from "@/lib/extract/fields";
+import { confirmSchema } from "@/lib/extract/schema";
 import { prisma } from "@/lib/prisma";
 import { saveUpload } from "@/lib/storage";
 
@@ -79,21 +80,6 @@ async function applyFootprint(extraction: ExtractionResult, postcode: string, os
   extraction.models.push("osm-footprint");
   return { osmId, outline: building.outline, measure: building.measure } as Prisma.InputJsonValue;
 }
-
-const recordSchema = z.object(
-  Object.fromEntries(
-    FIELDS.map((f) => [
-      f.key,
-      f.kind === "number"
-        ? z.coerce.number().min(f.min).max(f.max)
-        : f.kind === "multi"
-          ? z.array(z.enum(f.options.map((o) => o.value) as [string, ...string[]])).max(f.options.length)
-          : z.enum(f.options.map((o) => o.value) as [string, ...string[]]),
-    ]),
-  ),
-);
-
-const confirmSchema = z.object({ nickname: z.string().trim().min(1).max(60), record: recordSchema });
 
 /** The user confirms (or corrects) the extracted record. Only now does the engine see it. */
 export async function confirmHome(homeId: string, input: z.input<typeof confirmSchema>): Promise<{ error: string }> {
