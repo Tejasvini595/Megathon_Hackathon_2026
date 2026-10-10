@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 import { ArrowRight, Flame, Info, Leaf, Sparkles, Thermometer, TriangleAlert, Zap, type LucideIcon } from "lucide-react";
 import { EmptyHome } from "@/components/app/empty-home";
 import { FocusButton, TwinViewProvider } from "@/components/twin/twin-view";
+import { findPostcode } from "@/lib/geo/postcode";
 import { getActiveHome, getActiveHomeRow } from "@/lib/homes";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/dal";
@@ -64,11 +65,12 @@ async function HomeContent({ searchParams }: { searchParams: Promise<HomeSearchP
   });
 
   const next = twin.retrofits[0];
+  const lat = home.postcode ? ((await findPostcode(home.postcode))?.lat ?? null) : null;
 
   return (
     <TwinViewProvider>
       <section className="sticky top-0 h-[64dvh] min-h-[420px] w-full">
-        <HomeStage geometry={twin.geometry} heatLoss={twin.heatLoss} />
+        <HomeStage geometry={twin.geometry} heatLoss={twin.heatLoss} lat={lat} />
         <header className="pointer-events-none absolute inset-x-0 top-0 flex items-start justify-between px-5 pt-safe">
           <div className="pointer-events-auto pt-3">
             <HomeSwitcher
