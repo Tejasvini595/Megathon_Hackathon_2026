@@ -3,7 +3,7 @@
  * must answer in these categories so outputs stay schema-valid and comparable.
  */
 
-export type FieldSource = "photo" | "text" | "plan" | "voice" | "postcode" | "default";
+export type FieldSource = "photo" | "text" | "plan" | "voice" | "postcode" | "map" | "default";
 
 export type FieldDef =
   | { key: string; label: string; group: Group; kind: "enum"; options: { value: string; label: string }[] }

@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { AnimatePresence, LayoutGroup, motion, useDragControls } from "motion/react";
 import { Html } from "@react-three/drei";
 import { toast } from "sonner";
-import { ArrowLeft, ArrowRight, Camera, Check, ChevronDown, FileText, Loader2, MapPin, Mic, Minus, PenLine, Plus, Sparkles, TriangleAlert, Type, type LucideIcon } from "lucide-react";
+import { ArrowLeft, ArrowRight, Camera, Check, ChevronDown, FileText, Loader2, Map as MapIcon, MapPin, Mic, Minus, PenLine, Plus, Sparkles, TriangleAlert, Type, type LucideIcon } from "lucide-react";
 import { geometryFromRecord } from "@/lib/twin/from-record";
 import { FIELDS, optionLabel, type ExtractedField, type ExtractionResult, type FieldKey, type FieldSource } from "@/lib/extract/fields";
 import type { Geometry } from "@/lib/twin/types";
@@ -22,6 +22,7 @@ const SOURCE_ICON: Record<Source, LucideIcon> = {
   plan: FileText,
   voice: Mic,
   postcode: MapPin,
+  map: MapIcon,
   default: Sparkles,
   you: PenLine,
 };

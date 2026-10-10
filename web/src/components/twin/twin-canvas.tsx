@@ -39,6 +39,11 @@ function detectWebGL() {
 }
 const noopSubscribe = () => () => {};
 
+/** False when the browser can't create a WebGL context (always true during SSR). */
+export function useWebGLSupported() {
+  return useSyncExternalStore(noopSubscribe, detectWebGL, () => true);
+}
+
 /** Friendly stand-in when the device can't (or stops being able to) run WebGL. */
 export function WebGLFallback({ compact }: { compact?: boolean }) {
   return (
@@ -124,7 +129,7 @@ function useOnScreen<T extends HTMLElement>() {
 }
 
 export function TwinCanvas({ className, ...props }: TwinSceneProps & { className?: string }) {
-  const supported = useSyncExternalStore(noopSubscribe, detectWebGL, () => true);
+  const supported = useWebGLSupported();
   const [lost, setLost] = useState(false);
   const [ref, active] = useOnScreen<HTMLDivElement>();
   const fallback = <WebGLFallback compact={props.interactive === false} />;

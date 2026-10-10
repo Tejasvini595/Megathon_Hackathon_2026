@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition, type ReactNode } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { toast } from "sonner";
-import { ArrowRight, ArrowUp, Camera, FileText, ImagePlus, MapPin, Mic, Square, X } from "lucide-react";
+import { ArrowRight, ArrowUp, Camera, Check, FileText, ImagePlus, Map as MapIcon, MapPin, Mic, Square, X } from "lucide-react";
 import { preloadTwinScene, TwinCanvas } from "@/components/twin/twin-canvas";
 import type { TwinSceneProps } from "@/components/twin/scene";
 import { useDictation } from "@/hooks/use-dictation";
@@ -17,6 +17,9 @@ import { Analysing } from "./analysing";
 import { downscaleImage } from "./downscale";
 import { ReviewStep } from "./review-step";
 import { partsUpTo } from "./steps";
+import { StreetPicker, type PickedHome } from "./street-picker";
+
+const UK_POSTCODE = /^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i;
 
 /** What the shared 3D stage shows; the analysing and review steps drive it. */
 export type StageView = Omit<TwinSceneProps, "heatLoss" | "mode" | "children"> & { markers?: ReactNode };
@@ -39,6 +42,8 @@ export function CaptureFlow() {
   const [voice, setVoice] = useState<string[]>([]);
   const [postcode, setPostcode] = useState("");
   const [showPostcode, setShowPostcode] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
+  const [picked, setPicked] = useState<PickedHome | null>(null);
   const [photos, setPhotos] = useState<File[]>([]);
   const [plans, setPlans] = useState<File[]>([]);
   const [result, setResult] = useState<{ homeId: string; extraction: ExtractionResult } | null>(null);
@@ -70,6 +75,10 @@ export function CaptureFlow() {
     form.set("text", text);
     form.set("voice", voice.join(". "));
     form.set("postcode", postcode);
+    if (picked) {
+      form.set("osmId", String(picked.osmId));
+      form.set("address", picked.address);
+    }
     photos.forEach((f) => form.append("photos", f));
     plans.forEach((f) => form.append("plans", f));
     startTransition(async () => {
@@ -97,6 +106,19 @@ export function CaptureFlow() {
         </div>
         <span className="size-10" />
       </header>
+
+      <AnimatePresence>
+        {mapOpen && (
+          <StreetPicker
+            postcode={postcode.trim()}
+            onClose={() => setMapOpen(false)}
+            onPick={(h) => {
+              setPicked(h);
+              setMapOpen(false);
+            }}
+          />
+        )}
+      </AnimatePresence>
 
       {step !== "compose" && view && (
         <div className="relative h-[46dvh] shrink-0 animate-in fade-in duration-500">
@@ -176,12 +198,24 @@ export function CaptureFlow() {
                   <MapPin className="size-4 text-muted-foreground" />
                   <input
                     value={postcode}
-                    onChange={(e) => setPostcode(e.target.value.toUpperCase())}
+                    onChange={(e) => {
+                      setPostcode(e.target.value.toUpperCase());
+                      setPicked(null);
+                    }}
                     placeholder="Postcode (optional)"
-                    className="flex-1 bg-transparent text-sm uppercase outline-none placeholder:normal-case placeholder:text-muted-foreground"
+                    className="min-w-0 flex-1 bg-transparent text-sm uppercase outline-none placeholder:normal-case placeholder:text-muted-foreground"
                     autoComplete="postal-code"
                     autoFocus
                   />
+                  {UK_POSTCODE.test(postcode.trim()) && (
+                    <button
+                      onClick={() => setMapOpen(true)}
+                      className={cn("flex shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium", picked ? "bg-volt/15 text-volt" : "bg-foreground text-background")}
+                    >
+                      {picked ? <Check className="size-3.5" /> : <MapIcon className="size-3.5" />}
+                      {picked ? picked.address || "Home picked" : "Find on map"}
+                    </button>
+                  )}
                 </div>
               )}
 

@@ -5,6 +5,8 @@ import { z } from "zod";
 import type { Prisma } from "@/generated/prisma/client";
 import { requireUser } from "@/lib/dal";
 import { extract, type ExtractInput } from "@/lib/extract";
+import { isUkPostcode } from "@/lib/geo/postcode";
+import { describeStreet } from "@/lib/geo/street";
 import { FIELDS, type ExtractionResult } from "@/lib/extract/fields";
 import { prisma } from "@/lib/prisma";
 import { saveUpload } from "@/lib/storage";
@@ -20,6 +22,8 @@ export async function createHome(form: FormData): Promise<CaptureResult> {
   const text = String(form.get("text") ?? "").trim().slice(0, 4000);
   const voice = String(form.get("voice") ?? "").trim().slice(0, 4000);
   const postcode = String(form.get("postcode") ?? "").trim().toUpperCase().slice(0, 10) || null;
+  const address = String(form.get("address") ?? "").trim().slice(0, 200) || null;
+  const osmId = Number(form.get("osmId")) || null;
   const files = (name: string) => form.getAll(name).filter((f): f is File => f instanceof File && f.size > 0);
   const photos = files("photos").filter((f) => f.type.startsWith("image/"));
   const plans = files("plans").filter((f) => f.type.startsWith("image/") || f.type === "application/pdf");
@@ -35,11 +39,14 @@ export async function createHome(form: FormData): Promise<CaptureResult> {
     for (const f of list) inputs.push({ kind, fileUrl: await saveUpload(f), mimeType: f.type });
 
   const extraction = await extract(inputs);
+  const footprint = postcode && osmId ? await applyFootprint(extraction, postcode, osmId) : null;
 
   const home = await prisma.home.create({
     data: {
       userId: user.id,
       postcode,
+      address,
+      footprint: footprint ?? undefined,
       inputs: { create: inputs.map(({ kind, text, fileUrl, mimeType }) => ({ kind, text, fileUrl, mimeType })) },
       extractions: {
         create: {
@@ -54,6 +61,22 @@ export async function createHome(form: FormData): Promise<CaptureResult> {
   });
 
   return { ok: true, homeId: home.id, extraction };
+}
+
+/**
+ * The building the user tapped on the street map. Looked up again on the server from the cached OSM
+ * data (never trusted from the client); its footprint fills fields the text didn't settle.
+ */
+async function applyFootprint(extraction: ExtractionResult, postcode: string, osmId: number) {
+  if (!isUkPostcode(postcode)) return null;
+  const street = await describeStreet(postcode);
+  const building = street.ok ? street.buildings.find((b) => b.osmId === osmId) : undefined;
+  if (!building) return null;
+  for (const [key, s] of Object.entries(building.suggestions) as [keyof typeof building.suggestions, { value: string | number; confidence: number; evidence: string }][]) {
+    if (s && s.confidence > extraction.fields[key].confidence) extraction.fields[key] = { value: s.value, confidence: s.confidence, source: "map", evidence: s.evidence };
+  }
+  extraction.models.push("osm-footprint");
+  return { osmId, outline: building.outline, measure: building.measure } as Prisma.InputJsonValue;
 }
 
 const recordSchema = z.object(
