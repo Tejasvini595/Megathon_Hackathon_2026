@@ -1,0 +1,208 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --font-heading: var(--font-geist-sans);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+
+  /* Green Home Twin tokens */
+  --color-volt: var(--volt);
+  --color-volt-dim: var(--volt-dim);
+  --color-ember: var(--ember);
+  --color-frost: var(--frost);
+  --color-amber: var(--amber);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-hairline: var(--hairline);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+
+  --animate-breathe: breathe 4s ease-in-out infinite;
+  --animate-scan: scan 2.4s cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  --animate-shimmer: shimmer 2.2s linear infinite;
+
+  @keyframes breathe {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 0.85;
+    }
+    50% {
+      transform: scale(1.06);
+      opacity: 1;
+    }
+  }
+  @keyframes scan {
+    0% {
+      transform: translateY(-100%);
+    }
+    100% {
+      transform: translateY(100%);
+    }
+  }
+  @keyframes shimmer {
+    0% {
+      background-position: -200% 0;
+    }
+    100% {
+      background-position: 200% 0;
+    }
+  }
+}
+
+/* The app is dark-first (Tesla-style). Light tokens exist so shadcn primitives still render sensibly. */
+:root {
+  --radius: 1rem;
+  --background: oklch(0.985 0 0);
+  --foreground: oklch(0.16 0 0);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.16 0 0);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.16 0 0);
+  --primary: oklch(0.16 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.95 0 0);
+  --secondary-foreground: oklch(0.2 0 0);
+  --muted: oklch(0.95 0 0);
+  --muted-foreground: oklch(0.5 0 0);
+  --accent: oklch(0.95 0 0);
+  --accent-foreground: oklch(0.2 0 0);
+  --destructive: oklch(0.6 0.22 25);
+  --border: oklch(0.9 0 0);
+  --input: oklch(0.9 0 0);
+  --ring: oklch(0.6 0.15 160);
+  --volt: oklch(0.62 0.17 160);
+  --volt-dim: oklch(0.62 0.17 160 / 15%);
+  --ember: oklch(0.65 0.22 35);
+  --frost: oklch(0.6 0.14 235);
+  --amber: oklch(0.75 0.16 75);
+  --surface: oklch(0 0 0 / 4%);
+  --surface-2: oklch(0 0 0 / 7%);
+  --hairline: oklch(0 0 0 / 8%);
+  --chart-1: var(--volt);
+  --chart-2: var(--frost);
+  --chart-3: var(--amber);
+  --chart-4: var(--ember);
+  --chart-5: oklch(0.55 0 0);
+}
+
+.dark {
+  --background: oklch(0.13 0.004 250);
+  --foreground: oklch(0.97 0 0);
+  --card: oklch(0.17 0.004 250);
+  --card-foreground: oklch(0.97 0 0);
+  --popover: oklch(0.19 0.005 250);
+  --popover-foreground: oklch(0.97 0 0);
+  --primary: oklch(0.97 0 0);
+  --primary-foreground: oklch(0.15 0 0);
+  --secondary: oklch(1 0 0 / 7%);
+  --secondary-foreground: oklch(0.97 0 0);
+  --muted: oklch(1 0 0 / 6%);
+  --muted-foreground: oklch(0.68 0.005 250);
+  --accent: oklch(1 0 0 / 8%);
+  --accent-foreground: oklch(0.97 0 0);
+  --destructive: oklch(0.7 0.19 25);
+  --border: oklch(1 0 0 / 9%);
+  --input: oklch(1 0 0 / 12%);
+  --ring: oklch(0.86 0.17 160);
+  --volt: oklch(0.87 0.17 160);
+  --volt-dim: oklch(0.87 0.17 160 / 14%);
+  --ember: oklch(0.72 0.2 38);
+  --frost: oklch(0.78 0.12 230);
+  --amber: oklch(0.84 0.15 80);
+  --surface: oklch(1 0 0 / 4.5%);
+  --surface-2: oklch(1 0 0 / 8%);
+  --hairline: oklch(1 0 0 / 8%);
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans;
+    -webkit-tap-highlight-color: transparent;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "ss01", "cv11";
+  }
+  /* Numbers line up in every stat. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+@layer components {
+  /* Frosted panel used for every floating surface. */
+  .glass {
+    background: color-mix(in oklch, var(--card) 62%, transparent);
+    backdrop-filter: blur(24px) saturate(140%);
+    -webkit-backdrop-filter: blur(24px) saturate(140%);
+    border: 1px solid var(--hairline);
+  }
+  .hairline {
+    border-color: var(--hairline);
+  }
+  /* Soft radial glow behind the hero model. */
+  .stage-glow {
+    background:
+      radial-gradient(60% 45% at 50% 55%, var(--volt-dim), transparent 70%),
+      radial-gradient(90% 60% at 50% 110%, oklch(0.3 0.03 250 / 60%), transparent 70%);
+  }
+  .text-gradient {
+    background: linear-gradient(180deg, var(--foreground) 30%, color-mix(in oklch, var(--foreground) 45%, transparent));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      color-mix(in oklch, var(--foreground) 12%, transparent) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    @apply animate-shimmer;
+  }
+  .pb-safe {
+    padding-bottom: max(env(safe-area-inset-bottom), 0.75rem);
+  }
+  .pt-safe {
+    padding-top: max(env(safe-area-inset-top), 0.75rem);
+  }
+}

@@ -1,0 +1,206 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Auth models (User, Session, Account, Verification) come from `bunx auth@latest generate`.
+// That command overwrites this file: re-add the app models below if you rerun it.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String        @id
+  name          String
+  email         String
+  emailVerified Boolean       @default(false)
+  image         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  sessions      Session[]
+  accounts      Account[]
+  homes         Home[]
+  memories      MemoryEvent[]
+
+  @@unique([email])
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  ipAddress String?
+  userAgent String?
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([token])
+  @@index([userId])
+  @@map("session")
+}
+
+model Account {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  @@index([userId])
+  @@map("account")
+}
+
+model Verification {
+  id         String   @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([identifier])
+  @@map("verification")
+}
+
+// ---------------------------------------------------------------- app models
+
+enum HomeStatus {
+  DRAFT // inputs captured, extraction not yet confirmed by the user
+  CONFIRMED // user has checked the extracted record
+}
+
+enum InputKind {
+  PHOTO
+  TEXT
+  PLAN
+  VOICE
+  POSTCODE
+}
+
+enum ExtractionStatus {
+  PENDING
+  DONE
+  FAILED
+}
+
+/// A home the user is analysing. `record` is the confirmed, typed property record
+/// that the engine reads; it only changes when the user confirms or edits it.
+model Home {
+  id          String        @id @default(cuid())
+  userId      String
+  user        User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nickname    String        @default("My home")
+  status      HomeStatus    @default(DRAFT)
+  postcode    String?
+  /// Optional link to a row in data/out/properties.parquet (e.g. "P1a2b3c4d5e").
+  propertyId  String?
+  record      Json?
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  inputs      HomeInput[]
+  extractions Extraction[]
+  scenarios   Scenario[]
+  messages    ChatMessage[]
+  memories    MemoryEvent[]
+
+  @@index([userId])
+}
+
+/// Anything the user gives us about the home: a photo, a description, a floor plan, a voice note.
+model HomeInput {
+  id        String    @id @default(cuid())
+  homeId    String
+  home      Home      @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  kind      InputKind
+  text      String?
+  fileUrl   String?
+  mimeType  String?
+  createdAt DateTime  @default(now())
+
+  @@index([homeId])
+}
+
+/// One run of the decision models over the inputs. `fields` maps a record field to
+/// { value, confidence, source, evidence } so the review screen can show why.
+model Extraction {
+  id        String           @id @default(cuid())
+  homeId    String
+  home      Home             @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  status    ExtractionStatus @default(PENDING)
+  models    String[]
+  fields    Json?
+  conflicts Json?
+  error     String?
+  createdAt DateTime         @default(now())
+
+  @@index([homeId])
+}
+
+/// A what-if: a typed retrofit spec plus the engine output it produced (never LLM numbers).
+model Scenario {
+  id        String   @id @default(cuid())
+  homeId    String
+  home      Home     @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  name      String
+  spec      Json
+  result    Json?
+  createdAt DateTime @default(now())
+
+  @@index([homeId])
+}
+
+enum ChatRole {
+  USER
+  ASSISTANT
+  SYSTEM
+}
+
+model ChatMessage {
+  id         String   @id @default(cuid())
+  homeId     String
+  home       Home     @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  role       ChatRole
+  content    String
+  scenarioId String?
+  createdAt  DateTime @default(now())
+
+  @@index([homeId, createdAt])
+}
+
+enum MemoryKind {
+  CONSTRAINT // e.g. listed building, renting, budget cap
+  PREFERENCE // e.g. no heat pump, low disruption
+  COMPLETED_RETROFIT
+  RESPONSE // accepted / declined a recommendation
+}
+
+/// Customer memory (optional extension in the brief). Parsed into typed payloads.
+model MemoryEvent {
+  id        String     @id @default(cuid())
+  userId    String
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  homeId    String?
+  home      Home?      @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  kind      MemoryKind
+  text      String
+  payload   Json
+  createdAt DateTime   @default(now())
+
+  @@index([userId])
+}

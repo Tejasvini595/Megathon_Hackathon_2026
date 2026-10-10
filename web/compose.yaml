@@ -1,0 +1,15 @@
+# Local Postgres for development. Works with `docker compose up -d` or `podman compose up -d`.
+services:
+  db:
+    image: docker.io/library/postgres:17-alpine
+    container_name: ght-postgres
+    environment:
+      POSTGRES_USER: ght
+      POSTGRES_PASSWORD: ght
+      POSTGRES_DB: ght
+    ports:
+      - "5432:5432"
+    volumes:
+      - ght-pg:/var/lib/postgresql/data
+volumes:
+  ght-pg:
