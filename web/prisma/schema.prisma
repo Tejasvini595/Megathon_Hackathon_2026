@@ -111,6 +111,15 @@ model Home {
   /// Optional link to a row in data/out/properties.parquet (e.g. "P1a2b3c4d5e").
   propertyId  String?
   record      Json?
+  /// Free-text address the user typed (their own data; never looked up from EPC).
+  address     String?
+  /// Selected OSM building: { osmId, polygon: [lon,lat][], widthM, depthM, bearingDeg, sharedWalls, levels? }.
+  footprint   Json?
+  /// Public share link (/t/[shareSlug]); null when not shared.
+  shareSlug   String?       @unique
+  sharedAt    DateTime?
+  /// Upload id of the canvas snapshot used as the share preview image.
+  shareImage  String?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   inputs      HomeInput[]
@@ -203,4 +212,26 @@ model MemoryEvent {
   createdAt DateTime   @default(now())
 
   @@index([userId])
+}
+
+/// UK postcode geography (ONS Postcode Directory via postcodes.io, OGL). Loaded by scripts/import-postcodes.ts.
+model Postcode {
+  /// Normalised: upper case, single space before the inward code ("B1 1BA").
+  postcode   String  @id
+  lat        Float
+  lon        Float
+  outcode    String
+  district   String?
+  region     String?
+  country    String
+  terminated Boolean @default(false)
+
+  @@index([outcode])
+}
+
+/// OSM building footprints near a postcode, fetched from Overpass on demand (ODbL, attribute OSM contributors).
+model BuildingCache {
+  postcode  String   @id
+  buildings Json
+  fetchedAt DateTime @default(now())
 }
