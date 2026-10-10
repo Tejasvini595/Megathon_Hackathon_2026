@@ -143,6 +143,7 @@ export function CaptureFlow() {
             onClose={() => setMapOpen(false)}
             onPick={(h) => {
               setPicked(h);
+              if (h.summary) setText((t) => (t.includes(h.summary!) ? t : t.trim() ? `${t.trimEnd()} ${h.summary}` : h.summary!));
               setMapOpen(false);
             }}
           />

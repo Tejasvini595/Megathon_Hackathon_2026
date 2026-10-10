@@ -7,12 +7,12 @@ import { Loader2, MapPin, X } from "lucide-react";
 import { useWebGLSupported } from "@/components/twin/twin-canvas";
 import { lookupStreet } from "@/lib/geo/actions";
 import type { StreetResult } from "@/lib/geo/street";
+import { describeForPrefill } from "./street-facts";
+import { StreetInfo } from "./street-info";
 
 const StreetScene = dynamic(() => import("./street-scene"), { ssr: false });
 
-export type PickedHome = { osmId: number; address: string };
-
-const BUILT_FORM: Record<string, string> = { detached: "Detached", semi: "Semi-detached", end_terrace: "End terrace", mid_terrace: "Mid terrace", flat: "Block of flats" };
+export type PickedHome = { osmId: number; address: string; summary?: string };
 
 /** Full-screen street model around a postcode; the user taps their own building. */
 export function StreetPicker({ postcode, onPick, onClose }: { postcode: string; onPick: (h: PickedHome) => void; onClose: () => void }) {
@@ -27,7 +27,6 @@ export function StreetPicker({ postcode, onPick, onClose }: { postcode: string; 
   }, [postcode]);
 
   const building = street?.ok ? street.buildings.find((b) => b.osmId === selected) : undefined;
-  const form = building?.suggestions.builtForm;
 
   function select(id: number) {
     navigator.vibrate?.(8);
@@ -62,6 +61,7 @@ export function StreetPicker({ postcode, onPick, onClose }: { postcode: string; 
         ) : (
           <>
             <StreetScene buildings={street.buildings} selected={selected} onSelect={select} />
+            {!building && <p className="pointer-events-none absolute inset-x-0 top-3 mx-auto w-fit animate-pulse rounded-full bg-volt/90 px-3 py-1 text-xs font-semibold text-black [animation-iteration-count:4]">Tap your home</p>}
             <p className="pointer-events-none absolute bottom-2 right-3 text-[10px] text-muted-foreground/70">{street.attribution}</p>
           </>
         )}
@@ -70,14 +70,7 @@ export function StreetPicker({ postcode, onPick, onClose }: { postcode: string; 
       <div className="space-y-3 px-5 pb-safe pt-4">
         {building ? (
           <>
-            <p className="text-sm">
-              <span className="font-medium">{form ? BUILT_FORM[form.value] : "Building"}</span>
-              <span className="tabular text-muted-foreground">
-                {" "}
-                · {building.measure.widthM} × {building.measure.depthM} m footprint
-              </span>
-            </p>
-            {form && <p className="-mt-2 text-xs text-muted-foreground">{form.evidence}</p>}
+            <StreetInfo b={building} />
             <label className="flex items-center gap-2 rounded-2xl bg-surface px-3 py-2.5 ring-1 ring-hairline">
               <MapPin className="size-4 text-muted-foreground" />
               <input
@@ -90,7 +83,7 @@ export function StreetPicker({ postcode, onPick, onClose }: { postcode: string; 
               />
             </label>
             <button
-              onClick={() => onPick({ osmId: building.osmId, address: address.trim() })}
+              onClick={() => onPick({ osmId: building.osmId, address: address.trim(), summary: describeForPrefill(building, address.trim()) })}
               className="h-14 w-full rounded-2xl bg-volt text-base font-semibold text-black transition-transform active:scale-[0.98]"
             >
               This is my home
@@ -98,7 +91,7 @@ export function StreetPicker({ postcode, onPick, onClose }: { postcode: string; 
           </>
         ) : (
           <p className="pb-2 text-center text-sm text-muted-foreground">
-            {street?.ok ? "Drag to look around, pinch to zoom. Your postcode is the green ring." : ""}
+            {street?.ok ? "Tap your home to select it. Drag to move, pinch to zoom, twist to turn. The green ring is your postcode." : ""}
           </p>
         )}
         <button onClick={onClose} className="w-full pb-2 text-center text-sm text-muted-foreground underline-offset-4 hover:underline">
