@@ -1,23 +1,18 @@
 "use client";
 
 import { useTwinView } from "@/components/twin/twin-view";
+import { cn } from "@/lib/utils";
 
 export function HomeSheet({ children }: { children: React.ReactNode }) {
   const { isSwitching } = useTwinView();
 
   return (
     <section className="relative z-10 -mt-10 rounded-t-[32px] border-t hairline bg-background px-5 pb-40 pt-3">
-      <div className="mx-auto mb-5 h-1 w-10 rounded-full bg-surface-2" />
-
-      {isSwitching ? (
-        <div className="animate-in fade-in-0 duration-200">
-          <HomeSheetSkeleton />
-        </div>
-      ) : (
-        <div className="animate-in fade-in-0 duration-200">
-          {children}
-        </div>
-      )}
+      {/* The handle doubles as a quiet loading indicator when switching homes. */}
+      <div className={cn("mx-auto mb-5 h-1 w-10 rounded-full bg-surface-2 transition-all duration-300", isSwitching && "w-16 shimmer")} />
+      <div aria-busy={isSwitching} className={cn("transition-opacity duration-300", isSwitching && "pointer-events-none opacity-40")}>
+        {children}
+      </div>
     </section>
   );
 }
