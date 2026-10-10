@@ -14,7 +14,7 @@ export type SunView = {
   north: [number, number];
 };
 
-const R = 26;
+const R = 15;
 const sunMat = new THREE.MeshBasicMaterial({ color: "#ffd27a", toneMapped: false });
 const shadowMat = new THREE.MeshBasicMaterial({ color: "#000000", transparent: true, opacity: 0.38, depthWrite: false });
 const arrowMat = new THREE.MeshBasicMaterial({ color: "#3dffb0", toneMapped: false });
