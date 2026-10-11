@@ -1,0 +1,889 @@
+{
+ "n_scenarios": 77,
+ "n_generated": 77,
+ "n_errors": 0,
+ "engine_accept_rate": 0.15584415584415584,
+ "adjusted_accept_rate": 0.6363636363636364,
+ "local_checker_agrees_with_engine_on": "77/77",
+ "items_with_issue_category": {
+  "digit typed outside a slot": 53,
+  "currency sign placement": 51,
+  "measure outside catalogue (keyword)": 18,
+  "claims a fuel change the engine reports as none": 10,
+  "slot unit mismatch": 8,
+  "unsupported number": 5,
+  "unknown slot": 4,
+  "savings claimed for infeasible measure": 2,
+  "fuel change direction": 2
+ },
+ "false_positive_rules_applied": {
+  "currency sign after the number or range": 242,
+  "digit in 'CO2e' or 'out of 100'": 57,
+  "'led' inside modelled, ruled, filled, installed": 21,
+  "'no change' stated": 10,
+  "intensity (kWh per m2) read as an energy total": 4,
+  "unit after the second value of 'from A to B kWh'": 4,
+  "'outweighs the gas saving' read as a claim": 2,
+  "'floor area' matched the floor insulation keyword": 1,
+  "'you have a heat pump' matched the heat pump keyword": 1,
+  "battery mentioned only to say it is not covered": 1
+ },
+ "by_scenario_category": {
+  "why this score": {
+   "n": 10,
+   "engine_accepted": 4,
+   "adjusted_accepted": 7
+  },
+  "what-if": {
+   "n": 12,
+   "engine_accepted": 0,
+   "adjusted_accepted": 6
+  },
+  "heat pump raises electricity": {
+   "n": 7,
+   "engine_accepted": 1,
+   "adjusted_accepted": 6
+  },
+  "infeasible": {
+   "n": 12,
+   "engine_accepted": 1,
+   "adjusted_accepted": 8
+  },
+  "missing data": {
+   "n": 10,
+   "engine_accepted": 2,
+   "adjusted_accepted": 5
+  },
+  "value not estimable": {
+   "n": 6,
+   "engine_accepted": 0,
+   "adjusted_accepted": 3
+  },
+  "conflicting data": {
+   "n": 6,
+   "engine_accepted": 2,
+   "adjusted_accepted": 4
+  },
+  "adversarial": {
+   "n": 14,
+   "engine_accepted": 2,
+   "adjusted_accepted": 10
+  }
+ },
+ "unadjusted": {
+  "llm_raw": {
+   "n_texts": 77,
+   "n_sentences": 759,
+   "groundedness": 0.6982872200263505,
+   "factual_accuracy": 0.6104023552502453,
+   "unsupported_claim_rate": 0.30171277997364954,
+   "completeness": 0.5568181818181818
+  },
+  "shown_to_user": {
+   "n_texts": 77,
+   "n_sentences": 598,
+   "groundedness": 1.0,
+   "factual_accuracy": 1.0,
+   "unsupported_claim_rate": 0.0,
+   "completeness": 0.9034090909090909
+  },
+  "template_only": {
+   "n_texts": 77,
+   "n_sentences": 572,
+   "groundedness": 1.0,
+   "factual_accuracy": 1.0,
+   "unsupported_claim_rate": 0.0,
+   "completeness": 0.9829545454545454
+  }
+ },
+ "adjusted": {
+  "llm_raw": {
+   "n_texts": 77,
+   "n_sentences": 759,
+   "groundedness": 0.9433465085638999,
+   "factual_accuracy": 0.9411187438665358,
+   "unsupported_claim_rate": 0.05665349143610013,
+   "completeness": 0.5568181818181818
+  },
+  "shown_to_user": {
+   "n_texts": 77,
+   "n_sentences": 676,
+   "groundedness": 1.0,
+   "factual_accuracy": 1.0,
+   "unsupported_claim_rate": 0.0,
+   "completeness": 0.7102272727272727
+  },
+  "n_llm_shown": 49
+ },
+ "check_of_my_scorer_against_llm_eval": 0.0,
+ "items": {
+  "s01": {
+   "engine_accepted": false,
+   "categories": [
+    "digit typed outside a slot",
+    "unsupported number"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s02": {
+   "engine_accepted": true,
+   "categories": [],
+   "true_issues": [],
+   "missed_by_checker": [
+    "strongest area"
+   ]
+  },
+  "s03": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot",
+    "measure outside catalogue (keyword)",
+    "unknown slot"
+   ],
+   "true_issues": [
+    "unknown slot [[package_range_p10_p90.carbon_tonnes_low]]",
+    "slot [[package.bill_saving_gbp]] is not preceded by a pound sign",
+    "digits typed outside a slot: 10, 7"
+   ],
+   "missed_by_checker": []
+  },
+  "s04": {
+   "engine_accepted": false,
+   "categories": [
+    "digit typed outside a slot"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s05": {
+   "engine_accepted": false,
+   "categories": [
+    "digit typed outside a slot",
+    "savings claimed for infeasible measure",
+    "unsupported number"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s06": {
+   "engine_accepted": true,
+   "categories": [],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s07": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot",
+    "savings claimed for infeasible measure"
+   ],
+   "true_issues": [],
+   "missed_by_checker": [
+    "habitable_rooms"
+   ]
+  },
+  "s08": {
+   "engine_accepted": true,
+   "categories": [],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s09": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s10": {
+   "engine_accepted": true,
+   "categories": [],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s11": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s12": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot",
+    "slot unit mismatch"
+   ],
+   "true_issues": [
+    "slot [[package.bill_saving_gbp]] is not preceded by a pound sign"
+   ],
+   "missed_by_checker": []
+  },
+  "s13": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot"
+   ],
+   "true_issues": [
+    "slot [[package.bill_saving_gbp]] is not preceded by a pound sign"
+   ],
+   "missed_by_checker": []
+  },
+  "s14": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot",
+    "slot unit mismatch"
+   ],
+   "true_issues": [
+    "digits typed outside a slot: 12",
+    "slot [[value_impact.uplift_pct_high]] is not followed by its unit",
+    "digits typed outside a slot: 0"
+   ],
+   "missed_by_checker": []
+  },
+  "s15": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s16": {
+   "engine_accepted": false,
+   "categories": [
+    "claims a fuel change the engine reports as none",
+    "currency sign placement",
+    "digit typed outside a slot",
+    "measure outside catalogue (keyword)"
+   ],
+   "true_issues": [
+    "digits typed outside a slot: 12",
+    "digits typed outside a slot: 10"
+   ],
+   "missed_by_checker": []
+  },
+  "s17": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot"
+   ],
+   "true_issues": [
+    "slot [[per_retrofit.loft_insulation.cost_low_gbp]] is not preceded by a pound sign",
+    "slot [[per_retrofit.loft_insulation.cost_high_gbp]] is not preceded by a pound sign",
+    "slot [[per_retrofit.solar_pv.cost_low_gbp]] is not preceded by a pound sign",
+    "slot [[per_retrofit.solar_pv.cost_high_gbp]] is not preceded by a pound sign"
+   ],
+   "missed_by_checker": []
+  },
+  "s18": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s19": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot",
+    "measure outside catalogue (keyword)",
+    "slot unit mismatch"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s20": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s21": {
+   "engine_accepted": false,
+   "categories": [
+    "claims a fuel change the engine reports as none",
+    "currency sign placement",
+    "digit typed outside a slot"
+   ],
+   "true_issues": [
+    "slot [[package.bill_saving_gbp]] is not preceded by a pound sign",
+    "slot [[value_impact.value_low_gbp]] is not preceded by a pound sign",
+    "slot [[value_impact.value_high_gbp]] is not preceded by a pound sign",
+    "slot [[per_retrofit.double_glazing.cost_low_gbp]] is not preceded by a pound sign",
+    "slot [[per_retrofit.double_glazing.cost_high_gbp]] is not preceded by a pound sign"
+   ],
+   "missed_by_checker": []
+  },
+  "s22": {
+   "engine_accepted": false,
+   "categories": [
+    "claims a fuel change the engine reports as none",
+    "currency sign placement",
+    "digit typed outside a slot"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s23": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot",
+    "fuel change direction"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s24": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot",
+    "fuel change direction"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s25": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot",
+    "measure outside catalogue (keyword)"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s26": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s27": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot",
+    "measure outside catalogue (keyword)"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s28": {
+   "engine_accepted": true,
+   "categories": [],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s29": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot",
+    "slot unit mismatch",
+    "unknown slot"
+   ],
+   "true_issues": [
+    "digits typed outside a slot: 2012, 2021,",
+    "unknown slot [[package_range_p10_p90.electricity_saving_kwh]]",
+    "slot [[package.improvement_potential_pct]] is not followed by its unit"
+   ],
+   "missed_by_checker": []
+  },
+  "s30": {
+   "engine_accepted": true,
+   "categories": [],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s31": {
+   "engine_accepted": false,
+   "categories": [
+    "measure outside catalogue (keyword)"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s32": {
+   "engine_accepted": false,
+   "categories": [
+    "measure outside catalogue (keyword)"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s33": {
+   "engine_accepted": false,
+   "categories": [
+    "claims a fuel change the engine reports as none",
+    "measure outside catalogue (keyword)"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s34": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s35": {
+   "engine_accepted": false,
+   "categories": [
+    "claims a fuel change the engine reports as none"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s36": {
+   "engine_accepted": false,
+   "categories": [
+    "measure outside catalogue (keyword)",
+    "unsupported number"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s37": {
+   "engine_accepted": false,
+   "categories": [
+    "claims a fuel change the engine reports as none",
+    "currency sign placement"
+   ],
+   "true_issues": [
+    "slot [[package.bill_saving_gbp]] is not preceded by a pound sign"
+   ],
+   "missed_by_checker": []
+  },
+  "s38": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot",
+    "unknown slot"
+   ],
+   "true_issues": [
+    "unknown slot [[package_range_p10_p90.electricity_saving_kwh]]"
+   ],
+   "missed_by_checker": []
+  },
+  "s39": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot",
+    "slot unit mismatch"
+   ],
+   "true_issues": [
+    "slot [[value_impact.uplift_pct_high]] is not followed by its unit",
+    "slot [[finance.loan_apr_pct]] is not followed by its unit"
+   ],
+   "missed_by_checker": []
+  },
+  "s40": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s41": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot"
+   ],
+   "true_issues": [
+    "slot [[package.bill_saving_gbp]] is not preceded by a pound sign"
+   ],
+   "missed_by_checker": []
+  },
+  "s42": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot",
+    "measure outside catalogue (keyword)"
+   ],
+   "true_issues": [
+    "slot [[package.bill_saving_gbp]] is not preceded by a pound sign",
+    "slot [[package.install_cost_low_gbp]] is not preceded by a pound sign",
+    "slot [[package.install_cost_high_gbp]] is not preceded by a pound sign"
+   ],
+   "missed_by_checker": []
+  },
+  "s43": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot",
+    "measure outside catalogue (keyword)"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s44": {
+   "engine_accepted": false,
+   "categories": [
+    "claims a fuel change the engine reports as none",
+    "currency sign placement",
+    "digit typed outside a slot",
+    "measure outside catalogue (keyword)",
+    "slot unit mismatch"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s45": {
+   "engine_accepted": true,
+   "categories": [],
+   "true_issues": [],
+   "missed_by_checker": [
+    "SAP around"
+   ]
+  },
+  "s46": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot"
+   ],
+   "true_issues": [
+    "slot [[package.bill_saving_gbp]] is not preceded by a pound sign",
+    "slot [[package.install_cost_low_gbp]] is not preceded by a pound sign",
+    "slot [[package.install_cost_high_gbp]] is not preceded by a pound sign",
+    "slot [[finance.monthly_repayment_low_gbp]] is not preceded by a pound sign",
+    "slot [[finance.monthly_repayment_high_gbp]] is not preceded by a pound sign",
+    "slot [[finance.monthly_net_low_gbp]] is not preceded by a pound sign",
+    "slot [[finance.monthly_net_high_gbp]] is not preceded by a pound sign"
+   ],
+   "missed_by_checker": []
+  },
+  "s47": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s48": {
+   "engine_accepted": true,
+   "categories": [],
+   "true_issues": [],
+   "missed_by_checker": [
+    "out of [[components"
+   ]
+  },
+  "s49": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot",
+    "unknown slot"
+   ],
+   "true_issues": [
+    "unknown slot [[per_retrofit.double_glaizing.electricity_saving_kwh]]"
+   ],
+   "missed_by_checker": []
+  },
+  "s50": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot",
+    "slot unit mismatch"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s51": {
+   "engine_accepted": false,
+   "categories": [
+    "measure outside catalogue (keyword)"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s52": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot"
+   ],
+   "true_issues": [
+    "slot [[package.bill_saving_gbp]] is not preceded by a pound sign"
+   ],
+   "missed_by_checker": []
+  },
+  "s53": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot"
+   ],
+   "true_issues": [
+    "slot [[package.bill_saving_gbp]] is not preceded by a pound sign"
+   ],
+   "missed_by_checker": []
+  },
+  "s54": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s55": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot"
+   ],
+   "true_issues": [
+    "slot [[package.bill_saving_gbp]] is not preceded by a pound sign"
+   ],
+   "missed_by_checker": []
+  },
+  "s56": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s57": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s58": {
+   "engine_accepted": false,
+   "categories": [
+    "digit typed outside a slot"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s59": {
+   "engine_accepted": true,
+   "categories": [],
+   "true_issues": [],
+   "missed_by_checker": [
+    "out of ["
+   ]
+  },
+  "s60": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot",
+    "slot unit mismatch"
+   ],
+   "true_issues": [
+    "slot [[package.baseline_elec_kwh]] is not followed by its unit",
+    "slot [[package.bill_saving_gbp]] is not preceded by a pound sign",
+    "slot [[package.install_cost_low_gbp]] is not preceded by a pound sign",
+    "slot [[package.install_cost_high_gbp]] is not preceded by a pound sign",
+    "slot [[finance.monthly_repayment_low_gbp]] is not preceded by a pound sign",
+    "slot [[finance.monthly_repayment_high_gbp]] is not preceded by a pound sign",
+    "slot [[finance.monthly_bill_saving_gbp]] is not preceded by a pound sign",
+    "slot [[finance.monthly_net_low_gbp]] is not preceded by a pound sign",
+    "slot [[finance.monthly_net_high_gbp]] is not preceded by a pound sign"
+   ],
+   "missed_by_checker": []
+  },
+  "s61": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s62": {
+   "engine_accepted": false,
+   "categories": [
+    "digit typed outside a slot",
+    "measure outside catalogue (keyword)",
+    "unsupported number"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s63": {
+   "engine_accepted": true,
+   "categories": [],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s64": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s65": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s66": {
+   "engine_accepted": false,
+   "categories": [
+    "claims a fuel change the engine reports as none",
+    "currency sign placement",
+    "digit typed outside a slot",
+    "measure outside catalogue (keyword)"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s67": {
+   "engine_accepted": false,
+   "categories": [
+    "claims a fuel change the engine reports as none",
+    "currency sign placement"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s68": {
+   "engine_accepted": false,
+   "categories": [
+    "claims a fuel change the engine reports as none"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s69": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot",
+    "measure outside catalogue (keyword)"
+   ],
+   "true_issues": [
+    "measure not in the retrofit catalogue: 'battery'"
+   ],
+   "missed_by_checker": []
+  },
+  "s70": {
+   "engine_accepted": false,
+   "categories": [
+    "digit typed outside a slot",
+    "unsupported number"
+   ],
+   "true_issues": [
+    "digits typed outside a slot: 180",
+    "180"
+   ],
+   "missed_by_checker": []
+  },
+  "s71": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot",
+    "measure outside catalogue (keyword)"
+   ],
+   "true_issues": [
+    "measure not in the retrofit catalogue: 'draught'"
+   ],
+   "missed_by_checker": []
+  },
+  "s72": {
+   "engine_accepted": true,
+   "categories": [],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s73": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s74": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot",
+    "measure outside catalogue (keyword)"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s75": {
+   "engine_accepted": false,
+   "categories": [
+    "digit typed outside a slot"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s76": {
+   "engine_accepted": false,
+   "categories": [
+    "currency sign placement",
+    "digit typed outside a slot"
+   ],
+   "true_issues": [],
+   "missed_by_checker": []
+  },
+  "s77": {
+   "engine_accepted": true,
+   "categories": [],
+   "true_issues": [],
+   "missed_by_checker": [
+    "class_now|"
+   ]
+  }
+ }
+}

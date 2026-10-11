@@ -20,6 +20,9 @@
     "e2e": "playwright test",
     "eval:extract": "bun src/lib/extract/eval/run.ts",
     "eval:llm": "bun src/lib/llm/eval/run.ts",
+    "eval:live-explain": "bun src/lib/llm/eval/live-explain.ts",
+    "eval:live-whatif": "bun --conditions react-server src/lib/llm/eval/live-whatif.ts",
+    "eval:live-whatif-summary": "bun src/lib/llm/eval/live-whatif-summary.ts",
     "eval:decide": "bun src/lib/llm/eval/decide.ts",
     "eval:bills": "bun src/lib/llm/eval/bills.ts",
     "bills:make": "bun scripts/make-bills.ts"
