@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, useTransition, type ReactNode } from "react";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, MotionConfig, motion } from "motion/react";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/app/confirm-dialog";
 import { ArrowRight, ArrowUp, Camera, Check, FileText, ImagePlus, Map as MapIcon, MapPin, Mic, Square, X } from "lucide-react";
@@ -325,7 +325,9 @@ export function CaptureFlow() {
 
         {step === "review" && result && (
           <motion.div key="review" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex min-h-0 flex-1 flex-col">
-            <ReviewStep homeId={result.homeId} extraction={result.extraction} footprint={result.footprint} onView={setView} />
+            <MotionConfig reducedMotion="user">
+              <ReviewStep homeId={result.homeId} extraction={result.extraction} footprint={result.footprint} postcode={postcode.trim() || null} onView={setView} />
+            </MotionConfig>
           </motion.div>
         )}
       </AnimatePresence>

@@ -4,20 +4,23 @@ import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { AnimatePresence, LayoutGroup, motion, useDragControls } from "motion/react";
 import { Html } from "@react-three/drei";
 import { toast } from "sonner";
-import { ArrowLeft, ArrowRight, BrickWall, Check, Eye, EyeOff, Flame, Gauge, Grid2x2, House, Loader2, Ruler, Sun, TriangleAlert, Zap, type LucideIcon } from "lucide-react";
+import { ArrowLeft, ArrowRight, BrickWall, Check, ChevronRight, Eye, EyeOff, Flame, Gauge, Grid2x2, House, Loader2, Ruler, Sparkles, Sun, TriangleAlert, Zap, type LucideIcon } from "lucide-react";
 import { geometryFromRecord, type FootprintSize } from "@/lib/twin/from-record";
 import { applies, isFlatLike, type EnergyUsage, type ExtractionResult, type FieldKey, type FieldValue } from "@/lib/extract/fields";
 import { sapInBand } from "@/lib/extract/epc";
+import type { FieldImpact } from "@/lib/questions";
 import { usageProblems } from "@/lib/extract/usage";
 import type { EpcBand, Geometry } from "@/lib/twin/types";
 import { cn } from "@/lib/utils";
 import { confirmHome } from "./actions";
 import { buzz } from "./controls/haptics";
 import { UsageStep } from "./controls/usage-step";
-import { FieldRow, type FieldState, type FieldStates } from "./field-row";
+import { DEF, FieldRow, type FieldState, type FieldStates } from "./field-row";
 import { missingOf } from "./missing";
+import { alternativesOf, arrange, reasonOf, topQuestions } from "./question-order";
 import { STEPS, detailOf, recordOf, stepAnchor, type StepId } from "./steps";
 import { Summary } from "./summary";
+import { useQuestionPlan } from "./use-question-plan";
 import type { StageView } from "./capture-flow";
 
 const STEP_ICON: Record<StepId, LucideIcon> = { shape: Ruler, walls: BrickWall, roof: House, windows: Grid2x2, heating: Flame, power: Sun, usage: Zap, rating: Gauge };
@@ -38,6 +41,7 @@ export function ReviewStep({
   initialNickname = "My home",
   initialUsage,
   footprint,
+  postcode = null,
 }: {
   homeId: string;
   extraction: ExtractionResult;
@@ -47,11 +51,14 @@ export function ReviewStep({
   initialUsage?: EnergyUsage;
   /** The real outline from the map, when the user picked their building. */
   footprint?: FootprintSize;
+  postcode?: string | null;
 }) {
   const [fields, setFields] = useState<FieldStates>(extraction.fields);
   const [usage, setUsage] = useState<EnergyUsage | undefined>(initialUsage);
   const [[index, dir], setIndex] = useState<[number, number]>([0, 0]);
   const [open, setOpen] = useState(() => new Set(STEPS.flatMap((s) => s.fields).filter((k) => needsCheck(extraction.fields[k]))));
+  const [confirmed, setConfirmed] = useState<ReadonlySet<FieldKey>>(() => new Set());
+  const [jump, setJump] = useState<FieldKey | null>(null);
   const [nickname, setNickname] = useState(initialNickname);
   const [saving, startSaving] = useTransition();
   const drag = useDragControls();
@@ -71,6 +78,19 @@ export function ReviewStep({
   const shown = useMemo(() => STEPS.map((s) => s.fields.filter((k) => applies(k, record))), [record]);
   const toCheck = useMemo(() => STEPS.map((s, i) => (s.id === "usage" ? usageProblems(usage, record).length : shown[i].filter((k) => needsCheck(fields[k])).length)), [shown, fields, usage, record]);
   const step = STEPS[index];
+  const alternatives = useMemo(() => alternativesOf(fields, extraction.fields, record), [fields, extraction.fields, record]);
+  const plan = useQuestionPlan(record, alternatives, postcode);
+  const impacts = useMemo(() => new Map(plan?.fields.map((f) => [f.key, f])), [plan]);
+  const arranged = useMemo(() => (step ? arrange(shown[index], plan, fields) : null), [step, shown, index, plan, fields]);
+  const top = useMemo(() => topQuestions(plan, fields, new Set(shown.flat())), [plan, fields, shown]);
+
+  function jumpTo(key: FieldKey) {
+    const i = STEPS.findIndex((s) => s.fields.includes(key));
+    buzz();
+    setOpen((s) => new Set(s).add(key));
+    setIndex(([cur]) => [i, i > cur ? 1 : -1]);
+    setJump(key);
+  }
 
   function go(i: number) {
     if (i < 0 || i > SUMMARY || i === index) return;
@@ -91,12 +111,24 @@ export function ReviewStep({
       return !h;
     });
   }
-  useEffect(() => scroller.current?.scrollTo({ top: 0 }), [index]);
+  useEffect(() => {
+    if (jump) return;
+    scroller.current?.scrollTo({ top: 0 });
+  }, [index, jump]);
+  useEffect(() => {
+    if (!jump) return;
+    const t = setTimeout(() => {
+      document.getElementById(`field-${jump}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+      setJump(null);
+    }, 350);
+    return () => clearTimeout(t);
+  }, [jump]);
   useEffect(() => {
     onView({ geometry, detail, focus: step?.focus ?? null, isolate: step?.focus ?? null, autoRotate: !step, interactive: true, focusDistance: 1.7, markers });
   }, [geometry, detail, step, markers, onView]);
 
   function set(key: FieldKey, value: FieldValue | null) {
+    setConfirmed((c) => new Set(c).add(key));
     const mine = (v: FieldValue): FieldState => ({ value: v, confidence: 1, source: "you", evidence: "You set this" });
     setFields((f) => {
       const next = { ...f };
@@ -175,9 +207,7 @@ export function ReviewStep({
                     {hints ? <Eye className="size-3.5" /> : <EyeOff className="size-3.5" />} Markers
                   </button>
                 </div>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {toCheck[index] > 0 ? `${toCheck[index]} to check. A quick look makes your results much sharper.` : "Looks solid. Tap anything to change it."}
-                </p>
+                <p className="mt-1 text-sm text-muted-foreground">{toCheck[index] > 0 ? `${toCheck[index]} to check. A quick look makes your results much sharper.` : "Looks solid. Tap anything to change it."}</p>
                 {extraction.conflicts
                   .filter((c) => step.fields.includes(c.field) && fields[c.field]?.source !== "you")
                   .map((c) => (
@@ -192,26 +222,51 @@ export function ReviewStep({
                   </div>
                 ) : null}
                 {step.id !== "usage" && shown[index].length === 0 && <p className="mt-4 rounded-2xl bg-surface px-4 py-3 text-sm text-muted-foreground ring-1 ring-hairline">Another home sits above yours, so there&apos;s no roof of your own to check.</p>}
-                <div className="mt-4 overflow-hidden rounded-3xl bg-surface ring-1 ring-hairline empty:hidden">
-                  {shown[index].map((key, i) => (
-                    <FieldRow
-                      key={key}
-                      fieldKey={key}
-                      field={fields[key]}
-                      record={record}
-                      first={i === 0}
-                      open={open.has(key)}
-                      onToggle={() =>
-                        setOpen((s) => {
-                          const next = new Set(s);
-                          if (!next.delete(key)) next.add(key);
-                          return next;
-                        })
-                      }
-                      onChange={(v) => set(key, v)}
-                    />
-                  ))}
-                </div>
+                {index === 0 && top.length > 0 && <WhatMatters questions={top} onPick={jumpTo} />}
+                {arranged && (
+                  <>
+                    {(() => {
+                      const row = (key: FieldKey, i: number, variant?: "matters" | "confident" | "quick") => (
+                        <FieldRow
+                          key={key}
+                          fieldKey={key}
+                          field={fields[key]}
+                          record={record}
+                          first={i === 0}
+                          open={open.has(key)}
+                          onToggle={() =>
+                            setOpen((s) => {
+                              const next = new Set(s);
+                              if (!next.delete(key)) next.add(key);
+                              return next;
+                            })
+                          }
+                          onChange={(v) => set(key, v)}
+                          impact={impacts.get(key)}
+                          variant={variant}
+                          confirmed={confirmed.has(key) || fields[key]?.source === "you"}
+                          onConfirm={() => setConfirmed((c) => new Set(c).add(key))}
+                        />
+                      );
+                      const group = (keys: FieldKey[], variant: "confident" | "quick" | undefined, title?: string) =>
+                        keys.length > 0 && (
+                          <section>
+                            {title && <h3 className="mb-2 mt-5 px-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">{title}</h3>}
+                            <div className={cn("overflow-hidden rounded-3xl bg-surface ring-1 ring-hairline", !title && "mt-4")}>
+                              <LayoutGroup>{keys.map((k, i) => row(k, i, variant ?? (arranged.matters.has(k) ? "matters" : undefined)))}</LayoutGroup>
+                            </div>
+                          </section>
+                        );
+                      return (
+                        <>
+                          {group(arranged.main, undefined)}
+                          {group(arranged.confident, "confident", "Read from your description")}
+                          {group(arranged.quick, "quick", "Quick confirms")}
+                        </>
+                      );
+                    })()}
+                  </>
+                )}
               </>
             ) : (
               <Summary fields={fields} usage={usage} missing={missing} nickname={nickname} onNickname={setNickname} onJump={go} models={extraction.models} />
@@ -252,14 +307,36 @@ function Hotspots({ geometry, counts, current, onSelect }: { geometry: Geometry;
     const Icon = STEP_ICON[s.id];
     return (
       <Html key={s.id} position={stepAnchor(s.id, geometry)} center zIndexRange={[10, 0]}>
-        <button
-          onClick={() => onSelect(i)}
-          aria-label={`Check ${s.label.toLowerCase()}`}
-          className="grid size-7 place-items-center rounded-full bg-amber text-black shadow-lg ring-4 ring-amber/25 animate-in zoom-in-50"
-        >
+        <button onClick={() => onSelect(i)} aria-label={`Check ${s.label.toLowerCase()}`} className="grid size-7 place-items-center rounded-full bg-amber text-black shadow-lg ring-4 ring-amber/25 animate-in zoom-in-50">
           <Icon className="size-3.5" />
         </button>
       </Html>
     );
   });
+}
+
+/** The few questions that move this home's score or plan the most; tapping one jumps to it. The figures are the engine's estimates. */
+function WhatMatters({ questions, onPick }: { questions: FieldImpact[]; onPick: (k: FieldKey) => void }) {
+  return (
+    <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ type: "spring", stiffness: 300, damping: 30 }} aria-label="What matters for your home" className="mt-4 rounded-3xl bg-amber/10 p-1.5 ring-1 ring-amber/25">
+      <h3 className="flex items-center gap-2 px-3 pb-1 pt-2.5 text-sm font-semibold">
+        <Sparkles className="size-4 text-amber" /> What matters for your home
+      </h3>
+      <p className="px-3 pb-1.5 text-xs text-muted-foreground">Worth a quick look first. These are estimates.</p>
+      <ol>
+        {questions.map((q) => (
+          <li key={q.key}>
+            <button onClick={() => onPick(q.key)} className="flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left active:bg-amber/10">
+              <span className="grid size-5 shrink-0 place-items-center rounded-full bg-amber/20 text-[10px] font-semibold text-amber">{q.rank}</span>
+              <span className="min-w-0 flex-1">
+                <span className="block text-sm font-medium">{DEF[q.key].label}</span>
+                <span className="block text-xs text-muted-foreground">{reasonOf(q)}</span>
+              </span>
+              <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+            </button>
+          </li>
+        ))}
+      </ol>
+    </motion.section>
+  );
 }
