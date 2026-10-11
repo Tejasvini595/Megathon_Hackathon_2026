@@ -81,7 +81,11 @@ export function ReviewStep({
   const alternatives = useMemo(() => alternativesOf(fields, extraction.fields, record), [fields, extraction.fields, record]);
   const plan = useQuestionPlan(record, alternatives, postcode);
   const impacts = useMemo(() => new Map(plan?.fields.map((f) => [f.key, f])), [plan]);
-  const arranged = useMemo(() => (step ? arrange(shown[index], plan, fields) : null), [step, shown, index, plan, fields]);
+  // A step is ordered by the ranking known when the user arrives on it; later plans update labels but never move rows
+  // under a finger mid-tap.
+  const [entryPlan, setEntryPlan] = useState<{ index: number; plan: typeof plan }>({ index, plan });
+  if (entryPlan.index !== index) setEntryPlan({ index, plan });
+  const arranged = useMemo(() => (step ? arrange(shown[index], entryPlan.plan, fields) : null), [step, shown, index, entryPlan, fields]);
   const top = useMemo(() => topQuestions(plan, fields, new Set(shown.flat())), [plan, fields, shown]);
 
   function jumpTo(key: FieldKey) {
