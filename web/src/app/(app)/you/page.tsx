@@ -89,7 +89,15 @@ async function Loader() {
         Preferences and constraints you mention (renting, listed building, no heat pump, budget) will appear here and shape your plan.
       </div>
 
-      <form action={signOutAction} className="mt-8">
+      <Link href="/portfolio" className="mt-8 flex items-center justify-between gap-3 rounded-2xl bg-surface px-4 py-3.5 text-sm ring-1 ring-hairline transition-colors hover:bg-surface-2">
+        <span>
+          For advisors: poorly performing homes
+          <span className="block text-xs text-muted-foreground">Dataset homes ranked by improvement potential</span>
+        </span>
+        <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+      </Link>
+
+      <form action={signOutAction} className="mt-3">
         <button type="submit" className="flex w-full items-center gap-3 rounded-2xl bg-surface px-4 py-3.5 text-left text-sm text-destructive ring-1 ring-hairline">
           <LogOut className="size-4" /> Sign out
         </button>
