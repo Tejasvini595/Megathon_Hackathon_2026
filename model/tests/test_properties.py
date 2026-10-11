@@ -121,7 +121,7 @@ def test_heat_pump_raises_electricity_and_the_explanation_says_so():
 def test_flat_requests_for_infeasible_measures_are_reported_not_quantified():
     pid = GAS[GAS.property_type == "Flat"].property_id.iloc[0]; a = GE.analyse(pid, ["heat_pump", "solar_pv"]); f = llm.facts(a)
     assert {x["retrofit"] for x in f["infeasible_requested"]} == {"heat_pump", "solar_pv"} and f["scenario_retrofits"] == []
-    assert "not feasible" in llm.template_explanation(f)
+    assert "not possible for this home" in llm.template_explanation(f)
 
 
 def test_community_heating_gets_a_score_but_savings_are_unavailable():
