@@ -97,6 +97,22 @@ async function Loader() {
         <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
       </Link>
 
+      <Link href="/methods" className="mt-3 flex items-center justify-between gap-3 rounded-2xl bg-surface px-4 py-3.5 text-sm ring-1 ring-hairline transition-colors hover:bg-surface-2">
+        <span>
+          How we calculate
+          <span className="block text-xs text-muted-foreground">The score, carbon, retrofit and value methods, with evidence</span>
+        </span>
+        <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+      </Link>
+
+      <Link href="/cases" className="mt-3 flex items-center justify-between gap-3 rounded-2xl bg-surface px-4 py-3.5 text-sm ring-1 ring-hairline transition-colors hover:bg-surface-2">
+        <span>
+          Edge cases
+          <span className="block text-xs text-muted-foreground">Live engine runs on homes built to break things</span>
+        </span>
+        <ChevronRight className="size-4 shrink-0 text-muted-foreground" />
+      </Link>
+
       <form action={signOutAction} className="mt-3">
         <button type="submit" className="flex w-full items-center gap-3 rounded-2xl bg-surface px-4 py-3.5 text-left text-sm text-destructive ring-1 ring-hairline">
           <LogOut className="size-4" /> Sign out
