@@ -11,7 +11,7 @@ import math
 import numpy as np
 import pandas as pd
 from . import config as C
-from .scoring import sub_scores
+from .scoring import insulation_score
 
 GAS_HEAT = {"gas_boiler", "gas_warm_air", "gas_room_heaters"}
 ELEC_HEAT = {"electric_direct", "electric_storage"}
@@ -274,7 +274,7 @@ def recommend(p: dict, elec: float, gas: float, par=None) -> dict:
     nohp = analyse_scenario(p, elec, gas, [r for r in chosen if r != "heat_pump"], par)
     excluded = [{"retrofit": r, "reason": feas[r][1]} for r in C.ORDER if not feas[r][0] or r not in chosen]
     recs = []
-    ins = sub_scores(pd.DataFrame([{**p, **pack["new_state"]}]))["insulation"].iloc[0]       # fabric state AFTER the planned fabric measures
+    ins = insulation_score({**p, **pack["new_state"]})       # fabric state AFTER the planned fabric measures
     fabric_ready = bool(pd.isna(ins) or ins >= 50)
     for i, s in enumerate(pack["per_retrofit"], 1):
         pb = s["cost_gbp"] / s["bill_saving_gbp"] if s["bill_saving_gbp"] > 1 else math.inf

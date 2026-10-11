@@ -1,5 +1,6 @@
 """Build a full property record from what a customer can realistically type in. Anything unknown stays NaN/None (never zero);
 EPC-modelled fields a customer cannot know (primary energy, EPC costs) are filled with dataset medians for similar homes and flagged."""
+import json
 import numpy as np
 import pandas as pd
 from . import config as C
@@ -22,16 +23,49 @@ PROPERTY_TYPES = ["House", "Flat", "Maisonette", "Bungalow"]
 BUILT_FORMS = ["Detached", "Semi-Detached", "Mid-Terrace", "End-Terrace", "unknown"]
 
 
-def build_property(x: dict, ref: pd.DataFrame) -> dict:
-    """x keys: property_type, built_form, floor_area, age_band, habitable_rooms, energy_rating, heating (HEATING key), wall_type, wall_ins,
+COST_COLS = ["epc_heating_cost_current", "epc_hot_water_cost_current", "epc_lighting_cost_current"]
+REFERENCE_FILE = C.MODELS / "customer_reference.json"
+
+
+def _per_m2(ref, hd: str, fuel_scope: str, col: str) -> float:
+    """Median EPC cost per m2 of similar dataset homes (same heating and fuel scope; all homes if the heating type never occurs).
+    `ref` is the dataset (DataFrame) or the same medians precomputed by `cost_reference`."""
+    if isinstance(ref, dict):
+        return ref["by_heating"].get(f"{hd}|{fuel_scope}", {}).get(col, np.nan) if hd in ref["heating_types"] else ref["all"][col]
+    sim = ref[(ref.heating_detail == hd) & (ref.fuel_scope == fuel_scope)] if (ref.heating_detail == hd).any() else ref
+    return float((sim[col] / sim.floor_area).median())
+
+
+def cost_reference(df: pd.DataFrame) -> dict:
+    """Everything `build_property` reads from the dataset, precomputed once (a few hundred bytes), so a customer home can be built
+    without loading the 129k-home table."""
+    hds = sorted({str(h) for h in df.heating_detail.dropna().unique()})
+    by = {}
+    for hd in hds:
+        for fs in sorted({str(f) for f in df.fuel_scope.dropna().unique()}):
+            sim = df[(df.heating_detail == hd) & (df.fuel_scope == fs)]
+            if len(sim):
+                by[f"{hd}|{fs}"] = {c: float((sim[c] / sim.floor_area).median()) for c in COST_COLS}
+    return {"heating_types": hds, "by_heating": by, "all": {c: float((df[c] / df.floor_area).median()) for c in COST_COLS}}
+
+
+def save_reference(df: pd.DataFrame):
+    REFERENCE_FILE.write_text(json.dumps(cost_reference(df), indent=1))
+
+
+def load_reference() -> dict:
+    r = json.loads(REFERENCE_FILE.read_text()); r["heating_types"] = set(r["heating_types"]); return r
+
+
+def build_property(x: dict, ref) -> dict:
+    """ref: the dataset or `load_reference()`. x keys: property_type, built_form, floor_area, age_band, habitable_rooms, energy_rating, heating (HEATING key), wall_type, wall_ins,
     loft ('unknown' or mm), glazing, controls, solar_kwp (None=unknown, 0=none), climate, elec_kwh/gas_kwh (optional annual), current_value (optional)."""
     hd, cond = HEATING[x["heating"]]
     gl_level, gl_label = GLAZING[x["glazing"]]; w_level, w_label = WALL_INS[x["wall_ins"]]; c_level, c_label = CONTROLS[x["controls"]]
     gas_heat = hd in ("gas_boiler", "gas_warm_air", "gas_room_heaters")
     fuel_scope = "gas_elec" if hd not in ("community", "oil_boiler") else ("heat_network" if hd == "community" else "other_fuel")
     pitched = x["property_type"] in ("House", "Bungalow")
-    sim = ref[(ref.heating_detail == hd) & (ref.fuel_scope == fuel_scope)] if (ref.heating_detail == hd).any() else ref
-    per_m2 = lambda col: float((sim[col] / sim.floor_area).median())
+    per_m2 = lambda col: _per_m2(ref, hd, fuel_scope, col)
     area = float(x["floor_area"]); sap = float(C.SAP_MID[x["energy_rating"]])
     loft = None if x["loft"] in (None, "unknown") else float(x["loft"])
     kwp = x.get("solar_kwp")
@@ -63,3 +97,8 @@ def build_property(x: dict, ref: pd.DataFrame) -> dict:
     else:
         p.update(elec_annual=np.nan, gas_annual=np.nan, elec_months=np.nan, gas_months=np.nan, usage_status="unavailable", intensity=np.nan)
     return p
+
+
+if __name__ == "__main__":      # python -m greenhome.custom  -> rewrite models/customer_reference.json from the dataset
+    from .features import build_master
+    save_reference(build_master()); print("wrote", REFERENCE_FILE)

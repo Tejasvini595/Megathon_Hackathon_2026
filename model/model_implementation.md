@@ -478,7 +478,7 @@ Labels are worded to avoid sign confusion ("saves X kWh", "uses X kWh more", "bi
 
 ## 19. Training, splits, calibration and evaluation
 
-`python -m greenhome.train` (about 21 minutes):
+`python -m greenhome.train` (the per-home loops in steps 6 and 7 run on `GREENHOME_WORKERS` processes; output is identical for any number):
 1. Rebuild the master table; score all homes.
 2. Energy models (full and lean) on metered train homes; evaluate against a type-by-size median baseline.
 3. Relevance classifier with calibration and abstention fitted on validation; ablations (no usage, no monthly shape, no heating-temperature report) and a popularity baseline; per-measure accuracy against the majority class; a coverage-versus-accuracy curve.
@@ -486,7 +486,7 @@ Labels are worded to avoid sign confusion ("saves X kWh", "uses X kWh more", "bi
 5. Value models: train-only (for evaluation) and train+val (production); price error and the rating premium, including the premium actually observed in held-out sales.
 6. Calibration (section 10) on train homes.
 7. Engine evaluation over each split: engine against the real EPC's potential SAP (independent), against the simulated labels (partly circular), and Monte Carlo coverage.
-8. Writes `models/*.joblib`, `models/calibration.json`, `reports/metrics.json`, `reports/test_predictions.parquet`.
+8. Writes `models/*.joblib`, `models/calibration.json`, `models/customer_reference.json`, `reports/metrics.json`, `reports/test_predictions.parquet`.
 
 **Splits** (`dataset/splits.parquet`): train 76,098, validation 17,281, test 16,808, and **Liverpool 19,131 held out completely** (an unseen city), all grouped by postcode so no postcode is in two splits. Fields unavailable at prediction time (hidden state, labels, later sales, EPC "potential" fields) are never features.
 
@@ -593,13 +593,13 @@ Other checks: explanation layer 100% grounded on 710 sentences (template output)
 ## 23. Reproducibility, tests and how to run
 
 ```
-pip install -r requirements.txt
+uv sync
 # put the built dataset in dataset/ (see README and data_patch/)
-python -m greenhome.run_all            # train, evaluate, benchmark, 39 tests, explanation / what-if / Break-it evaluations
-python -m greenhome.run_all --llm      # also scores the language model (needs ANTHROPIC_API_KEY)
-streamlit run app.py
+uv run python -m greenhome.run_all            # train, evaluate, benchmark, 39 tests, explanation / what-if / Break-it evaluations
+uv run python -m greenhome.run_all --llm      # also scores the language model (needs ANTHROPIC_API_KEY)
+uv run streamlit run app.py
 ```
-Individual steps: `python -m greenhome.train`, `python -m greenhome.benchmark`, `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q tests`, `python -m greenhome.llm_eval [--llm]`, `python -m greenhome.whatif_eval [--llm]`, `python -m greenhome.breakit`.
+Individual steps (prefix with `uv run`): `python -m greenhome.train`, `python -m greenhome.benchmark`, `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q tests`, `python -m greenhome.llm_eval [--llm]`, `python -m greenhome.whatif_eval [--llm]`, `python -m greenhome.breakit`.
 
 - **Seeds:** fixed everywhere (42); LightGBM runs in deterministic mode.
 - **Dataset rebuild check:** the dataset was rebuilt from the raw sources with the pinned toolchain (Python 3.14, pandas 3.0.6); eleven of fourteen tables were identical and the other three differed only in how missing values are stored. `validate.py` passes 23 of 23.

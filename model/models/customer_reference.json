@@ -1,0 +1,112 @@
+{
+ "heating_types": [
+  "community",
+  "electric_direct",
+  "electric_storage",
+  "gas_boiler",
+  "gas_room_heaters",
+  "gas_warm_air",
+  "heat_pump_air",
+  "heat_pump_ground",
+  "oil_boiler",
+  "solid_fuel",
+  "unknown"
+ ],
+ "by_heating": {
+  "community|heat_network": {
+   "epc_heating_cost_current": 7.369230769230769,
+   "epc_hot_water_cost_current": 5.0,
+   "epc_lighting_cost_current": 0.8028169014084507
+  },
+  "electric_direct|gas_elec": {
+   "epc_heating_cost_current": 12.272727272727273,
+   "epc_hot_water_cost_current": 8.298850574712644,
+   "epc_lighting_cost_current": 0.8028169014084507
+  },
+  "electric_direct|heat_network": {
+   "epc_heating_cost_current": 8.758620689655173,
+   "epc_hot_water_cost_current": 8.318181818181818,
+   "epc_lighting_cost_current": 0.95
+  },
+  "electric_direct|other_fuel": {
+   "epc_heating_cost_current": 39.58715596330275,
+   "epc_hot_water_cost_current": 11.385321100917432,
+   "epc_lighting_cost_current": 1.7798165137614679
+  },
+  "electric_storage|gas_elec": {
+   "epc_heating_cost_current": 13.0,
+   "epc_hot_water_cost_current": 8.0,
+   "epc_lighting_cost_current": 0.8955223880597015
+  },
+  "electric_storage|heat_network": {
+   "epc_heating_cost_current": 12.615136298421806,
+   "epc_hot_water_cost_current": 7.0476190476190474,
+   "epc_lighting_cost_current": 0.933982683982684
+  },
+  "gas_boiler|gas_elec": {
+   "epc_heating_cost_current": 9.98984745413317,
+   "epc_hot_water_cost_current": 2.6818181818181817,
+   "epc_lighting_cost_current": 0.7096774193548387
+  },
+  "gas_boiler|heat_network": {
+   "epc_heating_cost_current": 9.347560975609756,
+   "epc_hot_water_cost_current": 2.7096774193548385,
+   "epc_lighting_cost_current": 0.6851851851851852
+  },
+  "gas_room_heaters|gas_elec": {
+   "epc_heating_cost_current": 17.619718309859156,
+   "epc_hot_water_cost_current": 8.341176470588236,
+   "epc_lighting_cost_current": 0.8028169014084507
+  },
+  "gas_warm_air|gas_elec": {
+   "epc_heating_cost_current": 11.085271317829458,
+   "epc_hot_water_cost_current": 4.977777777777778,
+   "epc_lighting_cost_current": 0.7195121951219512
+  },
+  "gas_warm_air|heat_network": {
+   "epc_heating_cost_current": 9.232558139534884,
+   "epc_hot_water_cost_current": 3.2093023255813953,
+   "epc_lighting_cost_current": 0.46511627906976744
+  },
+  "heat_pump_air|gas_elec": {
+   "epc_heating_cost_current": 10.083333333333334,
+   "epc_hot_water_cost_current": 3.8285714285714287,
+   "epc_lighting_cost_current": 0.7333003463631865
+  },
+  "heat_pump_air|heat_network": {
+   "epc_heating_cost_current": 11.386576196589033,
+   "epc_hot_water_cost_current": 4.735333631885355,
+   "epc_lighting_cost_current": 1.5734437975817284
+  },
+  "heat_pump_ground|gas_elec": {
+   "epc_heating_cost_current": 9.51063829787234,
+   "epc_hot_water_cost_current": 8.208333333333334,
+   "epc_lighting_cost_current": 0.6875
+  },
+  "oil_boiler|heat_network": {
+   "epc_heating_cost_current": 5.073529411764706,
+   "epc_hot_water_cost_current": 4.794117647058823,
+   "epc_lighting_cost_current": 1.0
+  },
+  "oil_boiler|other_fuel": {
+   "epc_heating_cost_current": 11.595744680851064,
+   "epc_hot_water_cost_current": 7.5,
+   "epc_lighting_cost_current": 0.775
+  },
+  "solid_fuel|other_fuel": {
+   "epc_heating_cost_current": 38.52714013950539,
+   "epc_hot_water_cost_current": 8.417774086378738,
+   "epc_lighting_cost_current": 0.9075088231714737
+  },
+  "unknown|no_heating": {
+   "epc_heating_cost_current": 10.53872818551279,
+   "epc_hot_water_cost_current": 9.334209897202964,
+   "epc_lighting_cost_current": 0.6881424814726274
+  }
+ },
+ "all": {
+  "epc_heating_cost_current": 10.01360607182525,
+  "epc_hot_water_cost_current": 3.028169014084507,
+  "epc_lighting_cost_current": 0.7307692307692307
+ }
+}

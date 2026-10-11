@@ -31,20 +31,28 @@ def _lgb(n_estimators=400, **kw):
                              subsample_freq=1, colsample_bytree=0.8, verbose=-1, n_jobs=-1, random_state=SEED, deterministic=True, force_row_wise=True, **kw)
 
 
+def _booster_predict(model, X: pd.DataFrame) -> np.ndarray:
+    """Same numbers as model.predict / predict_proba: LightGBM's own pandas conversion (category codes, missing -> NaN, float64) done here,
+    skipping the sklearn wrapper's per-call checks, which cost ~3 ms for a single home. Small batches run on one thread."""
+    M = np.column_stack([np.where(X[c].cat.codes.to_numpy() < 0, np.nan, X[c].cat.codes.to_numpy()).astype(float) if isinstance(X[c].dtype, pd.CategoricalDtype)
+                         else X[c].to_numpy(dtype=float) for c in X.columns])
+    return model.booster_.predict(M, num_threads=1) if len(M) < 1000 else model.booster_.predict(M)
+
+
 class Design:
     """Stable feature matrix: fixed category levels, NaN kept as missing."""
     def fit(self, df):
         self.cats = {c: sorted(df[c].astype(str).unique()) for c in CAT_COLS}; return self
 
     def __call__(self, df, extra_cat=None):
-        X = pd.DataFrame(index=df.index)
+        X = {}                                       # built in one go: a column-by-column DataFrame costs more than the model itself for one home
         for c in CAT_COLS:
             X[c] = pd.Categorical(df[c].astype(str), categories=self.cats[c])
         for c in NUM_COLS:
-            X[c] = df[c].astype(float)
+            X[c] = df[c].astype(float).to_numpy()
         for c in BOOL_COLS:
-            X[c] = df[c].map({True: 1.0, False: 0.0}).astype(float) if df[c].dtype == object else df[c].astype(float)
-        return X
+            X[c] = (df[c].map({True: 1.0, False: 0.0}).astype(float) if df[c].dtype == object else df[c].astype(float)).to_numpy()
+        return pd.DataFrame(X, index=df.index)
 
 
 EPC_MODELLED = ["epc_primary_kwh_m2", "epc_co2_t", "epc_heating_cost_current", "epc_hot_water_cost_current", "epc_lighting_cost_current"]
@@ -63,7 +71,7 @@ class EnergyModel:
         self.e = _lgb().fit(X, np.log1p(d.elec_annual)); self.g = _lgb().fit(X, np.log1p(d.gas_annual)); return self
 
     def predict(self, df):
-        X = self._X(df); return np.expm1(self.e.predict(X)), np.expm1(self.g.predict(X))
+        X = self._X(df); return np.expm1(_booster_predict(self.e, X)), np.expm1(_booster_predict(self.g, X))
 
 
 TRIVIAL_MEASURES = ("heat_pump", "condensing_boiler", "solar_pv")   # >95% one class by construction; excluded from the headline relevance metrics
@@ -76,14 +84,11 @@ def usage_features(M):
     which is what drives the saving of smart controls and wall insulation."""
     f = lambda c: M[c].astype(float) if c in M else pd.Series(np.nan, index=M.index)
     ea, ga, area = f("elec_annual"), f("gas_annual"), f("floor_area")
-    U = pd.DataFrame(index=M.index)
-    U["elec_annual"], U["gas_annual"] = ea, ga
-    U["purchased"] = ea + ga
-    U["intensity"] = f("intensity")
-    U["gas_per_m2"], U["elec_per_m2"] = ga / area, ea / area
-    U["metered_vs_epc"] = U.intensity / f("epc_primary_kwh_m2")
-    U["gas_vs_epc_heatcost"] = ga / (f("epc_heating_cost_current") + f("epc_hot_water_cost_current") + 1)
-    U["elec_share"] = ea / U.purchased
+    purchased, intensity = ea + ga, f("intensity")
+    U = pd.DataFrame({"elec_annual": ea, "gas_annual": ga, "intensity": intensity, "purchased": purchased, "gas_per_m2": ga / area, "elec_per_m2": ea / area,
+                      "metered_vs_epc": intensity / f("epc_primary_kwh_m2"),
+                      "gas_vs_epc_heatcost": ga / (f("epc_heating_cost_current") + f("epc_hot_water_cost_current") + 1),
+                      "elec_share": ea / purchased}, index=M.index)
     return U[USAGE_FEATS].replace([np.inf, -np.inf], np.nan)
 
 
@@ -110,16 +115,18 @@ class RelevanceModel:
                                     colsample_bytree=0.8, verbose=-1, n_jobs=-1, random_state=SEED, deterministic=True, force_row_wise=True).fit(X, y); return self
 
     def _X(self, df, lab):
-        base = self.d(df.set_index("property_id")); X = base.loc[lab.property_id].reset_index(drop=True)
+        D = df.set_index("property_id"); ids = lab.property_id
+        parts = [self.d(D).loc[ids].reset_index(drop=True)]
         if self.use_usage:
-            U = usage_features(df.set_index("property_id")).loc[lab.property_id].reset_index(drop=True); X = pd.concat([X, U], axis=1)
+            parts.append(usage_features(D).loc[ids].reset_index(drop=True))
         if self.use_twin:
-            Tb = df.set_index("property_id").reindex(columns=TWIN_COLS).loc[lab.property_id].reset_index(drop=True).astype(float); X = pd.concat([X, Tb], axis=1)
+            parts.append(D.reindex(columns=TWIN_COLS).loc[ids].reset_index(drop=True).astype(float))
         if getattr(self, "use_thermo", False):      # getattr: models saved before this option existed have no attribute
-            Th = df.set_index("property_id").reindex(columns=THERMO).loc[lab.property_id].reset_index(drop=True).astype(float); X = pd.concat([X, Th], axis=1)
+            parts.append(D.reindex(columns=THERMO).loc[ids].reset_index(drop=True).astype(float))
+        X = pd.concat(parts, axis=1) if len(parts) > 1 else parts[0]
         X["retrofit_id"] = pd.Categorical(lab.retrofit_id.values, categories=C.ORDER); return X
 
-    def _raw(self, X): return np.log(np.clip(self.m.predict_proba(X), 1e-9, 1))
+    def _raw(self, X): return np.log(np.clip(_booster_predict(self.m, X), 1e-9, 1))
     def predict_proba(self, df, lab):
         z = self._raw(self._X(df, lab)) / self.T; z -= z.max(1, keepdims=True); p = np.exp(z); return p / p.sum(1, keepdims=True)
 

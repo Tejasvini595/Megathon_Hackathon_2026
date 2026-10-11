@@ -8,11 +8,14 @@ from .scoring import green_score, key_issues, score_df
 from .retrofits import recommend, analyse_scenario, feasibility, monte_carlo, needs_info
 from .breakit import conflict_flags
 from .models import load
+from .custom import cost_reference, load_reference
 
 
 class GreenEngine:
-    def __init__(self):
-        self.df = build_master().set_index("property_id", drop=False)
+    def __init__(self, lite: bool = False):
+        """lite=True: models only (~0.2 GB, ~1 s) for customer-entered homes; dataset lookups (prop, search, portfolio) are unavailable."""
+        self.df = None if lite else build_master().set_index("property_id", drop=False)
+        self.ref = load_reference() if lite else cost_reference(self.df)     # what custom.build_property needs from the dataset
         self.em, self.em_lean, self.vm = load("energy_model"), load("energy_model_lean"), load("value_model")
         self.rel = load("relevance_model")
 

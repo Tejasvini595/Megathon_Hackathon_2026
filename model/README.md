@@ -1,10 +1,13 @@
 # Green Home Score & Retrofit Engine (Megathon X, Lloyds PS2)
 
-    pip install -r requirements.txt          # versions pinned
-    python -m greenhome.run_all              # train + evaluate -> benchmark table -> tests -> explanation-layer evaluation (~12 min)
-    streamlit run app.py                     # dashboard (export ANTHROPIC_API_KEY to enable LLM explanations)
+    uv sync                                  # versions pinned in pyproject.toml / uv.lock
+    uv run python -m greenhome.run_all       # train + evaluate -> benchmark table -> tests -> explanation-layer evaluation
+    uv run streamlit run app.py              # dashboard (export ANTHROPIC_API_KEY to enable LLM explanations)
 
-Individual steps: `python -m greenhome.train` · `python -m greenhome.benchmark` · `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q tests` · `python -m greenhome.llm_eval [--llm]` · `python -m greenhome.whatif_eval [--llm]` · `python -m greenhome.breakit`.
+Individual steps (prefix with `uv run`): `python -m greenhome.train` · `python -m greenhome.benchmark` · `PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest -q tests` · `python -m greenhome.llm_eval [--llm]` · `python -m greenhome.whatif_eval [--llm]` · `python -m greenhome.breakit`.
+Training's per-home evaluation runs on `GREENHOME_WORKERS` processes (default: cores - 2, max 16; results are identical for any value).
+`GreenEngine(lite=True)` loads the models only (~0.2 GB, under a second) for customer-entered homes; it reads `models/customer_reference.json`
+(the few dataset medians `custom.build_property` needs, written by training or `python -m greenhome.custom`) instead of the 129k-home table.
 Reads only from `dataset/` (parquet, never modified). `data/` and `greenhome/gen_data.py` are an old sample stand-in and are not used. Models use fixed seeds.
 
 ## Layout

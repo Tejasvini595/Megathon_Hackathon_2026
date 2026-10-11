@@ -6,7 +6,7 @@ What the metrics do and do NOT show (also printed by `python -m greenhome.benchm
  * PARTLY CIRCULAR evidence: engine vs labels_* savings. The simulator that made those labels and our engine both use the catalogue's impact
    percentages and SCOP, so strong agreement is expected, not proof. The simulator additionally uses hidden per-home facts we never see.
  * The relevance model is scored against rule-based labels built from the same fields (re-learning a rule); the score itself is a documented formula, not a model."""
-import json, time
+import json, os, time
 import numpy as np
 import pandas as pd
 from scipy.stats import spearmanr
@@ -15,6 +15,7 @@ import lightgbm as lgb
 from . import config as C
 from .features import build_master
 from .scoring import score_df
+from .custom import save_reference
 from .models import EnergyModel, RelevanceModel, ValueModel, TRIVIAL_MEASURES, hpi_reference_price, save
 from .retrofits import recommend, analyse_scenario, feasibility, monte_carlo
 
@@ -25,6 +26,31 @@ MC_HOMES, MC_DRAWS = 2000, 100
 def mdape(y, p): return float(np.median(np.abs(y - p) / y) * 100)
 
 
+WORKERS = int(os.environ.get("GREENHOME_WORKERS", max(1, min(16, (os.cpu_count() or 1) - 2))))
+_CTX = {}      # read-only tables for the per-home workers (inherited through fork)
+
+
+def _pmap(fn, items):
+    """Order-preserving map over worker processes. Every item is independent and every random draw is seeded by the item's own index, so the
+    result is identical to a plain loop. Workers are forked after the calibration constants are set, so they see the same config as the parent."""
+    if WORKERS <= 1 or len(items) < 500: return [fn(x) for x in items]
+    import multiprocessing as mp
+    from concurrent.futures import ProcessPoolExecutor
+    with ProcessPoolExecutor(WORKERS, mp_context=mp.get_context("fork")) as ex:
+        return list(ex.map(fn, items, chunksize=max(1, len(items) // (WORKERS * 4))))
+
+
+def _cal_sap(item):
+    p, measures = item; x = analyse_scenario(p, p["elec_annual"], p["gas_annual"], measures)
+    return (x["sap_after"] - x["sap_before"], p["potential_sap"] - p["sap_score"]) if x["selected"] else None
+
+
+def _cal_mc(item):
+    n_, p = item; e, g = p["elec_annual"], p["gas_annual"]; a = recommend(p, e, g)["package"]
+    if not a["selected"]: return None
+    return p["property_id"], monte_carlo(p, e, g, a["selected"], n=MC_DRAWS, seed=10_000 + n_)["package"]
+
+
 def calibrate(s, epc_sets, lab_p, n_sap=4000, n_mc=1200):
     """Fit (on TRAIN homes only): (1) SAP_GAIN_SCALE so the engine's mean SAP gain for the EPC-recommended measures matches the EPC's own potential-SAP gain;
     (2) Monte Carlo widening factors so P10-P90 covers ~80% of reference savings. Written to models/calibration.json."""
@@ -33,16 +59,14 @@ def calibrate(s, epc_sets, lab_p, n_sap=4000, n_mc=1200):
     d = s[(s.split == "train") & (s.usage_status == "metered") & (s.fuel_scope == "gas_elec")]
     C.SAP_GAIN_SCALE = 1.0; C.UNCERT_SCALE = {"elec": 1.0, "gas": 1.0, "imp": 1.0, "carbon": 1.0}
     ids = [pid for pid in d.property_id if pid in epc_sets and epc_sets[pid][0] and not epc_sets[pid][1]]
-    samp = d[d.property_id.isin(rng.choice(ids, min(n_sap, len(ids)), replace=False))]; eng, epc = [], []
-    for p in samp.to_dict("records"):
-        x = analyse_scenario(p, p["elec_annual"], p["gas_annual"], list(epc_sets[p["property_id"]][0]))
-        if x["selected"]: eng.append(x["sap_after"] - x["sap_before"]); epc.append(p["potential_sap"] - p["sap_score"])
+    samp = d[d.property_id.isin(rng.choice(ids, min(n_sap, len(ids)), replace=False))]
+    pairs = [r for r in _pmap(_cal_sap, [(p, list(epc_sets[p["property_id"]][0])) for p in samp.to_dict("records")]) if r is not None]
+    eng, epc = [r[0] for r in pairs], [r[1] for r in pairs]
     k = float(np.mean(epc) / np.mean(eng)); C.SAP_GAIN_SCALE = k
     rows = []
-    for n_, p in enumerate(d.sample(min(n_mc, len(d)), random_state=1).to_dict("records")):
-        e, g = p["elec_annual"], p["gas_annual"]; a = recommend(p, e, g)["package"]
-        if not a["selected"]: continue
-        mc = monte_carlo(p, e, g, a["selected"], n=MC_DRAWS, seed=10_000 + n_)["package"]; y = lab_p.loc[p["property_id"]]
+    for r in _pmap(_cal_mc, list(enumerate(d.sample(min(n_mc, len(d)), random_state=1).to_dict("records")))):
+        if r is None: continue
+        mc = r[1]; y = lab_p.loc[r[0]]
         rows.append({"e": mc["elec"], "g": mc["gas"], "i": mc["improvement_pct"], "c": mc["carbon_kg"],
                      "ye": y.elec_saving_kwh, "yg": y.gas_saving_kwh, "yi": y.improvement_potential_pct, "yc": y.co2_saving_kg})
     def factor(key, ykey):
@@ -54,6 +78,28 @@ def calibrate(s, epc_sets, lab_p, n_sap=4000, n_mc=1200):
     C.UNCERT_SCALE = sc; C.CALIBRATED = True
     C.MODELS.mkdir(exist_ok=True); out = {"sap_gain_scale": k, "uncertainty_scale": sc, "n_sap_homes": len(eng), "n_mc_homes": len(rows), "fitted_on": "train split only"}
     (C.MODELS / "calibration.json").write_text(_j.dumps(out, indent=1)); return out
+
+
+def _eval_home(item):
+    """One held-out home: default package (+ Monte Carlo for the first MC_HOMES), every feasible measure alone, and the real EPC's own measures."""
+    n_, p, sp = item; epc_sets = _CTX["epc_sets"]
+    e, g = p["elec_annual"], p["gas_annual"]; r = recommend(p, e, g); a = r["package"]; pid = p["property_id"]
+    row = {"property_id": pid, "split": sp, "score": p["score"], "classification": p["classification"], "d_elec": a["saving"]["elec"], "d_gas": a["saving"]["gas"],
+           "carbon_kg": a["carbon_saving_kg"], "impr": a["improvement_potential_pct"], "impr_nohp": r["package_no_hp"]["improvement_potential_pct"],
+           "sap_before": a["sap_before"], "sap_after": a["sap_after"], "rating_after": a["rating_after"], "measures": "+".join(a["selected"]), "package_cost_gbp": a["cost_gbp"]}
+    if n_ < MC_HOMES and a["selected"]:
+        mc = monte_carlo(p, e, g, a["selected"], n=MC_DRAWS, seed=n_)["package"]
+        row.update(mc_e10=mc["elec"][0], mc_e90=mc["elec"][2], mc_g10=mc["gas"][0], mc_g90=mc["gas"][2], mc_i10=mc["improvement_pct"][0], mc_i90=mc["improvement_pct"][2],
+                   mc_c10=mc["carbon_kg"][0], mc_c90=mc["carbon_kg"][2])
+    alone, ind = [], None
+    for k, (ok_, _) in feasibility(p).items():
+        if ok_:
+            x1 = analyse_scenario(p, e, g, [k]); alone.append((pid, k, x1["saving"]["elec"], x1["saving"]["gas"]))
+    es = epc_sets.get(pid)       # INDEPENDENT: apply exactly the measures the real EPC recommended (all mappable to our nine) and compare SAP gain
+    if es and es[0] and not es[1]:
+        x2 = analyse_scenario(p, e, g, list(es[0]))
+        if x2["selected"]: ind = {"eng_dsap": x2["sap_after"] - x2["sap_before"], "epc_dsap": p["potential_sap"] - p["sap_score"], "n_measures": len(x2["selected"])}
+    return row, alone, ind
 
 
 def train_relevance(df, lr, M):
@@ -103,6 +149,7 @@ def train_relevance(df, lr, M):
 def main():
     t0 = time.time(); M = {"notes": "Targets are simulator / real-EPC / real-sales references. Agreement with simulated labels does not prove real-world accuracy; see the module docstring for which checks are independent and which are partly circular."}
     df = build_master(refresh=True); s = score_df(df)
+    save_reference(df)          # the few dataset medians a customer-entered home needs (lets the app load models only)
     M["n_homes"] = {k: int(v) for k, v in df.split.value_counts().items()}
     tr = s[s.split == "train"]
 
@@ -189,8 +236,11 @@ def main():
     # ---- 4b calibration on TRAIN homes only (then everything below is evaluated on held-out splits)
     lab_p = pd.read_parquet(C.DATA / "labels_package.parquet").set_index("property_id")
     er = pd.read_parquet(C.DATA / "epc_recommendations.parquet")
-    epc_sets = {pid: (set(z.mapped_retrofit.dropna()), z.mapped_retrofit.isna().any()) for pid, z in er.groupby("property_id")}
+    has_unmapped = er.mapped_retrofit.isna().groupby(er.property_id).any()        # {pid: (measures the EPC recommended, any unmappable?)}
+    mapped = er.mapped_retrofit.dropna().groupby(er.property_id[er.mapped_retrofit.notna()]).agg(set)
+    epc_sets = {pid: (mapped.get(pid, set()), na) for pid, na in has_unmapped.items()}
     cal = calibrate(s, epc_sets, lab_p); M["calibration"] = cal
+    _CTX["epc_sets"] = epc_sets
     print(f"[{time.time() - t0:5.0f}s] engine evaluation", flush=True)
     # ---- 5 engine vs reference labels + independent EPC checks + Monte Carlo coverage
     lab_v = pd.read_parquet(C.DATA / "labels_value.parquet").set_index("property_id")
@@ -200,24 +250,10 @@ def main():
         d = s[(s.split == sp) & (s.usage_status == "metered") & (s.fuel_scope == "gas_elec")]
         recs, alone, ind = [], [], []
         print(f"[{sp}] engine over {len(d):,} homes", flush=True)
-        for n_, p in enumerate(d.to_dict("records")):
-            if n_ % 5000 == 0: print(f"  {n_:,}/{len(d):,}  ({time.time() - t0:.0f}s)", flush=True)
-            e, g = p["elec_annual"], p["gas_annual"]; r = recommend(p, e, g); a = r["package"]; pid = p["property_id"]
-            row = {"property_id": pid, "split": sp, "score": p["score"], "classification": p["classification"], "d_elec": a["saving"]["elec"], "d_gas": a["saving"]["gas"],
-                   "carbon_kg": a["carbon_saving_kg"], "impr": a["improvement_potential_pct"], "impr_nohp": r["package_no_hp"]["improvement_potential_pct"],
-                   "sap_before": a["sap_before"], "sap_after": a["sap_after"], "rating_after": a["rating_after"], "measures": "+".join(a["selected"]), "package_cost_gbp": a["cost_gbp"]}
-            if n_ < MC_HOMES and a["selected"]:
-                mc = monte_carlo(p, e, g, a["selected"], n=MC_DRAWS, seed=n_)["package"]
-                row.update(mc_e10=mc["elec"][0], mc_e90=mc["elec"][2], mc_g10=mc["gas"][0], mc_g90=mc["gas"][2], mc_i10=mc["improvement_pct"][0], mc_i90=mc["improvement_pct"][2],
-                           mc_c10=mc["carbon_kg"][0], mc_c90=mc["carbon_kg"][2])
-            recs.append(row)
-            for k, (ok_, _) in feasibility(p).items():
-                if ok_:
-                    x1 = analyse_scenario(p, e, g, [k]); alone.append((pid, k, x1["saving"]["elec"], x1["saving"]["gas"]))
-            es = epc_sets.get(pid)       # INDEPENDENT: apply exactly the measures the real EPC recommended (all mappable to our nine) and compare SAP gain
-            if es and es[0] and not es[1]:
-                x2 = analyse_scenario(p, e, g, list(es[0]))
-                if x2["selected"]: ind.append({"eng_dsap": x2["sap_after"] - x2["sap_before"], "epc_dsap": p["potential_sap"] - p["sap_score"], "n_measures": len(x2["selected"])})
+        for row, al, x in _pmap(_eval_home, [(n_, p, sp) for n_, p in enumerate(d.to_dict("records"))]):
+            recs.append(row); alone += al
+            if x is not None: ind.append(x)
+        print(f"  done ({time.time() - t0:.0f}s)", flush=True)
         R = pd.DataFrame(recs)
         up = vm.uplift_batch(d.reset_index(drop=True), R.sap_after.values)
         R["uplift_low"], R["uplift_mid"], R["uplift_high"] = up.low_pct.values, up.mid_pct.values, up.high_pct.values
