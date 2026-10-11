@@ -23,6 +23,11 @@ export function BottomNav() {
   useEffect(() => {
     if (homeId) document.cookie = `${LAST_HOME_COOKIE}=${encodeURIComponent(homeId)}; path=/; max-age=31536000; SameSite=Lax`;
   }, [homeId]);
+  return <NavBar pathname={pathname} homeId={homeId} />;
+}
+
+/** The bar itself, without reading the URL: also the Suspense fallback while the path is resolved. */
+export function NavBar({ pathname = "", homeId = null }: { pathname?: string; homeId?: string | null }) {
   const hrefOf = (href: string) => (homeId && href !== "/you" ? `${href}/${homeId}` : href);
   return (
     <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center px-4 pb-safe">

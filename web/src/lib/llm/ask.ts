@@ -41,7 +41,7 @@ export async function parseQuestion(question: string, current: RetrofitId[]): Pr
       const { output } = await generateText({
         model: model("parse"),
         output: Output.object({ schema: intent }),
-        system:
+        instructions:
           "Turn a homeowner's message into a retrofit scenario for an energy engine. Use only these measure ids:\n" +
           Object.entries(p.measures).map(([id, label]) => `- ${id}: ${label}`).join("\n") +
           `\nThe current scenario is: ${current.length ? current.join(", ") : "nothing (the home as it is today)"}. Do not answer the question.`,

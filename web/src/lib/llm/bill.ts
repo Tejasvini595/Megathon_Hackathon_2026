@@ -33,7 +33,7 @@ async function readOne(file: { data: Uint8Array; mediaType: string }) {
   const { output } = await generateText({
     model: model("vision"),
     output: Output.object({ schema }),
-    system: SYSTEM,
+    instructions: SYSTEM,
     messages: [{ role: "user", content: [{ type: "text", text: "Transcribe the energy consumption on this bill." }, { type: "file", data: file.data, mediaType: file.mediaType }] }],
   });
   return output;

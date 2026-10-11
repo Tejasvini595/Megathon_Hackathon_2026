@@ -36,7 +36,7 @@ For solar, give kW; if only panels are counted, use 0.4 kW per panel. Negations 
 quote must be copied exactly from the text.`;
 
 async function readText(text: string) {
-  const { output } = await generateText({ model: model("extract"), output: Output.object({ schema }), system: SYSTEM, prompt: text });
+  const { output } = await generateText({ model: model("extract"), output: Output.object({ schema }), instructions: SYSTEM, prompt: text });
   return output as Record<string, { value: string | number; basis: "stated" | "implied"; quote: string } | null>;
 }
 

@@ -10,10 +10,8 @@ export async function generateExplanation(system: string, question: string, ctx:
   const { text } = await generateText({
     model: model("explain"),
     maxOutputTokens: 700,
-    messages: [
-      { role: "system", content: system },
-      { role: "user", content: `FACTS:\n${JSON.stringify(ctx.facts)}\n\nSLOTS (use these names only):\n${slots}\n\nCUSTOMER QUESTION: ${question || "Explain my score and what I should do."}` },
-    ],
+    instructions: system,
+    prompt: `FACTS:\n${JSON.stringify(ctx.facts)}\n\nSLOTS (use these names only):\n${slots}\n\nCUSTOMER QUESTION: ${question || "Explain my score and what I should do."}`,
   });
   return text;
 }
