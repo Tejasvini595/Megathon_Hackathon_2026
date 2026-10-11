@@ -61,6 +61,13 @@ scripts/                             import-postcodes.ts, prewarm-buildings.ts
 prisma/schema.prisma                 auth models + Home, HomeInput, Extraction, Scenario, ChatMessage, MemoryEvent
 ```
 
+## Snap your energy bill
+
+The Usage step can fill itself from a photo, image or PDF of a bill or annual statement (up to 4 files, 10 MB each). `readBill` (`new/bill-actions.ts`) re-checks the session, validates the upload, and sends the bytes to the vision model (`LLM_VISION_MODEL`) in memory; nothing is stored. The model only transcribes printed periods and consumption (`lib/llm/bill.ts`). Everything that earns trust is deterministic, in `lib/extract/bill-checks.ts`: m³ to kWh (m³ x 1.02264 x calorific value / 3.6), contiguous non-overlapping periods, monthly bills mapped to months, longer periods used only as a yearly total when they cover about 12 months (never split into fake months), the 2% check against a printed yearly total, plausibility ranges, and the same validity rules as typed readings. The user sees each finding (ok, check, reject) and confirms before anything is used. Without `OPENROUTER_API_KEY` the card says bill reading isn't set up.
+
+- `bun run bills:make` regenerates the synthetic test bills in `e2e/fixtures/bills/` (made-up people and numbers, with `truth.json`).
+- `bun run eval:bills` runs the checks on the ground truth (no key needed, includes the deliberately inconsistent bill) and, with a key, scores the reader per number.
+
 ## 3D performance rules
 
 - The canvas renders on demand. It only runs continuously while auto-rotating or in thermal view, and it stops while off-screen, covered by the sheet, or in a background tab.
