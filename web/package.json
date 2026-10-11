@@ -18,7 +18,8 @@
     "db:buildings": "bun --conditions react-server scripts/prewarm-buildings.ts",
     "test": "bun test src",
     "e2e": "playwright test",
-    "eval:extract": "bun src/lib/extract/eval/run.ts"
+    "eval:extract": "bun src/lib/extract/eval/run.ts",
+    "eval:llm": "bun src/lib/llm/eval/run.ts"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "4.0.65",

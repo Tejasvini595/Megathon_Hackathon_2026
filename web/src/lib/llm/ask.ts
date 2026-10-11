@@ -3,6 +3,7 @@ import { anthropic } from "@ai-sdk/anthropic";
 import { generateText, Output } from "ai";
 import { z } from "zod";
 import { engineJson, type LlmContext } from "@/lib/engine";
+import { generateExplanation } from "./explainer";
 import type { RetrofitId } from "@/lib/twin/types";
 
 /**
@@ -11,7 +12,6 @@ import type { RetrofitId } from "@/lib/twin/types";
  * rejects any number or claim the facts don't support; on rejection, or without an API key, the engine's template is used.
  */
 const PARSE_MODEL = process.env.ASK_PARSE_MODEL ?? "claude-haiku-5-5";
-const EXPLAIN_MODEL = process.env.ASK_EXPLAIN_MODEL ?? "claude-sonnet-5-5";
 export const llmEnabled = () => Boolean(process.env.ANTHROPIC_API_KEY);
 
 const IDS = ["loft_insulation", "cavity_wall_insulation", "solid_wall_insulation", "floor_insulation", "double_glazing", "smart_thermostat", "heat_pump", "solar_pv", "condensing_boiler"] as const;
@@ -67,15 +67,7 @@ export async function explain(question: string, ctx: LlmContext): Promise<Explan
   const p = await enginePrompt();
   if (!llmEnabled() || !p) return { text: ctx.template, source: "template", note: "Standard explanation (the AI explainer is not configured)." };
   try {
-    const slots = Object.entries(ctx.slots).map(([k, v]) => `${k} = ${v}`).join("\n");
-    const { text: raw } = await generateText({
-      model: anthropic(EXPLAIN_MODEL),
-      maxOutputTokens: 700,
-      messages: [
-        { role: "system", content: p.system, providerOptions: { anthropic: { cacheControl: { type: "ephemeral" } } } },
-        { role: "user", content: `FACTS:\n${JSON.stringify(ctx.facts)}\n\nSLOTS (use these names only):\n${slots}\n\nCUSTOMER QUESTION: ${question}` },
-      ],
-    });
+    const raw = await generateExplanation(p.system, question, ctx);
     const check = await engineJson<{ ok: boolean; text: string; issues: string[] }>("/check", { text: raw, facts: ctx.facts });
     if (check?.ok) return { text: check.text, source: "llm", note: null };
     console.warn("LLM explanation rejected by the engine's checks:", check?.issues.slice(0, 3));
