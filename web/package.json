@@ -19,7 +19,8 @@
     "test": "bun test src",
     "e2e": "playwright test",
     "eval:extract": "bun src/lib/extract/eval/run.ts",
-    "eval:llm": "bun src/lib/llm/eval/run.ts"
+    "eval:llm": "bun src/lib/llm/eval/run.ts",
+    "eval:decide": "bun src/lib/llm/eval/decide.ts"
   },
   "dependencies": {
     "@openrouter/ai-sdk-provider": "3.1.0",
