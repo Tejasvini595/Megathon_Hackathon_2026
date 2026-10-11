@@ -2,7 +2,8 @@ import { generateText, Output } from "ai";
 import { z } from "zod";
 import { FIELDS, type ExtractedField, type FieldKey, type FieldSource } from "./fields";
 import { rulesExtractor, type Extractor } from "./index";
-import { config, llmEnabled, model } from "../llm/provider";
+import { config, decisionModelId, llmEnabled, model } from "../llm/provider";
+import { decideFields } from "./decide-fields";
 
 /**
  * LLM reading of free-text and voice descriptions into the record's categories. The LLM only extracts what the user
@@ -65,7 +66,13 @@ export const llmExtractor: Extractor = async (inputs) => {
   return { ...base, fields, models: [...base.models.filter((m) => m !== "rules-v0"), "rules-v0", `llm:${config("extract").model}`] };
 };
 
-/** The LLM reader when an API key is configured, else the rules alone. */
-export const autoExtractor: Extractor = (inputs) => (llmEnabled() ? llmExtractor(inputs).catch(() => rulesExtractor(inputs)) : rulesExtractor(inputs));
+/** LLM reader plus the decision model's probabilities for choice fields when a key is configured, else the rules alone. */
+export const autoExtractor: Extractor = async (inputs) => {
+  if (!llmEnabled()) return rulesExtractor(inputs);
+  const result = await llmExtractor(inputs).catch(() => rulesExtractor(inputs));
+  const text = inputs.filter((i) => i.text && (i.kind === "TEXT" || i.kind === "VOICE")).map((i) => i.text).join("\n");
+  if (text && (await decideFields(text, result.fields, inputs.some((i) => i.kind === "TEXT") ? "text" : "voice"))) result.models.push(`decide:${decisionModelId()}`);
+  return result;
+};
 
 export default llmExtractor;
