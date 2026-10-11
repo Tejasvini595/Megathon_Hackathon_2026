@@ -1,21 +1,21 @@
 import { confirmSampleHome, expect, test } from "./fixtures";
 
-test("home: thermal toggle and heat bar focus", async ({ app }) => {
+test("home: thermal view shows each part's insulation score", async ({ app }) => {
   await confirmSampleHome(app);
   const home = app.getByRole("tab", { name: "Home", exact: true });
   const thermal = app.getByRole("tab", { name: "Thermal" });
   await expect(home).toHaveAttribute("aria-selected", "true");
   await thermal.click();
   await expect(thermal).toHaveAttribute("aria-selected", "true");
+
+  const roof = app.getByRole("button", { name: "Roof", exact: true });
+  await roof.click();
+  await expect(roof).toHaveAttribute("aria-pressed", "true");
+  await expect(app.getByText(/^Roof · (\d+\/100|not applicable)$/)).toBeVisible();
+  await roof.click();
+  await expect(roof).toHaveAttribute("aria-pressed", "false");
   await home.click();
   await expect(home).toHaveAttribute("aria-selected", "true");
-
-  const bar = app.getByRole("button", { name: /^Roof/ }).first();
-  await bar.scrollIntoViewIfNeeded();
-  await bar.click();
-  await expect(bar).toHaveAttribute("aria-pressed", "true");
-  await bar.click();
-  await expect(bar).toHaveAttribute("aria-pressed", "false");
 });
 
 test("plan: after-plan toggle", async ({ app }) => {
