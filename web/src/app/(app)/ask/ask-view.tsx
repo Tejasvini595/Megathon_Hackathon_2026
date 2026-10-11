@@ -1,60 +1,109 @@
 "use client";
 
 import { useEffect, useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
-import { ArrowRight, ArrowUp, Brain, Check, Cpu, Mic, ShieldCheck, Square } from "lucide-react";
+import { ArrowRight, ArrowUp, Brain, Check, Cpu, History, Loader2, Mic, Pencil, ShieldCheck, Square, SquarePen } from "lucide-react";
 import { useDictation } from "@/hooks/use-dictation";
 import { cn } from "@/lib/utils";
-import type { RetrofitId } from "@/lib/twin/types";
-import { askHome, rememberFromAsk, type AskReply } from "./actions";
-
-type Msg = { role: "user" | "assistant"; text: string; reply?: AskReply; asked?: string };
+import { askHome, listChats, rememberFromAsk, type AskReply, type ChatSummary, type ChatTurn } from "./actions";
+import { ChatHistory } from "./chat-history";
 
 const SUGGESTIONS = ["Why this score?", "What if I add solar?", "We rent, so skip the heat pump", "What should I do first?"];
 
+/** Shown before the server has saved a message; such messages can't be edited yet. */
+const local = (role: ChatTurn["role"], text: string): ChatTurn => ({ id: `local-${role}`, role, text });
+
 /**
  * Voice-first "talk to your house". Each question becomes a typed scenario, the engine re-runs, and the LLM explains
- * only the engine's outputs (checked before they're shown). Follow-ups build on the last scenario.
+ * only the engine's outputs (checked before they're shown). Follow-ups build on the last scenario. Chats are saved per
+ * home; editing a question drops everything after it and asks again.
  */
-export function AskView({ homeId }: { homeId: string }) {
-  const [messages, setMessages] = useState<Msg[]>([]);
+export function AskView({ homeId, homeName, chatId, initial }: { homeId: string; homeName: string; chatId: string | null; initial: ChatTurn[] }) {
+  const router = useRouter();
+  const [chat, setChat] = useState(chatId);
+  const [messages, setMessages] = useState(initial);
   const [input, setInput] = useState("");
-  const [current, setCurrent] = useState<RetrofitId[]>([]);
+  const [editing, setEditing] = useState<{ id: string; text: string } | null>(null);
+  const [chats, setChats] = useState<ChatSummary[] | null>(null);
+  const [historyOpen, setHistoryOpen] = useState(false);
   const [thinking, startThinking] = useTransition();
   const bottom = useRef<HTMLDivElement>(null);
   const dictation = useDictation((t) => t && send(t));
 
+  // Opening another chat (history, back/forward) brings new props. A refresh of the chat already on screen (the URL
+  // it was given after its first answer, or a revalidation) keeps the local state.
+  const [shown, setShown] = useState(chatId);
+  if (chatId !== shown) {
+    setShown(chatId);
+    if (chatId !== chat) {
+      setChat(chatId);
+      setMessages(initial);
+      setEditing(null);
+    }
+  }
+
   useEffect(() => bottom.current?.scrollIntoView({ behavior: "smooth" }), [messages, thinking]);
 
-  function send(text: string) {
+  function send(text: string, editOf?: string) {
     const q = text.trim();
-    if (!q) return;
+    if (!q || thinking) return;
+    const kept = editOf ? messages.slice(0, messages.findIndex((m) => m.id === editOf)) : messages;
     setInput("");
-    setMessages((m) => [...m, { role: "user", text: q }]);
+    setEditing(null);
+    setMessages([...kept, local("user", q)]);
     startThinking(async () => {
       try {
-        const reply = await askHome(homeId, q, current);
-        if (reply.scenario) setCurrent(reply.scenario.retrofits);
-        setMessages((m) => [...m, { role: "assistant", text: reply.text, reply, asked: q }]);
+        const res = await askHome(homeId, q, { chat: chat ?? undefined, editOf });
+        setMessages([...kept, res.question, res.answer]);
+        if (!chat) {
+          setChat(res.chatId);
+          // Same view, now addressable: no remount, and a reload reopens this chat.
+          window.history.replaceState(null, "", `/ask/${homeId}/${res.chatId}`);
+        }
       } catch {
-        setMessages((m) => [...m, { role: "assistant", text: "Sorry, I couldn't reach the engine. Try again in a moment." }]);
+        setMessages([...kept, local("user", q), local("assistant", "Sorry, I couldn't reach the engine. Try again in a moment.")]);
       }
     });
+  }
+
+  function newChat() {
+    setMessages([]);
+    setChat(null);
+    setEditing(null);
+    setInput("");
+    setHistoryOpen(false);
+    router.push(`/ask/${homeId}`);
+  }
+
+  function openHistory() {
+    setHistoryOpen(true);
+    listChats(homeId).then(setChats, () => setChats([]));
   }
 
   const empty = messages.length === 0;
 
   return (
     <div className="flex flex-1 flex-col">
+      <header className="flex items-center gap-1 pt-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-xs text-muted-foreground">Talking to</p>
+          <h1 className="truncate text-xl font-semibold tracking-tight">{homeName}</h1>
+        </div>
+        <button onClick={openHistory} aria-label="Your chats" className="grid size-10 place-items-center rounded-full text-muted-foreground hover:bg-surface-2 hover:text-foreground">
+          <History className="size-[18px]" />
+        </button>
+        <button onClick={newChat} disabled={thinking || (empty && !chat)} aria-label="New chat" className="grid size-10 place-items-center rounded-full text-muted-foreground hover:bg-surface-2 hover:text-foreground disabled:opacity-30">
+          <SquarePen className="size-[18px]" />
+        </button>
+      </header>
 
       <AnimatePresence>
         {empty && (
           <motion.div exit={{ opacity: 0, scale: 0.95 }} className="flex flex-1 flex-col items-center justify-center py-10">
             <Orb active={dictation.listening} />
-            <p className="mt-10 text-center text-2xl font-medium tracking-tight text-gradient">
-              {dictation.listening ? dictation.interim || "Listening…" : "Ask your home anything."}
-            </p>
+            <p className="mt-10 text-center text-2xl font-medium tracking-tight text-gradient">{dictation.interim || "Ask your home anything."}</p>
             <p className="mt-2 text-center text-sm text-muted-foreground">Try a what-if. Every number comes from the engine.</p>
           </motion.div>
         )}
@@ -63,28 +112,37 @@ export function AskView({ homeId }: { homeId: string }) {
       {!empty && (
         <div className="flex-1 space-y-4 py-6">
           {messages.map((m, i) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
-              <div className={cn("max-w-[85%] rounded-3xl px-4 py-3 text-[15px] leading-relaxed", m.role === "user" ? "rounded-br-lg bg-primary text-primary-foreground" : "rounded-bl-lg bg-surface ring-1 ring-hairline")}>
-                {m.reply?.scenario?.after && <ScenarioCard s={m.reply.scenario} />}
-                {m.role === "assistant" ? <Prose text={m.text} /> : m.text}
-                {m.reply?.note && <p className="mt-2 text-[11px] text-muted-foreground">{m.reply.note}</p>}
-                {m.reply?.memory && <RememberChips homeId={homeId} s={m.reply.memory} said={m.asked ?? ""} />}
-                {m.reply && (
-                  <div className="mt-3 flex flex-wrap gap-1">
-                    {m.reply.source === "llm" && (
-                      <span className="flex items-center gap-1 rounded-full bg-volt/10 px-2 py-0.5 text-[10px] text-volt">
-                        <ShieldCheck className="size-2.5" /> numbers from the engine
-                      </span>
-                    )}
-                    {m.reply.trace.map((t) => (
-                      <span key={t} className="flex items-center gap-1 rounded-full bg-surface-2 px-2 py-0.5 font-mono text-[10px] text-muted-foreground">
-                        <Cpu className="size-2.5" />
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                )}
-              </div>
+            <motion.div key={`${i}:${m.id}`} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className={cn("flex flex-col", m.role === "user" ? "items-end" : "items-start")}>
+              {editing?.id === m.id ? (
+                <EditBox text={editing.text} busy={thinking} onChange={(text) => setEditing({ id: m.id, text })} onCancel={() => setEditing(null)} onSubmit={() => send(editing.text, m.id)} />
+              ) : (
+                <div className={cn("max-w-[85%] rounded-3xl px-4 py-3 text-[15px] leading-relaxed", m.role === "user" ? "rounded-br-lg bg-primary text-primary-foreground" : "rounded-bl-lg bg-surface ring-1 ring-hairline")}>
+                  {m.reply?.scenario?.after && <ScenarioCard s={m.reply.scenario} />}
+                  {m.role === "assistant" ? <Prose text={m.text} /> : m.text}
+                  {m.reply?.note && <p className="mt-2 text-[11px] text-muted-foreground">{m.reply.note}</p>}
+                  {m.reply?.memory && <RememberChips homeId={homeId} s={m.reply.memory} said={messages[i - 1]?.text ?? ""} />}
+                  {m.reply && (
+                    <div className="mt-3 flex flex-wrap gap-1">
+                      {m.reply.source === "llm" && (
+                        <span className="flex items-center gap-1 rounded-full bg-volt/10 px-2 py-0.5 text-[10px] text-volt">
+                          <ShieldCheck className="size-2.5" /> numbers from the engine
+                        </span>
+                      )}
+                      {m.reply.trace.map((t) => (
+                        <span key={t} className="flex items-center gap-1 rounded-full bg-surface-2 px-2 py-0.5 font-mono text-[10px] text-muted-foreground">
+                          <Cpu className="size-2.5" />
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+              {m.role === "user" && !m.id.startsWith("local-") && editing?.id !== m.id && !thinking && (
+                <button onClick={() => setEditing({ id: m.id, text: m.text })} className="mt-1 flex items-center gap-1 rounded-full px-2 py-1 text-[11px] text-muted-foreground hover:bg-surface-2 hover:text-foreground">
+                  <Pencil className="size-3" /> Edit
+                </button>
+              )}
             </motion.div>
           ))}
           {thinking && (
@@ -115,23 +173,76 @@ export function AskView({ homeId }: { homeId: string }) {
           }}
           className="glass flex items-center gap-2 rounded-full p-1.5 pl-4 shadow-2xl shadow-black/40"
         >
-          <input value={input} onChange={(e) => setInput(e.target.value)} placeholder="What if I…" className="flex-1 bg-transparent text-[15px] outline-none placeholder:text-muted-foreground" />
+          <input value={input} onChange={(e) => setInput(e.target.value)} maxLength={500} placeholder={dictation.interim || "What if I…"} className="min-w-0 flex-1 bg-transparent text-[15px] outline-none placeholder:text-muted-foreground" />
           {dictation.supported && (
             <button
               type="button"
+              disabled={dictation.transcribing || thinking}
               onClick={() => (dictation.listening ? dictation.stop() : dictation.start())}
-              aria-label={dictation.listening ? "Stop" : "Speak"}
-              className={cn("grid size-10 place-items-center rounded-full", dictation.listening ? "bg-volt text-black" : "text-muted-foreground hover:bg-surface-2")}
+              aria-label={dictation.listening ? "Stop" : dictation.transcribing ? "Transcribing" : "Speak"}
+              className={cn("grid size-10 place-items-center rounded-full disabled:opacity-60", dictation.listening ? "bg-volt text-black" : "text-muted-foreground hover:bg-surface-2")}
             >
-              {dictation.listening ? <Square className="size-3.5 fill-current" /> : <Mic className="size-[18px]" />}
+              {dictation.listening ? <Square className="size-3.5 fill-current" /> : dictation.transcribing ? <Loader2 className="size-[18px] animate-spin" /> : <Mic className="size-[18px]" />}
             </button>
           )}
-          <button type="submit" disabled={!input.trim()} aria-label="Send" className="grid size-10 place-items-center rounded-full bg-primary text-primary-foreground disabled:opacity-30">
+          <button type="submit" disabled={!input.trim() || thinking} aria-label="Send" className="grid size-10 place-items-center rounded-full bg-primary text-primary-foreground disabled:opacity-30">
             <ArrowUp className="size-5" />
           </button>
         </form>
       </div>
+
+      <ChatHistory
+        open={historyOpen}
+        homeId={homeId}
+        chats={chats}
+        current={chat}
+        onClose={() => setHistoryOpen(false)}
+        onRemoved={(id) => {
+          setChats((cs) => cs?.filter((c) => c.id !== id) ?? null);
+          if (id === chat) newChat();
+        }}
+      />
     </div>
+  );
+}
+
+/** Editing a sent question in place; asking again replaces everything after it. */
+function EditBox({ text, busy, onChange, onCancel, onSubmit }: { text: string; busy: boolean; onChange: (t: string) => void; onCancel: () => void; onSubmit: () => void }) {
+  return (
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        onSubmit();
+      }}
+      className="w-[85%] rounded-3xl rounded-br-lg bg-surface-2 p-3 ring-1 ring-hairline"
+    >
+      <textarea
+        autoFocus
+        value={text}
+        maxLength={500}
+        rows={Math.min(5, Math.ceil(text.length / 32) || 1)}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={(e) => e.currentTarget.setSelectionRange(text.length, text.length)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" && !e.shiftKey) {
+            e.preventDefault();
+            if (text.trim()) onSubmit();
+          }
+          if (e.key === "Escape") onCancel();
+        }}
+        aria-label="Edit your question"
+        className="w-full resize-none bg-transparent text-[15px] leading-relaxed outline-none"
+      />
+      <p className="mt-1 text-[11px] text-muted-foreground">Asking again replaces the answers after this question.</p>
+      <div className="mt-2 flex justify-end gap-2">
+        <button type="button" onClick={onCancel} className="rounded-full px-3 py-1.5 text-xs text-muted-foreground hover:bg-surface">
+          Cancel
+        </button>
+        <button type="submit" disabled={!text.trim() || busy} className="rounded-full bg-primary px-3 py-1.5 text-xs font-semibold text-primary-foreground disabled:opacity-30">
+          Ask again
+        </button>
+      </div>
+    </form>
   );
 }
 

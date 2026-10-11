@@ -5,13 +5,15 @@ import { createOpenRouter } from "@openrouter/ai-sdk-provider";
  * (see .env.example); the defaults are small open-weight models, since none of these jobs needs a frontier model.
  */
 type Effort = "none" | "minimal" | "low" | "medium" | "high" | "xhigh";
-export type Role = "parse" | "explain" | "extract" | "vision";
+export type Role = "parse" | "explain" | "extract" | "vision" | "transcribe";
 
 const DEFAULTS: Record<Role, { model: string; effort: Effort | "default" }> = {
   parse: { model: "deepseek/deepseek-v4.1-flash", effort: "none" },
   explain: { model: "z-ai/glm-5.3-flash", effort: "low" },
   extract: { model: "deepseek/deepseek-v4.1-flash", effort: "none" },
   vision: { model: "z-ai/glm-5.3-flash", effort: "low" },
+  // Cheapest accurate audio-input model on OpenRouter (~$0.0006 per minute of speech), and it takes a vocabulary prompt.
+  transcribe: { model: "google/gemini-2.5-flash-lite", effort: "none" },
 };
 const EFFORTS = ["none", "minimal", "low", "medium", "high", "xhigh", "default"];
 

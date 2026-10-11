@@ -217,7 +217,7 @@ export function CaptureFlow() {
                 {!text && <RotatingPlaceholder />}
               </div>
 
-              {dictation.listening && (
+              {(dictation.listening || dictation.transcribing) && (
                 <div className="flex items-center gap-2 px-2 pb-2 text-sm text-volt">
                   <Waveform />
                   <span className="line-clamp-1 text-muted-foreground">{dictation.interim || "Listening…"}</span>

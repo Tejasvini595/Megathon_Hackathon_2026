@@ -130,7 +130,7 @@ model Home {
   inputs      HomeInput[]
   extractions Extraction[]
   scenarios   Scenario[]
-  messages    ChatMessage[]
+  chats       Chat[]
   memories    MemoryEvent[]
 
   @@index([userId])
@@ -185,16 +185,31 @@ enum ChatRole {
   SYSTEM
 }
 
-model ChatMessage {
-  id         String   @id @default(cuid())
-  homeId     String
-  home       Home     @relation(fields: [homeId], references: [id], onDelete: Cascade)
-  role       ChatRole
-  content    String
-  scenarioId String?
-  createdAt  DateTime @default(now())
+/// An Ask conversation about one home. Each turn is a user message and the assistant's reply.
+model Chat {
+  id        String        @id @default(cuid())
+  homeId    String
+  home      Home          @relation(fields: [homeId], references: [id], onDelete: Cascade)
+  /// The first question, shortened; shown in the chat list.
+  title     String
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+  messages  ChatMessage[]
 
-  @@index([homeId, createdAt])
+  @@index([homeId, updatedAt])
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  chatId    String
+  chat      Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
+  role      ChatRole
+  content   String
+  /// The full Ask reply on assistant messages (scenario, trace, memory suggestion); the next question builds on its scenario.
+  reply     Json?
+  createdAt DateTime @default(now())
+
+  @@index([chatId, createdAt])
 }
 
 enum MemoryKind {
