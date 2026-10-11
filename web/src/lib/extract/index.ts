@@ -19,7 +19,9 @@ export type ExtractInput = {
  */
 export type Extractor = (inputs: ExtractInput[]) => Promise<ExtractionResult>;
 
-const DEFAULTS: Record<FieldKey, FieldValue> = {
+type OptionalKey = "sapScore" | "thermostatC" | "currentValueGbp";
+
+const DEFAULTS: Record<Exclude<FieldKey, OptionalKey>, FieldValue> = {
   propertyType: "house",
   builtForm: "semi",
   storeys: 2,

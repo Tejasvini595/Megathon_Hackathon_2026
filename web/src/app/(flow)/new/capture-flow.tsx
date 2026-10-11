@@ -12,6 +12,7 @@ import type { TwinSceneProps } from "@/components/twin/scene";
 import { useDictation } from "@/hooks/use-dictation";
 import { geometryFromRecord, type FootprintSize } from "@/lib/twin/from-record";
 import { MOCK_TWIN } from "@/lib/twin/mock";
+import { thermalGlow } from "@/lib/twin/types";
 import { cn } from "@/lib/utils";
 import type { ExtractionResult } from "@/lib/extract/fields";
 import { createHome } from "./actions";
@@ -334,7 +335,7 @@ export function CaptureFlow() {
 
 function Stage({ view: { markers, ...view } }: { view: StageView }) {
   return (
-    <TwinCanvas className="absolute inset-0" heatLoss={MOCK_TWIN.heatLoss} mode="normal" {...view}>
+    <TwinCanvas className="absolute inset-0" heatLoss={thermalGlow(MOCK_TWIN.elementScores)} mode="normal" {...view}>
       {markers}
     </TwinCanvas>
   );

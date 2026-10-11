@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { applies, FIELDS, type PropertyRecord } from "./fields";
+import { applies, FIELDS, type FieldDef, type FieldKey, type PropertyRecord } from "./fields";
 import { sapInBand } from "./epc";
 import { usageProblems } from "./usage";
 import type { EpcBand } from "@/lib/twin/types";
@@ -14,7 +14,7 @@ export const usageSchema = z.object({
   otherFuelKwh: reading.optional(),
 });
 
-const fieldSchema = (f: (typeof FIELDS)[number]) => {
+const fieldSchema = (f: FieldDef) => {
   const base =
     f.kind === "number"
       ? z.coerce.number().min(f.min).max(f.max)
@@ -22,10 +22,10 @@ const fieldSchema = (f: (typeof FIELDS)[number]) => {
         ? z.array(z.enum(f.options.map((o) => o.value) as [string, ...string[]])).max(f.options.length)
         : z.enum(f.options.map((o) => o.value) as [string, ...string[]]);
   // Fields that only apply to some homes (a flat's floor, the solar size) arrive null when they don't.
-  return "optional" in f || "when" in f ? base.nullish() : base;
+  return f.optional || f.when ? base.nullish() : base;
 };
 
-const shape = Object.fromEntries(FIELDS.map((f) => [f.key, fieldSchema(f)]));
+const shape = Object.fromEntries(FIELDS.map((f: FieldDef) => [f.key, fieldSchema(f)])) as Record<string, z.ZodType>;
 
 /**
  * The record the engine reads: every field that applies to this home must have a value (only
@@ -33,17 +33,19 @@ const shape = Object.fromEntries(FIELDS.map((f) => [f.key, fieldSchema(f)]));
  */
 export const recordSchema = z
   .object({ ...shape, postcode: z.string().max(10).nullish(), usage: usageSchema })
-  .superRefine((r, ctx) => {
-    for (const f of FIELDS) {
-      if (!("optional" in f) && r[f.key] == null && applies(f.key, r as Partial<PropertyRecord>)) ctx.addIssue({ code: "custom", path: [f.key], message: `${f.label} is required` });
+  .superRefine((raw, ctx) => {
+    const r = raw as Partial<PropertyRecord>;
+    for (const f of FIELDS as readonly FieldDef[]) {
+      if (!f.optional && r[f.key as FieldKey] == null && applies(f.key as FieldKey, r)) ctx.addIssue({ code: "custom", path: [f.key], message: `${f.label} is required` });
     }
     const sap = r.sapScore as number | null | undefined;
     if (sap != null && r.epcBand !== "unknown" && !sapInBand(sap, r.epcBand as EpcBand)) ctx.addIssue({ code: "custom", path: ["sapScore"], message: `An EPC score of ${sap} isn't in band ${r.epcBand}` });
-    for (const message of usageProblems(r.usage, r as Partial<PropertyRecord>)) ctx.addIssue({ code: "custom", path: ["usage"], message });
+    for (const message of usageProblems(r.usage, r)) ctx.addIssue({ code: "custom", path: ["usage"], message });
   })
-  .transform((r) => {
-    const out: Record<string, unknown> = { ...r };
-    for (const { key } of FIELDS) out[key] = applies(key, r as Partial<PropertyRecord>) ? (r[key] ?? null) : null;
+  .transform((raw) => {
+    const r = raw as Partial<PropertyRecord>;
+    const out: Record<string, unknown> = { ...raw };
+    for (const { key } of FIELDS) out[key] = applies(key, r) ? (r[key] ?? null) : null;
     return out as unknown as PropertyRecord;
   });
 

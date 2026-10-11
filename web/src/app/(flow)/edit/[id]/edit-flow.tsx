@@ -6,12 +6,13 @@ import { X } from "lucide-react";
 import { TwinCanvas } from "@/components/twin/twin-canvas";
 import { geometryFromRecord, type FootprintSize } from "@/lib/twin/from-record";
 import { MOCK_TWIN } from "@/lib/twin/mock";
-import type { ExtractionResult } from "@/lib/extract/fields";
+import { thermalGlow } from "@/lib/twin/types";
+import type { EnergyUsage, ExtractionResult } from "@/lib/extract/fields";
 import type { StageView } from "../../new/capture-flow";
 import { ReviewStep } from "../../new/review-step";
 import { partsUpTo } from "../../new/steps";
 
-export function EditFlow({ homeId, nickname, extraction, backHref, footprint }: { homeId: string; nickname: string; extraction: ExtractionResult; backHref: string; footprint?: FootprintSize }) {
+export function EditFlow({ homeId, nickname, extraction, backHref, footprint, usage }: { homeId: string; nickname: string; extraction: ExtractionResult; backHref: string; footprint?: FootprintSize; usage?: EnergyUsage }) {
   const [{ markers, ...view }, setView] = useState<StageView>({ geometry: geometryFromRecord({}), parts: partsUpTo(0), interactive: false });
 
   return (
@@ -22,13 +23,13 @@ export function EditFlow({ homeId, nickname, extraction, backHref, footprint }: 
         </Link>
       </header>
       <div className="relative h-[46dvh] shrink-0">
-        <TwinCanvas className="absolute inset-0" heatLoss={MOCK_TWIN.heatLoss} mode="normal" {...view}>
+        <TwinCanvas className="absolute inset-0" heatLoss={thermalGlow(MOCK_TWIN.elementScores)} mode="normal" {...view}>
           {markers}
         </TwinCanvas>
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-14 bg-[linear-gradient(transparent,var(--background))]" />
       </div>
       <div className="flex min-h-0 flex-1 flex-col">
-        <ReviewStep homeId={homeId} extraction={extraction} initialNickname={nickname} footprint={footprint} onView={setView} />
+        <ReviewStep homeId={homeId} extraction={extraction} initialNickname={nickname} initialUsage={usage} footprint={footprint} onView={setView} />
       </div>
     </div>
   );

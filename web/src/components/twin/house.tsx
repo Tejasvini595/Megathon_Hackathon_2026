@@ -4,7 +4,8 @@ import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import { Edges, Sparkles } from "@react-three/drei";
 import * as THREE from "three";
-import { GlazingSection, HeatingUnit, LoftLayer, Scaffold, WallSection } from "./cutaways";
+import { FloorSection, GlazingSection, HeatingUnit, LOFT_MM, LoftLayer, Scaffold, WallSection } from "./cutaways";
+import { SOLAR_KW_PER_PANEL } from "@/lib/extract/solar";
 import type { Element, Geometry } from "@/lib/twin/types";
 
 export type ViewMode = "normal" | "thermal";
@@ -12,7 +13,7 @@ export type Highlight = Element | "system" | "roof_pv" | null;
 /** Which parts are built, for the assembly animation. Missing keys count as built. */
 export type Parts = Partial<Record<"body" | "roof" | "windows" | "system" | "solar", boolean>>;
 /** Record fields that only change the cutaway callouts, not the house shape. */
-export type HouseDetail = { wallType?: string; wallInsulation?: string; loftInsulationMm?: number; glazing?: string; heating?: string };
+export type HouseDetail = { wallType?: string; wallInsulation?: string; loftInsulation?: string; floorType?: string; floorInsulation?: string; glazing?: string; heating?: string; boilerAge?: string };
 
 export const STOREY_H = 2.7;
 export const PLINTH_H = 0.35;
@@ -185,6 +186,37 @@ const panelMaterial = new THREE.MeshStandardMaterial({ color: "#0f1d3a", metalne
 const pumpMaterial = new THREE.MeshStandardMaterial({ color: "#d9dde3", roughness: 0.4, metalness: 0.3 });
 const fanMaterial = new THREE.MeshStandardMaterial({ color: "#20252c", roughness: 0.9 });
 
+/**
+ * Solar panels as one instanced mesh: they pop in one after another when the count rises, and
+ * drop out again when it falls. Rows run down the slope, 1.05 m by 1.65 m each.
+ */
+function PanelGrid({ count, cols, rows, position, rotation }: { count: number; cols: number; rows: number; position: [number, number, number]; rotation: [number, number, number] }) {
+  const ref = useRef<THREE.InstancedMesh>(null);
+  const shown = useRef(0);
+  const capacity = cols * rows;
+  useEffect(() => {
+    const mesh = ref.current;
+    if (!mesh) return;
+    const m = new THREE.Matrix4();
+    for (let i = 0; i < capacity; i++) mesh.setMatrixAt(i, m.makeTranslation(((i % cols) - (cols - 1) / 2) * 1.05, 0, (Math.floor(i / cols) - (rows - 1) / 2) * 1.75));
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.count = Math.floor(shown.current);
+  }, [capacity, cols, rows]);
+  useFrame((state, delta) => {
+    const mesh = ref.current;
+    if (!mesh || shown.current === count) return;
+    const step = easeFactor(delta, 6) === 1 ? Infinity : delta * 22;
+    shown.current += Math.sign(count - shown.current) * Math.min(step, Math.abs(count - shown.current));
+    mesh.count = Math.floor(shown.current);
+    state.invalidate();
+  });
+  return (
+    <instancedMesh key={capacity} ref={ref} args={[undefined, undefined, capacity]} material={panelMaterial} position={position} rotation={rotation} frustumCulled={false}>
+      <boxGeometry args={[1.0, 0.05, 1.65]} />
+    </instancedMesh>
+  );
+}
+
 function Ghost({ size, position }: { size: [number, number, number]; position: [number, number, number] }) {
   return (
     <mesh position={position} material={ghostMaterial}>
@@ -283,6 +315,10 @@ export function House({ geometry: g, heatLoss, mode, highlight = null, heatRef, 
   const slope = Math.atan2(roofRise, D / 2 + ROOF_OVERHANG);
   const panelCols = Math.max(2, Math.floor((W - 0.8) / 1.05));
   const pitched = hasRoofAbove && g.roof !== "flat";
+  const panels = Math.max(1, Math.round((g.solarKw ?? 3.5) / SOLAR_KW_PER_PANEL));
+  const slopeRows = Math.max(1, Math.floor((Math.hypot(D / 2 + ROOF_OVERHANG, roofRise) - 0.3) / 1.75));
+  const slopeCap = panelCols * slopeRows;
+  const flatRows = Math.max(1, Math.floor((D - 0.8) / 1.75));
 
   return (
     <group>
@@ -340,13 +376,16 @@ export function House({ geometry: g, heatLoss, mode, highlight = null, heatRef, 
             <WallSection wallType={detail.wallType} insulation={detail.wallInsulation} />
           </Appear>
           <Appear show={isolate === "roof" && hasRoofAbove} position={[0, topY, 0]}>
-            <LoftLayer width={W} depth={D} mm={Number(detail.loftInsulationMm ?? 0)} />
+            <LoftLayer width={W} depth={D} mm={LOFT_MM[detail.loftInsulation ?? "none"] ?? 0} />
           </Appear>
           <Appear show={isolate === "windows"} position={[W / 2 + 1.3, baseY + STOREY_H * 0.55, D / 2 + 1.2]} rotation={[0, -0.7, 0]}>
             <GlazingSection glazing={detail.glazing} />
           </Appear>
+          <Appear show={isolate === "walls" && floorIndex === 0} position={[W / 2 + 1.7, baseY - 0.1, D / 2 + 2.9]} rotation={[0, -0.5, 0]}>
+            <FloorSection floorType={detail.floorType} insulation={detail.floorInsulation} />
+          </Appear>
           <Appear show={built.system && !g.hasHeatPump && Boolean(detail.heating)} position={heatPumpPos}>
-            <HeatingUnit heating={detail.heating} />
+            <HeatingUnit heating={detail.heating} condensing={detail.heating === "gas_boiler" && detail.boilerAge === "from_2005"} />
           </Appear>
         </>
       )}
@@ -364,33 +403,16 @@ export function House({ geometry: g, heatLoss, mode, highlight = null, heatRef, 
         />
       )}
 
-      <Appear show={built.solar && g.hasSolar && pitched}>
-        <group position={[0, topY + roofRise / 2 + 0.06, (D / 2 + ROOF_OVERHANG) / 2]} rotation={[slope, 0, 0]}>
-          {Array.from({ length: 2 * panelCols }, (_, i) => {
-            const r = Math.floor(i / panelCols);
-            const c = i % panelCols;
-            return (
-              <mesh key={i} material={panelMaterial} position={[(c - (panelCols - 1) / 2) * 1.05, 0, (r - 0.5) * 1.7]}>
-                <boxGeometry args={[1.0, 0.05, 1.65]} />
-              </mesh>
-            );
-          })}
-        </group>
-      </Appear>
-
-      {/* Flat roofs, including the block's roof above a flat (shared panels). */}
-      <Appear show={built.solar && g.hasSolar && !pitched}>
-        <group position={[0, (hasRoofAbove ? topY : blockTopY) + 0.35, 0]} rotation={[0.22, 0, 0]}>
-          {Array.from({ length: 2 * panelCols }, (_, i) => {
-            const r = Math.floor(i / panelCols);
-            const c = i % panelCols;
-            return (
-              <mesh key={i} material={panelMaterial} position={[(c - (panelCols - 1) / 2) * 1.05, 0, (r - 0.5) * 1.7]}>
-                <boxGeometry args={[1.0, 0.05, 1.65]} />
-              </mesh>
-            );
-          })}
-        </group>
+      <Appear show={built.solar && g.hasSolar}>
+        {pitched ? (
+          <>
+            <PanelGrid count={Math.min(panels, slopeCap)} cols={panelCols} rows={slopeRows} position={[0, topY + roofRise / 2 + 0.06, (D / 2 + ROOF_OVERHANG) / 2]} rotation={[slope, 0, 0]} />
+            <PanelGrid count={Math.max(0, panels - slopeCap)} cols={panelCols} rows={slopeRows} position={[0, topY + roofRise / 2 + 0.06, -(D / 2 + ROOF_OVERHANG) / 2]} rotation={[-slope, 0, 0]} />
+          </>
+        ) : (
+          // Flat roofs, including the block's roof above a flat (shared panels).
+          <PanelGrid count={Math.min(panels, panelCols * flatRows)} cols={panelCols} rows={flatRows} position={[0, (hasRoofAbove ? topY : blockTopY) + 0.35, 0]} rotation={[0.22, 0, 0]} />
+        )}
       </Appear>
 
       <Appear show={built.system && g.hasHeatPump} position={heatPumpPos}>

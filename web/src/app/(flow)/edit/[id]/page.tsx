@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { requireUser } from "@/lib/dal";
 import { prisma } from "@/lib/prisma";
 import { EditFlow } from "./edit-flow";
+import type { EnergyUsage } from "@/lib/extract/fields";
 import { footprintSize } from "@/lib/twin/from-record";
 import { savedExtraction } from "./saved-extraction";
 
@@ -27,5 +28,5 @@ async function Loader({ params }: { params: PageProps<"/edit/[id]">["params"] })
   const extraction = home && savedExtraction(home.record as Record<string, unknown> | null, home.extractions[0] ?? null);
   if (!home || !extraction) notFound();
 
-  return <EditFlow homeId={home.id} nickname={home.nickname} extraction={extraction} footprint={footprintSize(home.footprint)} backHref={home.status === "CONFIRMED" ? `/home?homeId=${home.id}` : "/you"} />;
+  return <EditFlow homeId={home.id} nickname={home.nickname} extraction={extraction} footprint={footprintSize(home.footprint)} usage={(home.record as { usage?: EnergyUsage } | null)?.usage} backHref={home.status === "CONFIRMED" ? `/home?homeId=${home.id}` : "/you"} />;
 }

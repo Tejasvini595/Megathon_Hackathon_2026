@@ -6,7 +6,7 @@ import { FileText } from "lucide-react";
 import { optionLabel, FIELDS, type ExtractionResult } from "@/lib/extract/fields";
 import { geometryFromRecord, type FootprintSize } from "@/lib/twin/from-record";
 import { cn } from "@/lib/utils";
-import { STEPS, detailOf, partsUpTo, recordOf } from "./steps";
+import { BUILD_STEPS, detailOf, partsUpTo, recordOf } from "./steps";
 import type { StageView } from "./capture-flow";
 
 type Props = {
@@ -28,7 +28,7 @@ const labelOf = Object.fromEntries(FIELDS.map((f) => [f.key, f.label]));
 export function Analysing({ result, text, photoUrl, hasPlan, onView, onDone, footprint }: Props) {
   const reduce = useReducedMotion();
   const [built, setBuilt] = useState(0);
-  const finished = built >= STEPS.length;
+  const finished = built >= BUILD_STEPS.length;
 
   useEffect(() => {
     if (!result) return;
@@ -42,7 +42,7 @@ export function Analysing({ result, text, photoUrl, hasPlan, onView, onDone, foo
   }, [geometry, built, result, onView]);
 
   const found = result
-    ? STEPS.slice(0, built).flatMap((s) => s.fields.filter((k) => result.fields[k].source !== "default").map((k) => ({ key: k, ...result.fields[k] })))
+    ? BUILD_STEPS.slice(0, built).flatMap((s) => s.fields.filter((k) => result.fields[k] && result.fields[k].source !== "default").map((k) => ({ key: k, ...result.fields[k] })))
     : [];
   const unknown = result ? Object.values(result.fields).filter((f) => f.source === "default").length : 0;
   // Every quote is marked from the start (stable keys); revealed ones light up as their part is built.
@@ -62,7 +62,7 @@ export function Analysing({ result, text, photoUrl, hasPlan, onView, onDone, foo
             transition={{ duration: 0.2 }}
             className="mt-1 text-2xl font-medium tracking-tight"
           >
-            {!result ? "Reading what you gave us…" : finished ? "Here’s your home, roughly." : `${STEPS[built].building}…`}
+            {!result ? "Reading what you gave us…" : finished ? "Here’s your home, roughly." : `${BUILD_STEPS[built].building}…`}
           </motion.h1>
         </AnimatePresence>
       </div>
