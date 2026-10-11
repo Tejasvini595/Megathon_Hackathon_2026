@@ -30,7 +30,12 @@ export function AskView({ homeId, homeName, chatId, initial }: { homeId: string;
   const [historyOpen, setHistoryOpen] = useState(false);
   const [thinking, startThinking] = useTransition();
   const bottom = useRef<HTMLDivElement>(null);
-  const dictation = useDictation((t) => t && send(t));
+  const field = useRef<HTMLInputElement>(null);
+  // The transcript lands in the input to check before sending: an audio model can mishear.
+  const dictation = useDictation((t) => {
+    setInput((v) => (v ? `${v} ${t}` : t).slice(0, 500));
+    field.current?.focus();
+  });
 
   // Opening another chat (history, back/forward) brings new props. A refresh of the chat already on screen (the URL
   // it was given after its first answer, or a revalidation) keeps the local state.
@@ -173,7 +178,7 @@ export function AskView({ homeId, homeName, chatId, initial }: { homeId: string;
           }}
           className="glass flex items-center gap-2 rounded-full p-1.5 pl-4 shadow-2xl shadow-black/40"
         >
-          <input value={input} onChange={(e) => setInput(e.target.value)} maxLength={500} placeholder={dictation.interim || "What if I…"} className="min-w-0 flex-1 bg-transparent text-[15px] outline-none placeholder:text-muted-foreground" />
+          <input ref={field} value={input} onChange={(e) => setInput(e.target.value)} maxLength={500} placeholder={dictation.interim || "What if I…"} className="min-w-0 flex-1 bg-transparent text-[15px] outline-none placeholder:text-muted-foreground" />
           {dictation.supported && (
             <button
               type="button"
