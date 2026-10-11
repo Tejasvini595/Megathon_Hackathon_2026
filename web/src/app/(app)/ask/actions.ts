@@ -5,7 +5,7 @@ import { z } from "zod";
 import type { Prisma } from "@/generated/prisma/client";
 import { getAnalysis, runEngine } from "@/lib/engine";
 import { detectMemory, type MemorySuggestion } from "@/lib/llm/memory-notes";
-import { parseMemory, retrofitId } from "@/lib/memory";
+import { parseMemory, RETROFIT_LABEL, retrofitId } from "@/lib/memory";
 import { prisma } from "@/lib/prisma";
 import { HOME_SECTIONS } from "@/lib/active-home";
 import { requireUser } from "@/lib/dal";
@@ -24,7 +24,8 @@ async function ownedHome(id: string) {
 export type AskReply = {
   text: string;
   source: "llm" | "template";
-  note: string | null;
+  /** Something the user should know about their question, in plain words (e.g. a measure we can't model). */
+  notice: string | null;
   /** The scenario the engine ran (what the next question builds on), with its computed results. */
   scenario: {
     retrofits: RetrofitId[];
@@ -32,7 +33,8 @@ export type AskReply = {
     before: { score: number; scoreClass: ScoreClass };
     after: { score: number; scoreClass: ScoreClass; gasSavingKwh: Band; elecSavingKwh: Band; carbonSavingKg: Band; billSavingGbp: number } | null;
   } | null;
-  trace: string[];
+  /** How the answer was made, in plain words, for the "How we got this answer" section. Missing on replies saved before it existed. */
+  steps?: string[];
   /** Facts about the home or the customer spotted in the message, for the user to confirm before they're remembered. */
   memory: MemorySuggestion | null;
 };
@@ -98,7 +100,7 @@ export async function askHome(homeId: string, question: string, opts: { chat?: s
     reply = await answer(home, q, current);
   } catch (e) {
     console.error("Ask failed", e instanceof Error ? e.message : e);
-    reply = { text: "Sorry, I couldn't reach the engine. Try again in a moment.", source: "template", note: null, scenario: null, trace: [], memory: null };
+    reply = { text: "Sorry, I couldn't reach the engine. Try again in a moment.", source: "template", notice: null, scenario: null, steps: [], memory: null };
   }
   const answered = await prisma.chatMessage.create({ data: { chatId: chat.id, role: "ASSISTANT", content: reply.text, reply: reply as unknown as Prisma.InputJsonValue } });
   // Bumps the chat to the top of the list; an edited first question renames it.
@@ -108,19 +110,20 @@ export async function askHome(homeId: string, question: string, opts: { chat?: s
 
 /** What-if: parse the question into a typed scenario, re-run the engine, then let the LLM explain only the engine's outputs. */
 async function answer(home: NonNullable<Awaited<ReturnType<typeof ownedHome>>>, q: string, cur: RetrofitId[]): Promise<AskReply> {
-  if (!home.record) return { text: "Add your home first, then ask me anything about it.", source: "template", note: null, scenario: null, trace: [], memory: null };
+  if (!home.record) return { text: "Add your home first, then ask me anything about it.", source: "template", notice: null, scenario: null, steps: [], memory: null };
 
   const base = await getAnalysis(home);
-  if (!base) return { text: "The engine isn't reachable right now, so I can't answer with real numbers. Try again in a moment.", source: "template", note: null, scenario: null, trace: [], memory: null };
+  if (!base) return { text: "The engine isn't reachable right now, so I can't answer with real numbers. Try again in a moment.", source: "template", notice: null, scenario: null, steps: [], memory: null };
   const [parsed, memory] = await Promise.all([parseQuestion(q, cur), detectMemory(q).catch(() => null)]);
-  const trace = [`read as ${parsed.kind === "scenario" ? "a what-if" : "a question"} (${parsed.source === "llm" ? "AI" : "rules"})`];
+  const names = (ids: RetrofitId[]) => ids.map((id) => RETROFIT_LABEL[id].toLowerCase()).join(", ").replace(/, ([^,]*)$/, " and $1");
+  const steps = [parsed.retrofits.length ? `We read your question as a what-if: your home with ${names(parsed.retrofits)}.` : "We answered from your home as it is today."];
 
   let ctx = base.llm;
   let scenario: AskReply["scenario"] = null;
   if (parsed.retrofits.length) {
     const run = await runEngine(home, parsed.retrofits);
-    if (!run) return { text: "The engine couldn't re-run that scenario. Try again in a moment.", source: "template", note: null, scenario: null, trace, memory: null };
-    trace.push(`engine re-ran ${parsed.retrofits.length} measure${parsed.retrofits.length > 1 ? "s" : ""}`);
+    if (!run) return { text: "The engine couldn't re-run that scenario. Try again in a moment.", source: "template", notice: null, scenario: null, steps, memory: null };
+    steps.push(run.twin.package ? "We recalculated your home's score, energy use, carbon and value with that change." : "That change can't be made to this home, so there was nothing to recalculate.");
     ctx = run.llm;
     const p = run.twin.package;
     scenario = {
@@ -131,10 +134,14 @@ async function answer(home: NonNullable<Awaited<ReturnType<typeof ownedHome>>>, 
     };
   }
   const ex = await explain(q, ctx);
-  trace.push(ex.source === "llm" ? "AI explanation, numbers checked" : "standard explanation");
-  const note = [parsed.note, ex.note].filter(Boolean).join(" ") || null;
-  if (memory) trace.push(`noticed something to remember (${memory.source})`);
-  return { text: ex.text, source: ex.source, note, scenario, trace, memory };
+  steps.push(
+    ex.source === "llm"
+      ? "AI wrote the wording. Every number in it was filled in by our calculations and checked before you saw it."
+      : "This is our standard summary, so every number comes straight from our calculations.",
+  );
+  const u = parsed.unsupported;
+  const notice = u.length ? `We can't model ${u.join(", ")} yet, so ${u.length > 1 ? "they were" : "it was"} left out of this answer.` : null;
+  return { text: ex.text, source: ex.source, notice, scenario, steps, memory };
 }
 
 const suggestion = z.object({

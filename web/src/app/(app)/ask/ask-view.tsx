@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
-import { ArrowRight, ArrowUp, Brain, Check, Cpu, History, Loader2, Mic, Pencil, ShieldCheck, Square, SquarePen } from "lucide-react";
+import { ArrowRight, ArrowUp, Brain, Check, ChevronDown, History, Loader2, Mic, Pencil, Square, SquarePen } from "lucide-react";
 import { useDictation } from "@/hooks/use-dictation";
 import { cn } from "@/lib/utils";
 import { askHome, listChats, rememberFromAsk, type AskReply, type ChatSummary, type ChatTurn } from "./actions";
@@ -124,23 +124,9 @@ export function AskView({ homeId, homeName, chatId, initial }: { homeId: string;
                 <div className={cn("max-w-[85%] rounded-3xl px-4 py-3 text-[15px] leading-relaxed", m.role === "user" ? "rounded-br-lg bg-primary text-primary-foreground" : "rounded-bl-lg bg-surface ring-1 ring-hairline")}>
                   {m.reply?.scenario?.after && <ScenarioCard s={m.reply.scenario} />}
                   {m.role === "assistant" ? <Prose text={m.text} /> : m.text}
-                  {m.reply?.note && <p className="mt-2 text-[11px] text-muted-foreground">{m.reply.note}</p>}
+                  {m.reply?.notice && <p className="mt-2 text-xs text-muted-foreground">{m.reply.notice}</p>}
                   {m.reply?.memory && <RememberChips homeId={homeId} s={m.reply.memory} said={messages[i - 1]?.text ?? ""} />}
-                  {m.reply && (
-                    <div className="mt-3 flex flex-wrap gap-1">
-                      {m.reply.source === "llm" && (
-                        <span className="flex items-center gap-1 rounded-full bg-volt/10 px-2 py-0.5 text-[10px] text-volt">
-                          <ShieldCheck className="size-2.5" /> numbers from the engine
-                        </span>
-                      )}
-                      {m.reply.trace.map((t) => (
-                        <span key={t} className="flex items-center gap-1 rounded-full bg-surface-2 px-2 py-0.5 font-mono text-[10px] text-muted-foreground">
-                          <Cpu className="size-2.5" />
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  )}
+                  {!!m.reply?.steps?.length && <HowWeGotThis steps={m.reply.steps} />}
                 </div>
               )}
               {m.role === "user" && !m.id.startsWith("local-") && editing?.id !== m.id && !thinking && (
@@ -254,6 +240,23 @@ function EditBox({ text, busy, onChange, onCancel, onSubmit }: { text: string; b
 const kwh = (n: number) => `${n < 0 ? "+" : "−"}${Math.abs(Math.round(n)).toLocaleString("en-GB")} kWh`;
 
 /** The engine's before -> after for the scenario, shown before the words. */
+/** Collapsed by default: how the answer was put together, in plain words. */
+function HowWeGotThis({ steps }: { steps: string[] }) {
+  return (
+    <details className="group mt-3 text-xs text-muted-foreground">
+      <summary className="flex cursor-pointer list-none items-center gap-1 select-none hover:text-foreground">
+        How we got this answer
+        <ChevronDown className="size-3.5 transition-transform group-open:rotate-180" />
+      </summary>
+      <ol className="mt-2 list-decimal space-y-1 pl-4 leading-relaxed">
+        {steps.map((s) => (
+          <li key={s}>{s}</li>
+        ))}
+      </ol>
+    </details>
+  );
+}
+
 function ScenarioCard({ s }: { s: NonNullable<AskReply["scenario"]> }) {
   const a = s.after!;
   return (

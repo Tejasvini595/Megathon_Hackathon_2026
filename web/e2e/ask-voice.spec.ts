@@ -19,5 +19,6 @@ test("ask: a spoken question is transcribed by the audio model and answered", as
   await app.getByRole("button", { name: "Stop" }).click();
   // "What if I add solar panels and cavity wall insulation to my semi-detached house?"
   await expect(app.getByText(/solar panels and cavity wall insulation/i)).toBeVisible({ timeout: 30_000 });
-  await expect(app.getByText(/engine re-ran 2 measures/)).toBeVisible({ timeout: 60_000 });
+  await app.getByText("How we got this answer").click({ timeout: 60_000 });
+  await expect(app.getByText(/what-if: your home with cavity wall insulation and solar pv/i)).toBeVisible();
 });

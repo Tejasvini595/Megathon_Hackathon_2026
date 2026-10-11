@@ -27,7 +27,7 @@ const intent = z.object({
   unsupported: z.array(z.string()).describe("Things the user asked about that match NO measure id above (e.g. a wind turbine). Never list a measure id or its label here, even if it seems unsuitable for the home"),
 });
 
-export type Parsed = { kind: "scenario" | "explain"; retrofits: RetrofitId[]; unsupported: string[]; source: "llm" | "rules"; note: string };
+export type Parsed = { kind: "scenario" | "explain"; retrofits: RetrofitId[]; unsupported: string[]; source: "llm" | "rules" };
 
 function compose(mode: "add" | "only" | "remove", measures: RetrofitId[], current: RetrofitId[]): RetrofitId[] {
   const set = new Set(mode === "only" ? measures : mode === "add" ? [...current, ...measures] : current.filter((m) => !measures.includes(m)));
@@ -58,30 +58,30 @@ export async function parseQuestion(question: string, current: RetrofitId[]): Pr
       // Small models sometimes list a catalogue measure as unsupported; feasibility is the engine's call, not the parser's.
       const known = new Set(Object.entries(p.measures).flatMap(([id, label]) => [id, id.replaceAll("_", " "), label.toLowerCase()]));
       const unsupported = output.unsupported.filter((u) => !known.has(u.trim().toLowerCase()));
-      return { kind, retrofits, unsupported, source: "llm", note: unsupported.length ? `Not in the retrofit catalogue, so ignored: ${unsupported.join(", ")}.` : "" };
+      return { kind, retrofits, unsupported, source: "llm" };
     } catch (e) {
       console.error("LLM parse failed, using rules", e instanceof Error ? e.message : e);
     }
   }
-  const r = await engineJson<{ retrofits: RetrofitId[]; unsupported: string[]; note: string }>("/parse", { text: question, current });
+  const r = await engineJson<{ retrofits: RetrofitId[]; unsupported: string[] }>("/parse", { text: question, current });
   if (!r) throw new Error("engine unavailable");
   const changed = r.retrofits.join() !== current.join();
-  return { kind: changed ? "scenario" : "explain", retrofits: r.retrofits, unsupported: r.unsupported, source: "rules", note: r.note };
+  return { kind: changed ? "scenario" : "explain", retrofits: r.retrofits, unsupported: r.unsupported, source: "rules" };
 }
 
-export type Explanation = { text: string; source: "llm" | "template"; note: string | null };
+export type Explanation = { text: string; source: "llm" | "template" };
 
 export async function explain(question: string, ctx: LlmContext): Promise<Explanation> {
   const p = await enginePrompt();
-  if (!llmEnabled() || !p) return { text: ctx.template, source: "template", note: "Standard explanation (the AI explainer is not configured)." };
+  if (!llmEnabled() || !p) return { text: ctx.template, source: "template" };
   try {
     const raw = await generateExplanation(p.system, question, ctx);
     const check = await engineJson<{ ok: boolean; text: string; issues: string[] }>("/check", { text: raw, facts: ctx.facts });
-    if (check?.ok) return { text: check.text, source: "llm", note: null };
+    if (check?.ok) return { text: check.text, source: "llm" };
     console.warn("LLM explanation rejected by the engine's checks:", check?.issues.slice(0, 3));
-    return { text: ctx.template, source: "template", note: "Standard explanation (the AI's wording didn't pass the number and claim checks)." };
+    return { text: ctx.template, source: "template" };
   } catch (e) {
     console.error("LLM explain failed", e instanceof Error ? e.message : e);
-    return { text: ctx.template, source: "template", note: "Standard explanation (the AI explainer is unavailable right now)." };
+    return { text: ctx.template, source: "template" };
   }
 }

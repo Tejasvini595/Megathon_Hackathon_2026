@@ -362,7 +362,7 @@ def template_explanation(f: dict, question: str = "") -> str:
         return "\n\n".join(out)
     for x in f["infeasible_requested"]:
         name = _name(x["retrofit"])
-        out.append((f"{name} cannot be estimated yet: {x['reason'].replace('Status unknown: ', '')}." if x.get("needs_info") else f"{name} is not feasible here: {x['reason']}."))
+        out.append((f"{name} cannot be estimated yet: {x['reason'].replace('Status unknown: ', '')}." if x.get("needs_info") else f"{name} is not possible for this home: {x['reason']}."))
     if f["scenario_retrofits"]:
         pk, v = f["package"], f["value_impact"]
         out.append(f"**Scenario ({', '.join(_name(r) for r in f['scenario_retrofits'])}):** estimated electricity change {pk['electricity_saving_kwh']:+,} kWh/yr and gas change "
@@ -376,7 +376,7 @@ def template_explanation(f: dict, question: str = "") -> str:
         out.append(f"Estimated value impact: {v['uplift_pct_low']}% to {v['uplift_pct_high']}% (GBP {v['value_low_gbp']:,} to {v['value_high_gbp']:,}), an indicative range from historical sales relationships, not a guaranteed or causal increase."
                    if v else "Property-value impact cannot be estimated (no current value estimate).")
     else:
-        out.append("No feasible retrofit was selected, so there are no savings to report.")
+        out.append("None of these changes can be made to this home, so there are no savings to show." if f["infeasible_requested"] else "No changes were included, so there are no savings to show.")
     out.append("All figures are estimates, not guarantees.")
     return "\n\n".join(out)
 
