@@ -18,6 +18,7 @@ import { PlanVariantProvider } from "./plan-variant";
 import { RouteSection } from "./route-section";
 import type { RoutePlan } from "./route-types";
 import { Step } from "./step";
+import { WhyThisOrder } from "./why-order";
 import type { StepStatus } from "./step-actions";
 
 export const metadata: Metadata = { title: "Plan" };
@@ -58,6 +59,7 @@ async function PlanContent() {
           </div>
           {twin.unavailableReason && <p className="mt-3 rounded-2xl bg-surface px-3.5 py-3 text-xs text-muted-foreground ring-1 ring-hairline">{twin.unavailableReason}</p>}
 
+          {twin.retrofits.length > 1 && <WhyThisOrder ids={twin.retrofits.map((r) => r.id)} />}
           <ol className="relative mt-6 space-y-3 before:absolute before:bottom-6 before:left-[15px] before:top-6 before:w-px before:bg-hairline">
             {twin.retrofits.map((r) => (
               <Step key={r.id} r={r} homeId={home.id} status={statusOf(r.id)} />

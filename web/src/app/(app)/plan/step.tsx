@@ -10,8 +10,7 @@ const kwh = (n: number) => Math.round(n).toLocaleString("en-GB");
 const nonZero = (b: Band) => b.p10 !== 0 || b.p50 !== 0 || b.p90 !== 0;
 
 export function Step({ r, homeId, status }: { r: Retrofit; homeId: string; status: StepStatus }) {
-  const tier = r.relevance?.tier ?? r.suitability;
-  const survey = tier === "needs survey";
+  const survey = r.relevance?.tier === "needs survey";
   const chip = (t: string) => (t === "High" ? "bg-volt/15 text-volt" : t === "Medium" ? "bg-amber/15 text-amber" : "bg-surface-2 text-muted-foreground");
   const gas = nonZero(r.gasSavingKwh);
   const elec = nonZero(r.elecSavingKwh);
@@ -28,19 +27,16 @@ export function Step({ r, homeId, status }: { r: Retrofit; homeId: string; statu
         <span className={cn("block min-w-0 flex-1 rounded-3xl bg-surface p-4 ring-1 ring-hairline transition-colors group-data-[active=true]:ring-volt/40", survey && "border border-dashed border-muted-foreground/50 ring-0")}>
           <span className="flex items-start justify-between gap-2">
             <span className="font-medium">{r.label}</span>
-            <span className="flex shrink-0 flex-col items-end gap-1">
-              <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-medium", chip(r.suitability))}>{r.suitability} suitability</span>
-              <span
-                className={cn("flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-medium", survey ? "border border-dotted border-muted-foreground/60 text-muted-foreground" : chip(tier))}
-                title={r.relevance ? `${Math.round(r.relevance.confidence * 100)}% confidence` : undefined}
-              >
-                {survey && <Search className="size-3" />}
-                {survey ? "Needs survey" : `${tier} relevance`}
+            {survey ? (
+              <span className="flex shrink-0 items-center gap-1 rounded-full border border-dotted border-muted-foreground/60 px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                <Search className="size-3" /> Needs a survey
               </span>
-            </span>
+            ) : (
+              <span className={cn("shrink-0 rounded-full px-2 py-0.5 text-[10px] font-medium", chip(r.suitability))}>{r.suitability} suitability</span>
+            )}
           </span>
           <span className="mt-1 block text-sm text-muted-foreground">{r.reason}</span>
-          {survey && <span className="mt-2 block text-xs text-muted-foreground">We can&apos;t tell from what we know whether this suits your home; a survey would settle it.</span>}
+          <span className="mt-1.5 block text-[11px] text-muted-foreground">{whyTier(r, survey)}</span>
 
           {(gas || elec) && (
             <span className="mt-3 block space-y-2">
@@ -71,6 +67,19 @@ export function Step({ r, homeId, status }: { r: Retrofit; homeId: string; statu
       </div>
     </li>
   );
+}
+
+/**
+ * One recommendation per card: suitability is the engine's payback rule (High within 10 years, Medium within 20); the
+ * relevance model's view of how much the measure saves for homes like this backs it up, or flags a survey when unsure.
+ */
+function whyTier(r: Retrofit, survey: boolean) {
+  const payback = r.paybackYears == null ? "doesn't pay back at today's prices" : `pays back in about ${r.paybackYears.toFixed(0)} years`;
+  if (survey) return `Why: ${payback}, but our model can't tell how much it would save in your home without a survey.`;
+  const m = r.relevance;
+  if (!m) return `Why: ${payback}.`;
+  const view = `our model rates its saving for homes like yours ${m.tier.toLowerCase()} (${Math.round(m.confidence * 100)}% sure)`;
+  return `Why: ${payback}; ${view}.`;
 }
 
 /** P10 to P90 span on a shared axis with a zero line; amber where use rises. The tick is the P50. */
