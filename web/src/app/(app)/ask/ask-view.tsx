@@ -2,15 +2,16 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowRight, ArrowUp, Cpu, Mic, ShieldCheck, Square } from "lucide-react";
+import Link from "next/link";
+import { ArrowRight, ArrowUp, Brain, Check, Cpu, Mic, ShieldCheck, Square } from "lucide-react";
 import { useDictation } from "@/hooks/use-dictation";
 import { cn } from "@/lib/utils";
 import type { RetrofitId } from "@/lib/twin/types";
-import { askHome, type AskReply } from "./actions";
+import { askHome, rememberFromAsk, type AskReply } from "./actions";
 
-type Msg = { role: "user" | "assistant"; text: string; reply?: AskReply };
+type Msg = { role: "user" | "assistant"; text: string; reply?: AskReply; asked?: string };
 
-const SUGGESTIONS = ["Why this score?", "What if I add solar?", "Skip the heat pump", "What should I do first?"];
+const SUGGESTIONS = ["Why this score?", "What if I add solar?", "We rent, so skip the heat pump", "What should I do first?"];
 
 /**
  * Voice-first "talk to your house". Each question becomes a typed scenario, the engine re-runs, and the LLM explains
@@ -35,7 +36,7 @@ export function AskView() {
       try {
         const reply = await askHome(q, current);
         if (reply.scenario) setCurrent(reply.scenario.retrofits);
-        setMessages((m) => [...m, { role: "assistant", text: reply.text, reply }]);
+        setMessages((m) => [...m, { role: "assistant", text: reply.text, reply, asked: q }]);
       } catch {
         setMessages((m) => [...m, { role: "assistant", text: "Sorry, I couldn't reach the engine. Try again in a moment." }]);
       }
@@ -67,6 +68,7 @@ export function AskView() {
                 {m.reply?.scenario?.after && <ScenarioCard s={m.reply.scenario} />}
                 {m.role === "assistant" ? <Prose text={m.text} /> : m.text}
                 {m.reply?.note && <p className="mt-2 text-[11px] text-muted-foreground">{m.reply.note}</p>}
+                {m.reply?.memory && <RememberChips s={m.reply.memory} said={m.asked ?? ""} />}
                 {m.reply && (
                   <div className="mt-3 flex flex-wrap gap-1">
                     {m.reply.source === "llm" && (
@@ -155,6 +157,60 @@ function ScenarioCard({ s }: { s: NonNullable<AskReply["scenario"]> }) {
         <span><span className="block text-muted-foreground">Bills</span><span className="tabular">{a.billSavingGbp >= 0 ? "−" : "+"}£{Math.abs(a.billSavingGbp).toLocaleString("en-GB")}/yr</span></span>
       </div>
       <p className="mt-2 text-[10px] text-muted-foreground">Engine estimates, not guarantees.</p>
+    </motion.div>
+  );
+}
+
+function memoryLabels(s: NonNullable<AskReply["memory"]>) {
+  const name = (id: string) => id.replaceAll("_", " ");
+  return [
+    ...s.completed.map((id) => `${name(id)} done`),
+    ...Object.keys(s.declined).map((id) => `no ${name(id)}`),
+    ...(s.renting ? ["you rent"] : []),
+    ...(s.listed ? ["listed building"] : []),
+    ...(s.budget_gbp != null ? [`budget £${s.budget_gbp.toLocaleString("en-GB")}`] : []),
+    ...(s.priority ? [s.priority === "carbon" ? "carbon first" : "cost first"] : []),
+  ];
+}
+
+/** Facts spotted in the message, remembered only if the user says so; the plan then adapts. */
+function RememberChips({ s, said }: { s: NonNullable<AskReply["memory"]>; said: string }) {
+  const [state, setState] = useState<"ask" | "saving" | "saved" | "dismissed">("ask");
+  if (state === "dismissed") return null;
+  return (
+    <motion.div initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} className="mt-3 rounded-2xl bg-volt/5 p-3 ring-1 ring-volt/20">
+      <p className="flex items-center gap-1.5 text-[11px] font-medium text-volt">
+        <Brain className="size-3" /> {state === "saved" ? "Remembered" : "Remember this for your plan?"}
+      </p>
+      <div className="mt-2 flex flex-wrap gap-1">
+        {memoryLabels(s).map((l) => (
+          <span key={l} className="rounded-full bg-surface-2 px-2 py-0.5 text-[11px]">
+            {l}
+          </span>
+        ))}
+      </div>
+      {state === "saved" ? (
+        <Link href="/plan" className="mt-2 inline-flex items-center gap-1 text-[11px] text-volt underline-offset-2 hover:underline">
+          <Check className="size-3" /> See how your plan changed
+        </Link>
+      ) : (
+        <div className="mt-2 flex gap-2">
+          <button
+            disabled={state === "saving"}
+            onClick={async () => {
+              setState("saving");
+              await rememberFromAsk(s, said);
+              setState("saved");
+            }}
+            className="rounded-full bg-volt px-3 py-1 text-[11px] font-semibold text-black disabled:opacity-50"
+          >
+            Remember
+          </button>
+          <button onClick={() => setState("dismissed")} className="rounded-full px-3 py-1 text-[11px] text-muted-foreground hover:bg-surface-2">
+            Not now
+          </button>
+        </div>
+      )}
     </motion.div>
   );
 }

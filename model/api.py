@@ -34,6 +34,10 @@ class SensitivityIn(Home):
     alternatives: dict[str, dict[str, float]]
 
 
+class NoteIn(BaseModel):
+    text: str
+
+
 class ParseIn(BaseModel):
     text: str
     current: list[str] = []
@@ -70,6 +74,15 @@ def plan(h: PlanIn):
 def sensitivity(h: SensitivityIn):
     """Which review questions matter for this home (the decision model supplies the probabilities, the engine the stakes)."""
     return _run(lambda: engine().sensitivity(h.record, h.place, h.alternatives))
+
+
+@app.post("/memory/parse")
+def memory_note(n: NoteIn):
+    """Memory facts in a customer's message, by the engine's transparent rules (the fallback when no decision model is configured)."""
+    from greenhome import memory
+    ev = memory.parse_note(n.text)
+    return {"completed": [APP_ID.get(r, r) for r in ev["completed"]], "declined": {APP_ID.get(k, k): v for k, v in ev["declined"].items()},
+            "renting": ev["renting"], "listed": ev["listed"], "budget_gbp": ev["budget_gbp"], "priority": {"bills": "cost"}.get(ev["priority"], ev["priority"])}
 
 
 @app.get("/llm/prompt")

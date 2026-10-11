@@ -78,3 +78,8 @@ def test_sensitivity_ranks_questions_that_change_the_plan():
     impact = {f["key"]: f["score_spread"] + 3 * f["plan_change_prob"] + f["bill_spread_gbp"] / 100 for f in r["fields"]}
     assert impact[keys[0]] >= impact[keys[-1]]
     assert impact["glazing"] > impact["controls"]            # single vs double glazing moves this home far more than a 10% chance of smart controls
+
+
+def test_memory_parse_reads_done_declined_and_constraints():
+    r = client.post("/memory/parse", json={"text": "We already did the loft and we rent. No heat pump, too disruptive. Budget 5k"}).json()
+    assert r["completed"] == ["loft_insulation"] and r["declined"] == {"heat_pump": "too disruptive"} and r["renting"] is True and r["budget_gbp"] == 5000
