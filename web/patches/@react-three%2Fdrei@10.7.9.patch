@@ -1,12 +1,18 @@
+diff --git a/node_modules/@react-three/drei/.bun-tag-1a5ce39bd13ad155 b/.bun-tag-1a5ce39bd13ad155
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
 diff --git a/web/Html.js b/web/Html.js
-index 81d68b7f4e9893a7d0b436a398bb38883d333374..b19aa76bf844d81972269b0a4efccb34ee0fef0e 100644
+index 81d68b7f4e9893a7d0b436a398bb38883d333374..f7b73f9fa729b561a15a49737eeab01f5b25efe1 100644
 --- a/web/Html.js
 +++ b/web/Html.js
-@@ -153,7 +153,8 @@ const Html = /* @__PURE__ */React.forwardRef(({
+@@ -152,8 +152,10 @@ const Html = /* @__PURE__ */React.forwardRef(({
+         if (prepend) target.prepend(el);else target.appendChild(el);
        }
        return () => {
-         if (target) target.removeChild(el);
+-        if (target) target.removeChild(el);
 -        currentRoot.unmount();
++        // The container may already be gone (canvas torn down, effects run twice in development): remove only if attached.
++        el.remove();
 +        // Deferred: unmounting a root synchronously during React's commit warns in React 19 (race with the current render).
 +        setTimeout(() => currentRoot.unmount());
        };
