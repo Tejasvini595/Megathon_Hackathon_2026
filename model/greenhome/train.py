@@ -289,6 +289,9 @@ def main():
         preds.append(R)
     C.REPORTS.mkdir(exist_ok=True)
     pd.concat(preds)[lambda z: z.split.isin(["test", "geo_test"])].to_parquet(C.REPORTS / "test_predictions.parquet")
+    print(f"[{time.time() - t0:5.0f}s] app models (SAP estimator, app relevance) and the customer-path evaluation", flush=True)
+    from . import app_models
+    app_models.main(df, M)
     M["runtime_s"] = round(time.time() - t0)
     json.dump(M, open(C.REPORTS / "metrics.json", "w"), indent=1, default=float)
     print("done", M["runtime_s"], "s")

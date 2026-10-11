@@ -459,6 +459,40 @@ Ten fault types are injected into real homes and checked against an explicit exp
 | Current value | Optional; blank or 0 means missing (value impact shown as n/a) |
 `fuel_scope` is `heat_network` for community heating and `other_fuel` for oil, so those get the unavailable-savings path.
 
+### 17b. Homes entered in the web app (`app_input.py`, `app_models.py`, `service.py`, `api.py`)
+
+The web app asks every input the Green Home Score needs as a required question with no "not sure" answer, so a web home's score is complete. The table maps each component to how it is collected:
+
+| Component | Input | How the app gets it |
+|---|---|---|
+| Energy efficiency | SAP | The EPC score if the user has it (recorded), else the band's midpoint, else **the SAP estimator** ("I don't know"). The estimator always runs: a given band two or more bands from the estimate raises a "certificate may be out of date" flag |
+| Energy use per m² | Metered kWh / floor area | Required: monthly readings (annualised with the same degree-day method as the dataset, and giving the monthly-shape features) or a 12-month bill total; oil in litres (x 10.35 kWh/l), heat-network and other fuel in kWh |
+| Insulation | Walls, roof, floor | Wall type and insulation; loft as four depth categories (0 / 50 / 150 / 270 mm, one inside each catalogue step); flat-roof insulation; ground floor type and insulation. Parts that do not apply (a home above or below) are set from the flat's floor |
+| Heating | Type, condensing | Ten types; condensing from "boiler fitted before / from April 2005" (Building Regulations required condensing gas boilers from then) |
+| Glazing | Level 0-5 | Six answers matching the levels |
+| Renewables | kWp | Solar yes / no, and kW (or panel count x 0.4 kW in the app) |
+| Smart | Controls level 0-3 | Four answers |
+
+Location (latitude, longitude) and the climate region come from the postcode (ONS region codes; Wales split north / south at 52.4 N). Scotland and Northern Ireland are outside the training data: the nearest region (North West England and North Wales) is used and the home is flagged.
+
+**Using an estimated rating in the score.** The brief asks for the recorded rating "or a documented rating-based measure". When the user does not know the rating, the estimator's SAP fills the energy-efficiency component, labelled as estimated, and the score is reported with the range it gives at the estimator's P10 and P90. Its inputs overlap the insulation, heating, glazing, renewables and smart components; the alternative (leaving the 25% out and renormalising) gives the same inputs more weight and moves the score far more (5.9 points mean error versus 0.9 measured below), so the estimate is the more faithful choice. Homes with a recorded rating are unaffected.
+
+**App models, fitted on `train`, reported on held-out homes reduced to exactly what the app collects** (`app_view`: answer categories, the last 12 monthly readings or a raw 12-month bill, no EPC-modelled figures) **with a documented homeowner-error model** (`homeowner_noise`: area +-15%, rooms +-1, 10% neighbouring glazing / wall answers). Full results: `reports/app_metrics.json` (also written into `metrics.json` by `train`).
+
+| | Test | Unseen city |
+|---|---|---|
+| SAP estimator: mean absolute error (SAP points) | 3.21 (baseline 5.02) | 3.55 (baseline 5.11) |
+| Band accuracy · within one band · macro-F1 (B-F) | 72.4% · 99.5% · 0.56 | 68.8% · 98.8% · 0.48 |
+| P10-P90 coverage (widened x1.2 on val) | 81.0% | 78.6% |
+| Score error vs the recorded rating · same class | 0.89 points · 94.5% | 0.98 points · 92.6% |
+| Relevance (app model), monthly readings: accuracy · macro-F1 | 89.8% · 0.897 | 90.0% · 0.900 |
+| Relevance (app model), bill totals: accuracy · macro-F1 | 86.5% · 0.863 | 87.7% · 0.874 |
+| Relevance on dataset inputs (dataset model, for comparison) | 91.8% · 0.917 | 91.6% · 0.916 |
+
+The app relevance model (`relevance_model_app`) is the same classifier refitted on app inputs: usage always present, the monthly shape hidden for half the rows (bill-only users), homeowner noise; its "needs survey" cut-off is set on app-path val. The remaining gap to dataset inputs is the EPC-modelled fields a homeowner cannot supply.
+
+`service.AppEngine` returns the web app's `TwinState`: the score with its rating source and range, per-part insulation scores, retrofits with P10-P90 savings and carbon, bill change, payback and the score with that measure alone, the package and the fabric-only alternative, value % (always) and £ (with a home value), flags and "confirm X" prompts, plus the facts and slots the LLM may use. `api.py` serves it (`/twin`, `/plan`, `/parse`, `/check`, `/llm/prompt`, `/portfolio`, `/health`); the LLM runs in the web app and its text is checked by `/check` before it is shown.
+
 ---
 
 ## 18. The app

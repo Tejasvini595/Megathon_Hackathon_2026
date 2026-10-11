@@ -49,8 +49,13 @@ def cost_reference(df: pd.DataFrame) -> dict:
     return {"heating_types": hds, "by_heating": by, "all": {c: float((df[c] / df.floor_area).median()) for c in COST_COLS}}
 
 
+HDD_FILE = C.MODELS / "monthly_hdd.parquet"
+
+
 def save_reference(df: pd.DataFrame):
+    """Also copies the monthly heating-degree-day table (tiny) so a customer's monthly readings can be annualised without the dataset."""
     REFERENCE_FILE.write_text(json.dumps(cost_reference(df), indent=1))
+    pd.read_parquet(C.DATA / "monthly_hdd.parquet")[["climate_region", "month", "hdd"]].to_parquet(HDD_FILE)
 
 
 def load_reference() -> dict:

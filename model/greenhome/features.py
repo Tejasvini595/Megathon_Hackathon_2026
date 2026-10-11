@@ -6,19 +6,23 @@ from . import config as C
 P_COLS = None  # all property columns are kept
 
 
-def _hdd_share():
-    h = pd.read_parquet(C.DATA / "monthly_hdd.parquet")[["climate_region", "month", "hdd"]]
+def _hdd_table():
+    return pd.read_parquet(C.DATA / "monthly_hdd.parquet")[["climate_region", "month", "hdd"]]
+
+
+def _hdd_share(hdd=None):
+    h = (_hdd_table() if hdd is None else hdd).copy()
     h["year_id"] = h.month.str[:4].astype(int) - (h.month.str[5:7].astype(int) < 10)   # Oct-Sep year
     h["share"] = h.hdd / h.groupby(["climate_region", "year_id"]).hdd.transform("sum")
     return h[["climate_region", "month", "share"]]
 
 
-def annualise(usage: pd.DataFrame, props: pd.DataFrame) -> pd.DataFrame:
+def annualise(usage: pd.DataFrame, props: pd.DataFrame, hdd=None) -> pd.DataFrame:
     """annual_f = sum(observed_f) / sum(w_t over observed months), w_t = (1-hs)/12 + hs * HDD-share_t.
     All 24 months used: with every month observed sum(w)=2 so this is the two-year mean.
     Unavailable (NaN) if < MIN_MONTHS observed or no Dec-Feb month. NaN is never treated as zero."""
     u = usage.merge(props[["property_id", "climate_region", "heating_fuel"]], on="property_id") \
-             .merge(_hdd_share(), on=["climate_region", "month"], how="left")
+             .merge(_hdd_share(hdd), on=["climate_region", "month"], how="left")
     u["share"] = u.share.fillna(1 / 12)
     mnum = u.month.str[5:7].astype(int)
     elec_heating = u.heating_fuel.isin(["elec"])
@@ -62,9 +66,9 @@ def _fit_line(u: pd.DataFrame, col: str, pre: str) -> pd.DataFrame:
     return out
 
 
-def twin_features(usage: pd.DataFrame, props: pd.DataFrame) -> pd.DataFrame:
+def twin_features(usage: pd.DataFrame, props: pd.DataFrame, hdd=None) -> pd.DataFrame:
     """Monthly-shape features per home (index = property_id), from `energy_usage` and `monthly_hdd`. See _fit_line."""
-    h = pd.read_parquet(C.DATA / "monthly_hdd.parquet")[["climate_region", "month", "hdd"]]
+    h = _hdd_table() if hdd is None else hdd
     u = usage[["property_id", "month", "electricity_kwh", "gas_kwh"]].merge(props[["property_id", "climate_region"]], on="property_id").merge(h, on=["climate_region", "month"], how="left")
     T = pd.concat([_fit_line(u, "gas_kwh", "g"), _fit_line(u, "electricity_kwh", "e")], axis=1)
     pr = props.set_index("property_id"); T = T.reindex(pr.index)

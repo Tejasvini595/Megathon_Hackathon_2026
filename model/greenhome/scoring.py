@@ -41,18 +41,24 @@ def _map(a, table: dict):
     return np.array([table.get(v, np.nan) if not pd.isna(v) else np.nan for v in a], float)
 
 
-def _sub_scores(c: dict) -> np.ndarray:
-    """(n, 7) sub-scores in WEIGHTS order; NaN = unknown."""
-    n = len(c["sap_score"])
-    s = np.empty((n, len(_KEYS)))
-    s[:, 0] = np.clip(_num(c["sap_score"]), 1, 100)
-    s[:, 1] = np.interp(_num(c["intensity"]), C.INTENSITY_X, C.INTENSITY_Y)
+def _parts(c: dict):
+    """Insulation part scores (walls, roof, floor); NaN = unknown or not applicable."""
     wall = _map(c["wall_insulation_level"], C.WALL_LEVEL_SCORE)
     loft_mm = _num(c["loft_mm"])
     loft = np.where(np.isnan(loft_mm), np.nan, np.interp(loft_mm, C.LOFT_X, C.LOFT_Y))
     roof = np.where(np.isnan(loft), _map(c["roof_insulation"], C.ROOF_CAT_SCORE), loft)
     roof = np.where(np.isin(np.array([str(v) for v in c["roof_type"]], dtype=object), list(C.ROOF_NA)), np.nan, roof)   # N/A roof excluded
     floor = _map(c["floor_insulation"], C.FLOOR_SCORE)
+    return wall, roof, floor
+
+
+def _sub_scores(c: dict) -> np.ndarray:
+    """(n, 7) sub-scores in WEIGHTS order; NaN = unknown."""
+    n = len(c["sap_score"])
+    s = np.empty((n, len(_KEYS)))
+    s[:, 0] = np.clip(_num(c["sap_score"]), 1, 100)
+    s[:, 1] = np.interp(_num(c["intensity"]), C.INTENSITY_X, C.INTENSITY_Y)
+    wall, roof, floor = _parts(c)
     num = np.zeros(n); den = np.zeros(n)
     for part, w in ((wall, C.INS_W["wall"]), (roof, C.INS_W["roof"]), (floor, C.INS_W["floor"])):
         num = num + np.where(np.isnan(part), 0.0, part) * w
@@ -73,6 +79,13 @@ def _sub_scores(c: dict) -> np.ndarray:
     s[:, 5] = ren
     s[:, 6] = _map(c["controls_level"], C.CONTROLS_SCORE)
     return s
+
+
+def element_scores(p: dict) -> dict:
+    """One home's insulation state per part (0-100, None when it doesn't apply), for the thermal view."""
+    c = _cols(p); wall, roof, floor = _parts(c); glazing = _map(c["glazing_level"], C.GLAZING_LEVEL_SCORE)
+    v = lambda a: None if np.isnan(a[0]) else round(float(a[0]), 1)
+    return {"walls": v(wall), "roof": v(roof), "floor": v(floor), "windows": v(glazing)}
 
 
 def insulation_score(p: dict) -> float:

@@ -14,12 +14,15 @@ dependencies = [
     "anthropic==0.75.0",
     "plotly==6.7.0",
     "streamlit==1.65.0",
+    "fastapi==0.118.0",
+    "uvicorn==0.37.0",
 ]
 
 [dependency-groups]
 dev = [
     "pytest==9.0.2",
     "hypothesis==6.168.5",
+    "httpx==0.28.1",
 ]
 
 [tool.uv]

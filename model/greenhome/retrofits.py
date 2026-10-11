@@ -260,7 +260,8 @@ def monte_carlo(p: dict, elec: float, gas: float, selected, n: int = 200, seed: 
     S = C.UNCERT_SCALE; de, dg = np.array(de), np.array(dg)
     return {"n": n, "calibrated": C.CALIBRATED,
             "package": {"elec": q(de, S["elec"]), "gas": q(dg, S["gas"]), "total": q(de + dg, S["gas"]), "improvement_pct": q(imp, S["imp"]), "carbon_kg": q(co, S["carbon"])},
-            "per_retrofit": {r: {"elec": q(v[0], S["elec"]), "gas": q(v[1], S["gas"])} for r, v in steps.items()},
+            "per_retrofit": {r: {"elec": q(v[0], S["elec"]), "gas": q(v[1], S["gas"]),
+                                 "carbon_kg": q([carbon_saving(e, g) for e, g in zip(*v)], S["carbon"])} for r, v in steps.items()},
             "note": "P10-P90 over catalogue/parameter ranges, widened by a factor calibrated on train homes against reference savings. Estimates, not guarantees."}
 
 

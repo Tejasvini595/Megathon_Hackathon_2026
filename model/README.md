@@ -8,6 +8,8 @@ Individual steps (prefix with `uv run`): `python -m greenhome.train` · `python 
 Training's per-home evaluation runs on `GREENHOME_WORKERS` processes (default: cores - 2, max 16; results are identical for any value).
 `GreenEngine(lite=True)` loads the models only (~0.2 GB, under a second) for customer-entered homes; it reads `models/customer_reference.json`
 (the few dataset medians `custom.build_property` needs, written by training or `python -m greenhome.custom`) instead of the 129k-home table.
+Web app engine: `uv run uvicorn api:app --port 8000` (set `ENGINE_URL=http://localhost:8000` in web/.env). The advisor ranking needs `uv run python -m greenhome.service_portfolio` once.
+App models only (SAP estimator + app relevance, ~2 min): `uv run python -m greenhome.app_models`. See model_implementation.md 17b.
 Reads only from `dataset/` (parquet, never modified). `data/` and `greenhome/gen_data.py` are an old sample stand-in and are not used. Models use fixed seeds.
 
 ## Layout

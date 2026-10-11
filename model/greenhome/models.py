@@ -102,14 +102,17 @@ class RelevanceModel:
 
     def __init__(self, use_usage=True, use_twin=True, use_thermo=False): self.use_usage = use_usage; self.use_twin = use_twin and use_usage; self.use_thermo = use_thermo and use_usage; self.T = 1.0; self.abstain_threshold = 0.0
 
-    def fit(self, df, lab, mask_frac=0.15, seed=42):
+    def fit(self, df, lab, mask_frac=0.15, seed=42, masks=None):
+        """masks: per-block hiding fractions {"usage", "twin", "thermo", "epc"} overriding mask_frac (the app model never hides usage,
+        since bills are required, and hides the monthly shape for half the rows). Same random draws as before when not given."""
+        f = {k: mask_frac for k in ("usage", "twin", "thermo", "epc")} | (masks or {})
         self.d = Design().fit(df); X = self._X(df, lab)
         rng = np.random.default_rng(seed)
         if self.use_usage:
-            m = rng.random(len(X)) < mask_frac; X.loc[m, USAGE_FEATS] = np.nan
-            if self.use_twin: m3 = (rng.random(len(X)) < mask_frac) | m; X.loc[m3, TWIN_COLS] = np.nan   # annual totals only, or no usage at all
-            if self.use_thermo: m4 = rng.random(len(X)) < mask_frac; X.loc[m4, THERMO] = np.nan          # customer did not give a heating temperature
-        m2 = rng.random(len(X)) < mask_frac; X.loc[m2, EPC_MODELLED] = np.nan
+            m = rng.random(len(X)) < f["usage"]; X.loc[m, USAGE_FEATS] = np.nan
+            if self.use_twin: m3 = (rng.random(len(X)) < f["twin"]) | m; X.loc[m3, TWIN_COLS] = np.nan   # annual totals only, or no usage at all
+            if self.use_thermo: m4 = rng.random(len(X)) < f["thermo"]; X.loc[m4, THERMO] = np.nan          # customer did not give a heating temperature
+        m2 = rng.random(len(X)) < f["epc"]; X.loc[m2, EPC_MODELLED] = np.nan
         y = lab.relevance.map({c: i for i, c in enumerate(self.CLASSES)}).values
         self.m = lgb.LGBMClassifier(n_estimators=250, learning_rate=0.08, num_leaves=63, min_child_samples=30, subsample=0.8, subsample_freq=1,
                                     colsample_bytree=0.8, verbose=-1, n_jobs=-1, random_state=SEED, deterministic=True, force_row_wise=True).fit(X, y); return self

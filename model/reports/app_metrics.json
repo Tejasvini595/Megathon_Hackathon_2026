@@ -1,0 +1,242 @@
+{
+ "sap_estimator": {
+  "widen": 1.2000000000000002,
+  "note": "SAP estimated from the app's questions only; used for 'I don't know my EPC rating' and as a cross-check.",
+  "val": {
+   "bill_totals": {
+    "n": 17281,
+    "mae_sap": 3.0874241397681126,
+    "bias_sap": -0.12691584906961784,
+    "band_accuracy": 0.7437069614026967,
+    "band_macro_f1_B_to_F": 0.5749954370860509,
+    "band_within_one": 0.9956599733811701,
+    "p10_p90_coverage": 0.8162143394479486,
+    "median_range_width": 9.246943754270092,
+    "score_mae": 0.8581679300966379,
+    "same_class": 0.9368670794514207
+   },
+   "monthly_readings": {
+    "n": 17281,
+    "mae_sap": 2.98440415983504,
+    "bias_sap": -0.09994390061137245,
+    "band_accuracy": 0.7478155199351889,
+    "band_macro_f1_B_to_F": 0.5817591166938904,
+    "band_within_one": 0.9964701116833516,
+    "p10_p90_coverage": 0.8029627915051212,
+    "median_range_width": 8.54277358572331,
+    "score_mae": 0.7541230252878884,
+    "same_class": 0.9465308720560153
+   },
+   "bill_totals_homeowner_noise": {
+    "n": 17281,
+    "mae_sap": 3.171761081797045,
+    "bias_sap": -0.10712250718188722,
+    "band_accuracy": 0.7384410624385163,
+    "band_macro_f1_B_to_F": 0.5694563767091574,
+    "band_within_one": 0.9954285052948325,
+    "p10_p90_coverage": 0.8064348128001851,
+    "median_range_width": 9.294973089263493,
+    "score_mae": 0.87818991956484,
+    "same_class": 0.9374457496672646
+   },
+   "baseline_type_x_age_median_mae_sap": 4.935644423867122
+  },
+  "test": {
+   "bill_totals": {
+    "n": 16808,
+    "mae_sap": 3.1109928404099216,
+    "bias_sap": 0.012698266656036093,
+    "band_accuracy": 0.7315564017134698,
+    "band_macro_f1_B_to_F": 0.566896651976963,
+    "band_within_one": 0.9955973346025702,
+    "p10_p90_coverage": 0.820383150880533,
+    "median_range_width": 9.297127025720275,
+    "score_mae": 0.8653617325083294,
+    "same_class": 0.9456211327939077
+   },
+   "monthly_readings": {
+    "n": 16808,
+    "mae_sap": 2.992482496737001,
+    "bias_sap": 0.032157686259733725,
+    "band_accuracy": 0.7385173726796763,
+    "band_macro_f1_B_to_F": 0.5801344974729917,
+    "band_within_one": 0.9956568300809139,
+    "p10_p90_coverage": 0.8094954783436459,
+    "median_range_width": 8.580577739261415,
+    "score_mae": 0.758745835316516,
+    "same_class": 0.9498453117563065
+   },
+   "bill_totals_homeowner_noise": {
+    "n": 16808,
+    "mae_sap": 3.208842396933835,
+    "bias_sap": 0.03198239187223097,
+    "band_accuracy": 0.724297953355545,
+    "band_macro_f1_B_to_F": 0.5577063074927685,
+    "band_within_one": 0.9953593526891956,
+    "p10_p90_coverage": 0.8097929557353641,
+    "median_range_width": 9.328099419341939,
+    "score_mae": 0.8924321751546882,
+    "same_class": 0.9454426463588768
+   },
+   "baseline_type_x_age_median_mae_sap": 5.017818895763922
+  },
+  "geo_test": {
+   "bill_totals": {
+    "n": 19131,
+    "mae_sap": 3.4939569600814138,
+    "bias_sap": -0.7022000072767317,
+    "band_accuracy": 0.6904500548847421,
+    "band_macro_f1_B_to_F": 0.4819245918444352,
+    "band_within_one": 0.9888139668600701,
+    "p10_p90_coverage": 0.7896607600229993,
+    "median_range_width": 9.246770049535286,
+    "score_mae": 0.957346714756155,
+    "same_class": 0.9232659035073963
+   },
+   "monthly_readings": {
+    "n": 19131,
+    "mae_sap": 3.382505233306178,
+    "bias_sap": -0.6508445153057846,
+    "band_accuracy": 0.6970884951126444,
+    "band_macro_f1_B_to_F": 0.5022515397994758,
+    "band_within_one": 0.9888139668600701,
+    "p10_p90_coverage": 0.7813496419423972,
+    "median_range_width": 8.582100068365506,
+    "score_mae": 0.8475772306727302,
+    "same_class": 0.9369086822434791
+   },
+   "bill_totals_homeowner_noise": {
+    "n": 19131,
+    "mae_sap": 3.551980024925639,
+    "bias_sap": -0.6710096902318392,
+    "band_accuracy": 0.688097851654383,
+    "band_macro_f1_B_to_F": 0.4816031108955852,
+    "band_within_one": 0.9881867126653077,
+    "p10_p90_coverage": 0.7860017772202185,
+    "median_range_width": 9.384287135449227,
+    "score_mae": 0.975275730489781,
+    "same_class": 0.926193089749621
+   },
+   "baseline_type_x_age_median_mae_sap": 5.1099524332235635
+  }
+ },
+ "relevance_app": {
+  "abstain_threshold": 0.7595851144464513,
+  "temperature": 1.0000000000000004,
+  "val": {
+   "dataset_inputs_dataset_model": {
+    "n": 52162,
+    "accuracy": 0.9179479314443465,
+    "macro_f1": 0.9171930958840436,
+    "accuracy_informative": 0.8812951655369448,
+    "macro_f1_informative": 0.8878444051214208,
+    "answered": 0.7835589126183812,
+    "accuracy_when_answered": 0.9787874339401057
+   },
+   "app_monthly_readings": {
+    "n": 52162,
+    "accuracy": 0.897089835512442,
+    "macro_f1": 0.8967818572823448,
+    "accuracy_informative": 0.8510167497619181,
+    "macro_f1_informative": 0.8629450747855952,
+    "answered": 0.8211149879222422,
+    "accuracy_when_answered": 0.9557329971282482
+   },
+   "app_bill_totals": {
+    "n": 52162,
+    "accuracy": 0.8651125340286032,
+    "macro_f1": 0.8635318399107316,
+    "accuracy_informative": 0.809674528037645,
+    "macro_f1_informative": 0.8256323086945558,
+    "answered": 0.7426287335608297,
+    "accuracy_when_answered": 0.9504349846400083
+   },
+   "app_bill_totals_dataset_model": {
+    "n": 52162,
+    "accuracy": 0.8566005904681568,
+    "macro_f1": 0.8548369618080884,
+    "accuracy_informative": 0.7984706739118257,
+    "macro_f1_informative": 0.812528137473801,
+    "answered": 0.6601357309919098,
+    "accuracy_when_answered": 0.9626241505488761
+   }
+  },
+  "test": {
+   "dataset_inputs_dataset_model": {
+    "n": 53262,
+    "accuracy": 0.9183658142765949,
+    "macro_f1": 0.9171521571621999,
+    "accuracy_informative": 0.881438182419764,
+    "macro_f1_informative": 0.8871268893657592,
+    "answered": 0.7900191506139461,
+    "accuracy_when_answered": 0.9788963353771567
+   },
+   "app_monthly_readings": {
+    "n": 53262,
+    "accuracy": 0.8979197176223198,
+    "macro_f1": 0.8969979507403604,
+    "accuracy_informative": 0.851797728024705,
+    "macro_f1_informative": 0.8629740424942005,
+    "answered": 0.8249033081746836,
+    "accuracy_when_answered": 0.9550937727603788
+   },
+   "app_bill_totals": {
+    "n": 53262,
+    "accuracy": 0.8653448988021478,
+    "macro_f1": 0.8630988172134034,
+    "accuracy_informative": 0.808453733318628,
+    "macro_f1_informative": 0.8236671889732762,
+    "answered": 0.7455596860801321,
+    "accuracy_when_answered": 0.9507932510702594
+   },
+   "app_bill_totals_dataset_model": {
+    "n": 53262,
+    "accuracy": 0.8580977056813488,
+    "macro_f1": 0.8556807073109928,
+    "accuracy_informative": 0.7987757803021948,
+    "macro_f1_informative": 0.8120543984446407,
+    "answered": 0.6627802185423003,
+    "accuracy_when_answered": 0.9628339140534262
+   }
+  },
+  "geo_test": {
+   "dataset_inputs_dataset_model": {
+    "n": 66893,
+    "accuracy": 0.9162692658424648,
+    "macro_f1": 0.9162783539600764,
+    "accuracy_informative": 0.8703598079756643,
+    "macro_f1_informative": 0.8784270880798228,
+    "answered": 0.7811729179435816,
+    "accuracy_when_answered": 0.9810353076260645
+   },
+   "app_monthly_readings": {
+    "n": 66893,
+    "accuracy": 0.9001988249891618,
+    "macro_f1": 0.8998336181297565,
+    "accuracy_informative": 0.8446218926755074,
+    "macro_f1_informative": 0.8590216195880965,
+    "answered": 0.8245855321184579,
+    "accuracy_when_answered": 0.958737468046919
+   },
+   "app_bill_totals": {
+    "n": 66893,
+    "accuracy": 0.8765192172574111,
+    "macro_f1": 0.8740258305908436,
+    "accuracy_informative": 0.8129663957412424,
+    "macro_f1_informative": 0.8315044312711866,
+    "answered": 0.766507706336986,
+    "accuracy_when_answered": 0.9575808401919101
+   },
+   "app_bill_totals_dataset_model": {
+    "n": 66893,
+    "accuracy": 0.8694781217765686,
+    "macro_f1": 0.8663064186756181,
+    "accuracy_informative": 0.8035553020580826,
+    "macro_f1_informative": 0.8200259997210976,
+    "answered": 0.703063100772876,
+    "accuracy_when_answered": 0.9653625345524134
+   }
+  }
+ },
+ "app_path_note": "Customer path: every held-out home is reduced to exactly what the app collects (answer categories, the last 12 monthly readings or a raw 12-month bill, no EPC-modelled figures), with a documented homeowner-error model (app_input.homeowner_noise) and the SAP estimate in place of the recorded rating. These are the numbers an app user gets."
+}
