@@ -44,14 +44,21 @@ export async function parseQuestion(question: string, current: RetrofitId[]): Pr
         instructions:
           "Turn a homeowner's message into a retrofit scenario for an energy engine. Use only these measure ids:\n" +
           Object.entries(p.measures).map(([id, label]) => `- ${id}: ${label}`).join("\n") +
-          `\nThe current scenario is: ${current.length ? current.join(", ") : "nothing (the home as it is today)"}. Do not answer the question.`,
+          `\nThe current scenario is: ${current.length ? current.join(", ") : "nothing (the home as it is today)"}. Do not answer the question.\n` +
+          "kind is scenario whenever the message names a measure to add, remove or try, including hypotheticals: 'What if I add solar?' is " +
+          "scenario, add, [solar_pv]; 'Without the heat pump' is scenario, remove, [heat_pump]; 'Just loft insulation' is scenario, only, " +
+          "[loft_insulation]. kind is explain when no measure is named: 'Why this score?', 'How can I improve?' and 'What should I do first?' " +
+          "are explain with measures []. Only list measures the message names. unsupported lists only physical measures that are not in " +
+          "the list, never questions.",
         prompt: question,
       });
       const retrofits = output.kind === "scenario" ? compose(output.mode, output.measures, current) : current;
+      // A "scenario" that changes nothing is a question about the current result (same rule as the fallback below).
+      const kind = retrofits.join() !== current.join() ? "scenario" : "explain";
       // Small models sometimes list a catalogue measure as unsupported; feasibility is the engine's call, not the parser's.
       const known = new Set(Object.entries(p.measures).flatMap(([id, label]) => [id, id.replaceAll("_", " "), label.toLowerCase()]));
       const unsupported = output.unsupported.filter((u) => !known.has(u.trim().toLowerCase()));
-      return { kind: output.kind, retrofits, unsupported, source: "llm", note: unsupported.length ? `Not in the retrofit catalogue, so ignored: ${unsupported.join(", ")}.` : "" };
+      return { kind, retrofits, unsupported, source: "llm", note: unsupported.length ? `Not in the retrofit catalogue, so ignored: ${unsupported.join(", ")}.` : "" };
     } catch (e) {
       console.error("LLM parse failed, using rules", e instanceof Error ? e.message : e);
     }
