@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { connection } from "next/server";
 import { ArrowLeft, ServerOff } from "lucide-react";
 import { PageSkeleton } from "@/components/app/page-skeleton";
 import { engineJson } from "@/lib/engine";
@@ -21,6 +22,7 @@ export default function Page() {
 }
 
 async function Loader() {
+  await connection();     // read live at request time: prerendered at build (no engine there) it would always say "unavailable"
   const m = await engineJson<Methods>("/methods");
   const ok = m && m.score && Array.isArray(m.retrofits) && m.evidence;
 

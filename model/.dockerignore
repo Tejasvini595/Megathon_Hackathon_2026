@@ -1,0 +1,9 @@
+.venv
+dataset
+data_patch
+tests
+.pytest_cache
+.hypothesis
+**/__pycache__
+*.pyc
+.env
