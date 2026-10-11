@@ -1,9 +1,9 @@
 import "server-only";
-import { anthropic } from "@ai-sdk/anthropic";
 import { generateText, Output } from "ai";
 import { z } from "zod";
 import { engineJson, type LlmContext } from "@/lib/engine";
 import { generateExplanation } from "./explainer";
+import { llmEnabled, MODELS, model } from "./provider";
 import type { RetrofitId } from "@/lib/twin/types";
 
 /**
@@ -11,8 +11,6 @@ import type { RetrofitId } from "@/lib/twin/types";
  * and the explanation may only reference the engine's facts through [[slots]]. The engine's /check fills the slots and
  * rejects any number or claim the facts don't support; on rejection, or without an API key, the engine's template is used.
  */
-const PARSE_MODEL = process.env.ASK_PARSE_MODEL ?? "claude-haiku-5-5";
-export const llmEnabled = () => Boolean(process.env.ANTHROPIC_API_KEY);
 
 const IDS = ["loft_insulation", "cavity_wall_insulation", "solid_wall_insulation", "floor_insulation", "double_glazing", "smart_thermostat", "heat_pump", "solar_pv", "condensing_boiler"] as const;
 
@@ -41,7 +39,7 @@ export async function parseQuestion(question: string, current: RetrofitId[]): Pr
   if (llmEnabled() && p) {
     try {
       const { output } = await generateText({
-        model: anthropic(PARSE_MODEL),
+        model: model(MODELS.parse),
         output: Output.object({ schema: intent }),
         system:
           "Turn a homeowner's message into a retrofit scenario for an energy engine. Use only these measure ids:\n" +
