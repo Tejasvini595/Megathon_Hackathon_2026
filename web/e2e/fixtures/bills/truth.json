@@ -1,0 +1,650 @@
+[
+  {
+    "file": "monthly-both.png",
+    "description": "Twelve monthly electricity and gas readings in kWh",
+    "consistent": true,
+    "statement": {
+      "start": "2025-01-01",
+      "end": "2025-12-31"
+    },
+    "fuels": [
+      {
+        "fuel": "electricity",
+        "unit": "kWh",
+        "periods": [
+          {
+            "start": "2025-01-01",
+            "end": "2025-01-31",
+            "consumption": 318
+          },
+          {
+            "start": "2025-02-01",
+            "end": "2025-02-28",
+            "consumption": 281
+          },
+          {
+            "start": "2025-03-01",
+            "end": "2025-03-31",
+            "consumption": 262
+          },
+          {
+            "start": "2025-04-01",
+            "end": "2025-04-30",
+            "consumption": 236
+          },
+          {
+            "start": "2025-05-01",
+            "end": "2025-05-31",
+            "consumption": 214
+          },
+          {
+            "start": "2025-06-01",
+            "end": "2025-06-30",
+            "consumption": 198
+          },
+          {
+            "start": "2025-07-01",
+            "end": "2025-07-31",
+            "consumption": 203
+          },
+          {
+            "start": "2025-08-01",
+            "end": "2025-08-31",
+            "consumption": 211
+          },
+          {
+            "start": "2025-09-01",
+            "end": "2025-09-30",
+            "consumption": 229
+          },
+          {
+            "start": "2025-10-01",
+            "end": "2025-10-31",
+            "consumption": 262
+          },
+          {
+            "start": "2025-11-01",
+            "end": "2025-11-30",
+            "consumption": 297
+          },
+          {
+            "start": "2025-12-01",
+            "end": "2025-12-31",
+            "consumption": 331
+          }
+        ],
+        "annualTotal": null,
+        "calorificValue": null
+      },
+      {
+        "fuel": "gas",
+        "unit": "kWh",
+        "periods": [
+          {
+            "start": "2025-01-01",
+            "end": "2025-01-31",
+            "consumption": 1840
+          },
+          {
+            "start": "2025-02-01",
+            "end": "2025-02-28",
+            "consumption": 1630
+          },
+          {
+            "start": "2025-03-01",
+            "end": "2025-03-31",
+            "consumption": 1210
+          },
+          {
+            "start": "2025-04-01",
+            "end": "2025-04-30",
+            "consumption": 790
+          },
+          {
+            "start": "2025-05-01",
+            "end": "2025-05-31",
+            "consumption": 410
+          },
+          {
+            "start": "2025-06-01",
+            "end": "2025-06-30",
+            "consumption": 240
+          },
+          {
+            "start": "2025-07-01",
+            "end": "2025-07-31",
+            "consumption": 205
+          },
+          {
+            "start": "2025-08-01",
+            "end": "2025-08-31",
+            "consumption": 198
+          },
+          {
+            "start": "2025-09-01",
+            "end": "2025-09-30",
+            "consumption": 360
+          },
+          {
+            "start": "2025-10-01",
+            "end": "2025-10-31",
+            "consumption": 810
+          },
+          {
+            "start": "2025-11-01",
+            "end": "2025-11-30",
+            "consumption": 1420
+          },
+          {
+            "start": "2025-12-01",
+            "end": "2025-12-31",
+            "consumption": 1930
+          }
+        ],
+        "annualTotal": null,
+        "calorificValue": null
+      }
+    ]
+  },
+  {
+    "file": "quarterly.png",
+    "description": "Quarterly electricity and gas bills over a year, kWh",
+    "consistent": true,
+    "statement": null,
+    "fuels": [
+      {
+        "fuel": "electricity",
+        "unit": "kWh",
+        "periods": [
+          {
+            "start": "2025-01-01",
+            "end": "2025-03-31",
+            "consumption": 861
+          },
+          {
+            "start": "2025-04-01",
+            "end": "2025-06-30",
+            "consumption": 648
+          },
+          {
+            "start": "2025-07-01",
+            "end": "2025-09-30",
+            "consumption": 643
+          },
+          {
+            "start": "2025-10-01",
+            "end": "2025-12-31",
+            "consumption": 890
+          }
+        ],
+        "annualTotal": null,
+        "calorificValue": null
+      },
+      {
+        "fuel": "gas",
+        "unit": "kWh",
+        "periods": [
+          {
+            "start": "2025-01-01",
+            "end": "2025-03-31",
+            "consumption": 4680
+          },
+          {
+            "start": "2025-04-01",
+            "end": "2025-06-30",
+            "consumption": 1440
+          },
+          {
+            "start": "2025-07-01",
+            "end": "2025-09-30",
+            "consumption": 763
+          },
+          {
+            "start": "2025-10-01",
+            "end": "2025-12-31",
+            "consumption": 4160
+          }
+        ],
+        "annualTotal": null,
+        "calorificValue": null
+      }
+    ]
+  },
+  {
+    "file": "gas-m3.png",
+    "description": "Gas billed in cubic metres (calorific value 39.4 printed), electricity in kWh",
+    "consistent": true,
+    "statement": null,
+    "fuels": [
+      {
+        "fuel": "electricity",
+        "unit": "kWh",
+        "periods": [
+          {
+            "start": "2025-01-01",
+            "end": "2025-01-31",
+            "consumption": 318
+          },
+          {
+            "start": "2025-02-01",
+            "end": "2025-02-28",
+            "consumption": 281
+          },
+          {
+            "start": "2025-03-01",
+            "end": "2025-03-31",
+            "consumption": 262
+          },
+          {
+            "start": "2025-04-01",
+            "end": "2025-04-30",
+            "consumption": 236
+          },
+          {
+            "start": "2025-05-01",
+            "end": "2025-05-31",
+            "consumption": 214
+          },
+          {
+            "start": "2025-06-01",
+            "end": "2025-06-30",
+            "consumption": 198
+          },
+          {
+            "start": "2025-07-01",
+            "end": "2025-07-31",
+            "consumption": 203
+          },
+          {
+            "start": "2025-08-01",
+            "end": "2025-08-31",
+            "consumption": 211
+          },
+          {
+            "start": "2025-09-01",
+            "end": "2025-09-30",
+            "consumption": 229
+          },
+          {
+            "start": "2025-10-01",
+            "end": "2025-10-31",
+            "consumption": 262
+          },
+          {
+            "start": "2025-11-01",
+            "end": "2025-11-30",
+            "consumption": 297
+          },
+          {
+            "start": "2025-12-01",
+            "end": "2025-12-31",
+            "consumption": 331
+          }
+        ],
+        "annualTotal": null,
+        "calorificValue": null
+      },
+      {
+        "fuel": "gas",
+        "unit": "m3",
+        "periods": [
+          {
+            "start": "2025-01-01",
+            "end": "2025-01-31",
+            "consumption": 164
+          },
+          {
+            "start": "2025-02-01",
+            "end": "2025-02-28",
+            "consumption": 145
+          },
+          {
+            "start": "2025-03-01",
+            "end": "2025-03-31",
+            "consumption": 108
+          },
+          {
+            "start": "2025-04-01",
+            "end": "2025-04-30",
+            "consumption": 70
+          },
+          {
+            "start": "2025-05-01",
+            "end": "2025-05-31",
+            "consumption": 37
+          },
+          {
+            "start": "2025-06-01",
+            "end": "2025-06-30",
+            "consumption": 21
+          },
+          {
+            "start": "2025-07-01",
+            "end": "2025-07-31",
+            "consumption": 18
+          },
+          {
+            "start": "2025-08-01",
+            "end": "2025-08-31",
+            "consumption": 18
+          },
+          {
+            "start": "2025-09-01",
+            "end": "2025-09-30",
+            "consumption": 32
+          },
+          {
+            "start": "2025-10-01",
+            "end": "2025-10-31",
+            "consumption": 72
+          },
+          {
+            "start": "2025-11-01",
+            "end": "2025-11-30",
+            "consumption": 127
+          },
+          {
+            "start": "2025-12-01",
+            "end": "2025-12-31",
+            "consumption": 172
+          }
+        ],
+        "annualTotal": null,
+        "calorificValue": 39.4
+      }
+    ]
+  },
+  {
+    "file": "annual-statement.png",
+    "description": "Annual statement with monthly figures and a printed yearly total",
+    "consistent": true,
+    "statement": {
+      "start": "2025-01-01",
+      "end": "2025-12-31"
+    },
+    "fuels": [
+      {
+        "fuel": "electricity",
+        "unit": "kWh",
+        "periods": [
+          {
+            "start": "2025-01-01",
+            "end": "2025-01-31",
+            "consumption": 402
+          },
+          {
+            "start": "2025-02-01",
+            "end": "2025-02-28",
+            "consumption": 351
+          },
+          {
+            "start": "2025-03-01",
+            "end": "2025-03-31",
+            "consumption": 318
+          },
+          {
+            "start": "2025-04-01",
+            "end": "2025-04-30",
+            "consumption": 270
+          },
+          {
+            "start": "2025-05-01",
+            "end": "2025-05-31",
+            "consumption": 244
+          },
+          {
+            "start": "2025-06-01",
+            "end": "2025-06-30",
+            "consumption": 219
+          },
+          {
+            "start": "2025-07-01",
+            "end": "2025-07-31",
+            "consumption": 226
+          },
+          {
+            "start": "2025-08-01",
+            "end": "2025-08-31",
+            "consumption": 238
+          },
+          {
+            "start": "2025-09-01",
+            "end": "2025-09-30",
+            "consumption": 257
+          },
+          {
+            "start": "2025-10-01",
+            "end": "2025-10-31",
+            "consumption": 301
+          },
+          {
+            "start": "2025-11-01",
+            "end": "2025-11-30",
+            "consumption": 366
+          },
+          {
+            "start": "2025-12-01",
+            "end": "2025-12-31",
+            "consumption": 412
+          }
+        ],
+        "annualTotal": 3604,
+        "calorificValue": null
+      },
+      {
+        "fuel": "gas",
+        "unit": "kWh",
+        "periods": [
+          {
+            "start": "2025-01-01",
+            "end": "2025-01-31",
+            "consumption": 2210
+          },
+          {
+            "start": "2025-02-01",
+            "end": "2025-02-28",
+            "consumption": 1940
+          },
+          {
+            "start": "2025-03-01",
+            "end": "2025-03-31",
+            "consumption": 1480
+          },
+          {
+            "start": "2025-04-01",
+            "end": "2025-04-30",
+            "consumption": 960
+          },
+          {
+            "start": "2025-05-01",
+            "end": "2025-05-31",
+            "consumption": 520
+          },
+          {
+            "start": "2025-06-01",
+            "end": "2025-06-30",
+            "consumption": 310
+          },
+          {
+            "start": "2025-07-01",
+            "end": "2025-07-31",
+            "consumption": 260
+          },
+          {
+            "start": "2025-08-01",
+            "end": "2025-08-31",
+            "consumption": 255
+          },
+          {
+            "start": "2025-09-01",
+            "end": "2025-09-30",
+            "consumption": 470
+          },
+          {
+            "start": "2025-10-01",
+            "end": "2025-10-31",
+            "consumption": 1010
+          },
+          {
+            "start": "2025-11-01",
+            "end": "2025-11-30",
+            "consumption": 1730
+          },
+          {
+            "start": "2025-12-01",
+            "end": "2025-12-31",
+            "consumption": 2290
+          }
+        ],
+        "annualTotal": 13435,
+        "calorificValue": null
+      }
+    ]
+  },
+  {
+    "file": "inconsistent.png",
+    "description": "Quarterly figures that do not add up to the printed yearly total (about 25% apart)",
+    "consistent": false,
+    "statement": {
+      "start": "2025-01-01",
+      "end": "2025-12-31"
+    },
+    "fuels": [
+      {
+        "fuel": "electricity",
+        "unit": "kWh",
+        "periods": [
+          {
+            "start": "2025-01-01",
+            "end": "2025-03-31",
+            "consumption": 861
+          },
+          {
+            "start": "2025-04-01",
+            "end": "2025-06-30",
+            "consumption": 648
+          },
+          {
+            "start": "2025-07-01",
+            "end": "2025-09-30",
+            "consumption": 643
+          },
+          {
+            "start": "2025-10-01",
+            "end": "2025-12-31",
+            "consumption": 890
+          }
+        ],
+        "annualTotal": 4600,
+        "calorificValue": null
+      },
+      {
+        "fuel": "gas",
+        "unit": "kWh",
+        "periods": [
+          {
+            "start": "2025-01-01",
+            "end": "2025-03-31",
+            "consumption": 4680
+          },
+          {
+            "start": "2025-04-01",
+            "end": "2025-06-30",
+            "consumption": 1440
+          },
+          {
+            "start": "2025-07-01",
+            "end": "2025-09-30",
+            "consumption": 763
+          },
+          {
+            "start": "2025-10-01",
+            "end": "2025-12-31",
+            "consumption": 4160
+          }
+        ],
+        "annualTotal": 14200,
+        "calorificValue": null
+      }
+    ]
+  },
+  {
+    "file": "electricity-only.png",
+    "description": "Monthly electricity only (all-electric home, no gas)",
+    "consistent": true,
+    "statement": {
+      "start": "2025-01-01",
+      "end": "2025-12-31"
+    },
+    "fuels": [
+      {
+        "fuel": "electricity",
+        "unit": "kWh",
+        "periods": [
+          {
+            "start": "2025-01-01",
+            "end": "2025-01-31",
+            "consumption": 668
+          },
+          {
+            "start": "2025-02-01",
+            "end": "2025-02-28",
+            "consumption": 590
+          },
+          {
+            "start": "2025-03-01",
+            "end": "2025-03-31",
+            "consumption": 550
+          },
+          {
+            "start": "2025-04-01",
+            "end": "2025-04-30",
+            "consumption": 496
+          },
+          {
+            "start": "2025-05-01",
+            "end": "2025-05-31",
+            "consumption": 449
+          },
+          {
+            "start": "2025-06-01",
+            "end": "2025-06-30",
+            "consumption": 416
+          },
+          {
+            "start": "2025-07-01",
+            "end": "2025-07-31",
+            "consumption": 426
+          },
+          {
+            "start": "2025-08-01",
+            "end": "2025-08-31",
+            "consumption": 443
+          },
+          {
+            "start": "2025-09-01",
+            "end": "2025-09-30",
+            "consumption": 481
+          },
+          {
+            "start": "2025-10-01",
+            "end": "2025-10-31",
+            "consumption": 550
+          },
+          {
+            "start": "2025-11-01",
+            "end": "2025-11-30",
+            "consumption": 624
+          },
+          {
+            "start": "2025-12-01",
+            "end": "2025-12-31",
+            "consumption": 695
+          }
+        ],
+        "annualTotal": null,
+        "calorificValue": null
+      }
+    ]
+  }
+]
