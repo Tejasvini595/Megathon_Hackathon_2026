@@ -34,7 +34,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
               <div style={{ display: "flex", fontSize: 64, fontWeight: 600, marginTop: 20, maxWidth: 560 }}>{twin.nickname.slice(0, 28)}</div>
               <div style={{ display: "flex", alignItems: "flex-end", marginTop: 24 }}>
                 <div style={{ display: "flex", fontSize: 190, lineHeight: 1, fontWeight: 300, color }}>{twin.score}</div>
-                <div style={{ display: "flex", fontSize: 40, marginLeft: 24, marginBottom: 20 }}>{twin.scoreClass}</div>
+                <div style={{ display: "flex", fontSize: 40, marginLeft: 24, marginBottom: 20 }}>{twin.scoreRange ? `${twin.scoreClass} (est.)` : twin.scoreClass}</div>
               </div>
             </>
           ) : (

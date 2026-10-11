@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
 import { optionLabel, type PropertyRecord } from "@/lib/extract/fields";
+import { ratingLabel } from "@/components/app/rating";
 import { scoreTone } from "@/lib/score";
 import { thermalGlow } from "@/lib/twin/types";
 import { getSharedTwin } from "./data";
@@ -31,6 +32,7 @@ export default async function Page({ params }: PageProps<"/t/[slug]">) {
     r.builtForm && optionLabel("builtForm", r.builtForm),
     r.heating && optionLabel("heating", r.heating),
     r.ageBand && `Built ${optionLabel("ageBand", r.ageBand)}`,
+    ratingLabel(twin.rating),
     twin.geometry.hasSolar && "Solar panels",
   ].filter(Boolean) as string[];
 
@@ -46,7 +48,9 @@ export default async function Page({ params }: PageProps<"/t/[slug]">) {
             </span>
             <span className="pb-1 text-sm">
               <span className="block font-medium">{twin.scoreClass}</span>
-              <span className="text-xs text-muted-foreground">Green Home Score</span>
+              <span className="text-xs text-muted-foreground">
+                Green Home Score{twin.scoreRange && ` · estimated ${twin.scoreRange.low}–${twin.scoreRange.high}`}
+              </span>
             </span>
           </div>
           {chips.length > 0 && (
@@ -60,6 +64,7 @@ export default async function Page({ params }: PageProps<"/t/[slug]">) {
           )}
         </div>
       </HoloCard>
+      {twin.modelVersion === "mock" && <p className="text-xs text-amber">Example data, engine not connected</p>}
       <Link href="/" className="flex items-center gap-2 rounded-full bg-volt px-6 py-3 text-sm font-medium text-black transition-transform active:scale-95">
         Build your own twin <ArrowRight className="size-4" />
       </Link>
