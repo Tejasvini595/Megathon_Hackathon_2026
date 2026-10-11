@@ -82,6 +82,23 @@ prisma/schema.prisma                 auth models + Home, HomeInput, Extraction, 
 
 `POST {ENGINE_URL}/twin` with `{ homeId, record, scenario? }` returns a `TwinState` (see `types.ts`). The UI never calculates a score, saving, carbon or value figure itself. The 3D house takes its geometry from the confirmed record, and its thermal colours come from `heatLoss` shares.
 
+## LLMs and decision models
+
+Everything goes through OpenRouter (`OPENROUTER_API_KEY`). Each job's model, thinking level and provider routing are environment variables (`web/.env.example`); defaults are small open-weight models. No LLM ever produces a score, saving, carbon or value figure. Without a key, every job falls back to a deterministic path.
+
+| Job | Default | What it does | Guardrail | Fallback |
+|---|---|---|---|---|
+| Describe → record (`lib/extract/llm.ts`) | `deepseek/deepseek-v4.1-flash` | Reads typed/spoken descriptions into the record's own answer options | Quotes must appear in the text; confidence from stated vs implied; the user confirms every field | Keyword rules |
+| Choice fields with probabilities (`lib/extract/decide-fields.ts`) | `perplexity/pplx-decider-v1.1-27b` (decision model) | A probability for every option of every choice field | Only pre-fills above `DECISION_CONFIDENT`; the review asks the rest by impact | Uniform probabilities (ranking by stakes only) |
+| Ask: question → scenario (`lib/llm/ask.ts`) | `deepseek/deepseek-v4.1-flash` | Typed scenario over the 9 catalogue measures | zod enum of measure ids | Engine rules (`/parse`) |
+| Ask: memory facts (`lib/llm/memory-notes.ts`) | decision model | Done / ruled out / renting / listed / priority in a message | Suggested only above the threshold; the user confirms | Engine rules (`/memory/parse`) |
+| Ask: explanation (`lib/llm/explainer.ts`) | `z-ai/glm-5.3-flash` | Explains the engine's results | No digits: `[[slots]]` only, filled and checked by the engine (`/check`) | Engine template |
+| Reading bills | `z-ai/glm-5.3-flash` (vision) | kWh per billing period from a photo/PDF | Arithmetic and plausibility checks decide what's accepted | Manual / CSV entry |
+
+The explanation prompt lives with its checks in `model/greenhome/llm.py` (served by `/llm/prompt`). Evaluation: `bun run eval:llm` (groundedness, factual accuracy, unsupported claims vs the brief's targets, scored by the engine's metrics), `bun run eval:extract [-- --heldout]` (description reading), `bun run eval:decide` (decision models: accuracy, calibration, latency, cost; also sets the threshold).
+
+**Asking only what matters.** The decision model gives a probability for each answer; the engine's `/sensitivity` re-runs the home under each plausible answer and measures how far the score, the recommended plan and the bill saving move. The review asks high-stakes, uncertain questions first, pre-fills confident ones for a one-tap confirm, and groups the rest as quick confirms. Required fields are never filled silently.
+
 ## Data sources in the app
 
 - Postcodes: ONS Postcode Directory (via postcodes.io / ONS Open Geography Portal), Open Government Licence v3. Imported into the `Postcode` table, so lookups never leave our database.
