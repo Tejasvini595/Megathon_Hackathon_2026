@@ -2,7 +2,7 @@ import { generateText, Output } from "ai";
 import { z } from "zod";
 import { FIELDS, type ExtractedField, type FieldKey, type FieldSource } from "./fields";
 import { rulesExtractor, type Extractor } from "./index";
-import { llmEnabled, MODELS, model } from "../llm/provider";
+import { config, llmEnabled, model } from "../llm/provider";
 
 /**
  * LLM reading of free-text and voice descriptions into the record's categories. The LLM only extracts what the user
@@ -35,7 +35,7 @@ For solar, give kW; if only panels are counted, use 0.4 kW per panel. Negations 
 quote must be copied exactly from the text.`;
 
 async function readText(text: string) {
-  const { output } = await generateText({ model: model(MODELS.extract), output: Output.object({ schema }), system: SYSTEM, prompt: text });
+  const { output } = await generateText({ model: model("extract"), output: Output.object({ schema }), system: SYSTEM, prompt: text });
   return output as Record<string, { value: string | number; basis: "stated" | "implied"; quote: string } | null>;
 }
 
@@ -62,7 +62,7 @@ export const llmExtractor: Extractor = async (inputs) => {
       };
     }
   }
-  return { ...base, fields, models: [...base.models.filter((m) => m !== "rules-v0"), "rules-v0", `llm:${MODELS.extract}`] };
+  return { ...base, fields, models: [...base.models.filter((m) => m !== "rules-v0"), "rules-v0", `llm:${config("extract").model}`] };
 };
 
 /** The LLM reader when an API key is configured, else the rules alone. */

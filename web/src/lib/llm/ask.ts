@@ -3,7 +3,7 @@ import { generateText, Output } from "ai";
 import { z } from "zod";
 import { engineJson, type LlmContext } from "@/lib/engine";
 import { generateExplanation } from "./explainer";
-import { llmEnabled, MODELS, model } from "./provider";
+import { llmEnabled, model } from "./provider";
 import type { RetrofitId } from "@/lib/twin/types";
 
 /**
@@ -39,7 +39,7 @@ export async function parseQuestion(question: string, current: RetrofitId[]): Pr
   if (llmEnabled() && p) {
     try {
       const { output } = await generateText({
-        model: model(MODELS.parse),
+        model: model("parse"),
         output: Output.object({ schema: intent }),
         system:
           "Turn a homeowner's message into a retrofit scenario for an energy engine. Use only these measure ids:\n" +

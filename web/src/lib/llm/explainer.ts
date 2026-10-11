@@ -1,5 +1,5 @@
 import { generateText } from "ai";
-import { MODELS, model } from "./provider";
+import { model } from "./provider";
 
 /** One explanation call, shared by Ask and the evaluation script so both measure the same prompt. */
 export type ExplainContext = { facts: Record<string, unknown>; slots: Record<string, unknown> };
@@ -8,7 +8,7 @@ export type ExplainContext = { facts: Record<string, unknown>; slots: Record<str
 export async function generateExplanation(system: string, question: string, ctx: ExplainContext) {
   const slots = Object.entries(ctx.slots).map(([k, v]) => `${k} = ${v}`).join("\n");
   const { text } = await generateText({
-    model: model(MODELS.explain),
+    model: model("explain"),
     maxOutputTokens: 700,
     messages: [
       { role: "system", content: system },
