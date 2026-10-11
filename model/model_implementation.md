@@ -493,6 +493,21 @@ The app relevance model (`relevance_model_app`) is the same classifier refitted 
 
 `service.AppEngine` returns the web app's `TwinState`: the score with its rating source and range, per-part insulation scores, retrofits with P10-P90 savings and carbon, bill change, payback and the score with that measure alone, the package and the fabric-only alternative, value % (always) and £ (with a home value), flags and "confirm X" prompts, plus the facts and slots the LLM may use. `api.py` serves it (`/twin`, `/plan`, `/parse`, `/check`, `/llm/prompt`, `/portfolio`, `/health`); the LLM runs in the web app and its text is checked by `/check` before it is shown.
 
+### 17c. Green finance illustration (`finance.py`, `config.FINANCE`, `service.AppEngine._finance`)
+
+`twin.finance` shows what a plan would cost per month on a loan against the bill it saves. It is an **illustration, not financial advice or a quote**; it is null when there is no package. Energy, cost and SAP figures are the engine's; the only additions are the assumed loan terms.
+
+- **Repayment.** Standard annuity: with monthly rate r = APR / 12 / 100 and n = years x 12, payment = P r / (1 - (1 + r)^-n); r = 0 gives P / n; P <= 0 gives 0. Computed on the plan's low and high install cost, so a repayment is a [best, worst] range.
+- **Bill saving per month.** The package's P10 / P50 / P90 gas and electricity savings (kWh) x the tariff in `config.TARIFF` / 12. Low pairs the two low ends and high the two high ends, which is conservative (a wider range than the real spread). A heat pump's extra electricity can make the saving negative (bills rise).
+- **Net monthly cost.** best = repayment(cost low) - saving high; worst = repayment(cost high) - saving low. Positive means the plan costs more per month than it saves. Interest = repayment x months - cost.
+- **Loans (indicative assumptions).** Green personal loan 7.0% over 5 or 10 years; added to a mortgage 4.5% over 15 or 25 years. Round numbers of the order of UK quoted household rates (Bank of England Bankstats, quoted household interest rates, table G1.4, Effective and quoted rates); a lender's APR, fees and eligibility differ.
+- **Heat pump grant.** GBP 7,500 off the plan cost when it includes a heat pump and the home is in England or Wales (Boiler Upgrade Scheme, GOV.UK); shown alongside, not instead of, the unsubsidised figures. Outside the training area (Scotland, Northern Ireland) it is null.
+- **Does the plan reach EPC C?** C starts at SAP 69 (SAP methodology, band C = 69-80). With delta = plan SAP - current SAP, the post-plan SAP range is: estimated rating, its SAP P10-P90 + delta; band only, that band's SAP bounds + delta; recorded SAP, plan SAP +- 2. "yes" if the low end is >= 69, "borderline" if only the high end is, else "no".
+- **Plans.** "full" (recommended package), "noHeatPump" (fabric-only alternative, when present) and, for the base view of a home below C, "toC": the first strict prefix of the ordered package whose reach is "yes" (deterministic engine run, bill saving low = mid = high).
+- **LLM.** The full plan on the 10-year personal loan is added to the facts (`finance.*` slots); the prompt requires calling it an illustration.
+
+Ignored: arrangement fees and early-repayment charges, rate changes, tariff changes and bill inflation, tax, and grant eligibility rules (for example the scheme's requirement that there is no outstanding loft or cavity wall insulation recommendation); the grant is applied whenever the plan has a heat pump in England or Wales.
+
 ---
 
 ## 18. The app

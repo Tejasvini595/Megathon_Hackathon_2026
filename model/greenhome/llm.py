@@ -17,7 +17,8 @@ RULES:
 (4) Call all savings and value impacts estimates, not guarantees; the value range is indicative and not proof of a causal effect.
 (5) If a requested retrofit is listed under infeasible_requested, say it is not feasible and why; do not quote savings for it.
 (6) If data_quality shows missing/modelled usage, or value_impact is null, or savings_unavailable_reason is present, say what is missing instead of guessing.
-(7) Be concise (under 180 words), plain English."""
+(7) FACTS may hold a finance block: loan repayments and bill savings per month at assumed loan terms. Always call it an illustration with assumed rates, not financial advice or a quote; a positive net figure means the plan costs more per month than it saves.
+(8) Be concise (under 180 words), plain English."""
 
 KEYWORDS = {"loft_insulation": ["loft", "roof insulation", "attic"], "cavity_wall_insulation": ["cavity"],
             "solid_wall_insulation": ["solid wall", "external wall", "internal wall"],

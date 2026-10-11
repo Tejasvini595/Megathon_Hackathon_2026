@@ -23,6 +23,44 @@ const packageResult = z.object({
   elementScoresAfter: elementScores,
 });
 
+const monthly = z.tuple([z.number(), z.number()]);
+const loanId = z.enum(["personal", "mortgage"]);
+const finance = z.object({
+  thresholdSap: z.number(),
+  alreadyC: z.boolean(),
+  plans: z.array(
+    z.object({
+      id: z.enum(["full", "noHeatPump", "toC"]),
+      label: z.string(),
+      retrofits: z.array(retrofitId),
+      costGbp: pair,
+      costWithGrantGbp: pair.nullable(),
+      billSavingMonthGbp: z.tuple([z.number(), z.number(), z.number()]),
+      sapAfter: z.number(),
+      bandAfter: epc,
+      reachesC: z.enum(["yes", "borderline", "no"]),
+      options: z.array(
+        z.object({
+          loan: loanId,
+          termYears: z.number(),
+          repaymentGbp: monthly,
+          netGbp: monthly,
+          repaymentWithGrantGbp: monthly.nullable(),
+          netWithGrantGbp: monthly.nullable(),
+          interestGbp: pair,
+        }),
+      ),
+    }),
+  ),
+  assumptions: z.object({
+    loans: z.array(z.object({ id: loanId, label: z.string(), aprPct: z.number(), terms: z.array(z.number()) })),
+    tariffGbpPerKwh: z.object({ elec: z.number(), gas: z.number() }),
+    heatPumpGrantGbp: z.number().nullable(),
+    sources: z.array(z.string()),
+  }),
+  note: z.string(),
+});
+
 export const engineTwinSchema = z.object({
   rating: z.object({
     sap: z.number(),
@@ -81,6 +119,7 @@ export const engineTwinSchema = z.object({
   package: packageResult.nullable(),
   packageNoHeatPump: packageResult.nullable(),
   value: z.object({ currentGbp: z.number().nullable(), upliftPct: pair.nullable(), valueAfterGbp: pair.nullable(), note: z.string() }),
+  finance: finance.nullable().default(null),
   flags: z.array(z.object({ field: z.string(), message: z.string(), severity: z.enum(["info", "warn"]) })),
   unavailableReason: z.string().nullable(),
   modelVersion: z.string(),

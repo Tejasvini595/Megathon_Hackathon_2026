@@ -11,7 +11,7 @@ import { askHome, rememberFromAsk, type AskReply } from "./actions";
 
 type Msg = { role: "user" | "assistant"; text: string; reply?: AskReply; asked?: string };
 
-const SUGGESTIONS = ["Why this score?", "What if I add solar?", "We rent, so skip the heat pump", "What should I do first?"];
+const SUGGESTIONS = ["Why this score?", "What if I add solar?", "We rent, so skip the heat pump", "Can I afford the plan?"];
 
 /**
  * Voice-first "talk to your house". Each question becomes a typed scenario, the engine re-runs, and the LLM explains

@@ -10,6 +10,7 @@ import { getOwnedHomeTwin } from "@/lib/homes";
 import { parseMemory, toEngineMemory } from "@/lib/memory";
 import type { RetrofitId } from "@/lib/twin/types";
 import { AboutYou } from "../about-you";
+import { FinanceCard } from "../finance-card";
 import { MemoryTimeline } from "../memory-timeline";
 import { PlanStage } from "../plan-stage";
 import { PlanSummary } from "../plan-summary";
@@ -55,6 +56,7 @@ async function PlanContent({ params }: { params: PageProps<"/plan/[id]">["params
           <div className="mt-3 rounded-3xl bg-surface p-4 ring-1 ring-hairline">
             <ValueCard value={twin.value} editHref={`/edit/${home.id}`} />
           </div>
+          {twin.finance && <FinanceCard finance={twin.finance} />}
           {twin.unavailableReason && <p className="mt-3 rounded-2xl bg-surface px-3.5 py-3 text-xs text-muted-foreground ring-1 ring-hairline">{twin.unavailableReason}</p>}
 
           {twin.retrofits.length > 1 && <WhyThisOrder ids={twin.retrofits.map((r) => r.id)} />}

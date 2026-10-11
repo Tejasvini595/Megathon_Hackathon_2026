@@ -2,14 +2,15 @@
 use. Every number here comes from the engine; this module only selects, renames and labels.
 LLM inference happens in the web app; this side supplies the facts, the slot table, the prompt, the template and the checks."""
 import hashlib
+from pathlib import Path
 import numpy as np
 import pandas as pd
-from . import config as C, llm, solver, memory
+from . import config as C, llm, solver, memory, finance
 from .engine import GreenEngine
 from .models import load
 from .custom import HDD_FILE
 from .scoring import green_score, element_scores
-from .retrofits import band_of, carbon_saving, monte_carlo, recommend
+from .retrofits import analyse_scenario, band_of, carbon_saving, monte_carlo, recommend
 from .app_input import property_from_record
 
 APP_ID = {"smart_controls": "smart_thermostat"}             # the app's id for the same measure
@@ -27,9 +28,10 @@ MC_DRAWS = 150
 
 
 def _model_version() -> str:
+    """Hash of the models and the engine code: the web app keys its twin cache on it, so any change to either re-runs saved homes."""
     h = hashlib.sha1()
-    for f in sorted(C.MODELS.glob("*")):
-        if f.suffix in (".joblib", ".json"): h.update(f.name.encode()); h.update(f.read_bytes())
+    files = [f for f in sorted(C.MODELS.glob("*")) if f.suffix in (".joblib", ".json")] + sorted(Path(__file__).parent.glob("*.py"))
+    for f in files: h.update(f.name.encode()); h.update(f.read_bytes())
     return h.hexdigest()[:12]
 
 
@@ -139,15 +141,45 @@ class AppEngine:
                           "upliftPct": None if up is None else [round(float(up.low_pct), 1), round(float(up.high_pct), 1)],
                           "valueAfterGbp": None if not value else [round(value["low_gbp"]), round(value["high_gbp"])],
                           "note": "Indicative range from how ratings relate to sale prices in the dataset; associational, not a proven effect."},
+                "finance": self._finance(res, scenario, pkg, pkg_nohp, rating, notes, p, elec, gas),
                 "flags": flags, "unavailableReason": a["data_quality"]["unavailable_reason"], "modelVersion": self.version}
         f = llm.facts(a)
         f["rating_source"] = rating["source"]
         if rating["range"]: f["rating_estimated_range"] = {"sap_low": rating["range"]["sap"][0], "sap_high": rating["range"]["sap"][1]}
         f["notes"] = [n["message"] for n in notes]
+        if twin["finance"]: f["finance"] = self._finance_facts(twin["finance"])
         return {"twin": twin, "llm": {"facts": f, "slots": llm.slot_table(f), "template": llm.template_explanation(f)}}
 
+    def _finance(self, res, scenario, pkg, pkg_nohp, rating, notes, p, elec, gas):
+        """Loan repayments against bill savings for the package, the fabric-only alternative and the shortest start of the ordered package that reaches EPC C."""
+        if pkg is None: return None
+        grant = None if any(n["code"] == "outside_training_area" for n in notes) else C.FINANCE["heatPumpGrantGbp"]
+        plan = lambda pid, label, k: finance.plan_finance(pid, label, k["retrofits"], k["costGbp"], finance.bill_saving_month(k["gasSavingKwh"], k["elecSavingKwh"]),
+                                                          k["sapAfter"], k["bandAfter"], rating, grant if "heat_pump" in k["retrofits"] else None)
+        plans = [plan("full", "Recommended plan" if scenario is None else "This scenario", pkg)]
+        if pkg_nohp: plans.append(plan("noHeatPump", "Without the heat pump", pkg_nohp))
+        if scenario is None and rating["sap"] < C.EPC_C_SAP:
+            for n in range(1, len(res["selected"])):
+                r = analyse_scenario(p, elec, gas, res["selected"][:n])
+                if finance.reaches_c(r["sap_after"], rating) != "yes": continue
+                s = r["saving"]; one = lambda kwh: {"p10": kwh, "p50": kwh, "p90": kwh}
+                k = {"retrofits": [APP_ID.get(x, x) for x in r["selected"]], "costGbp": [r["cost_low"], r["cost_high"]], "sapAfter": r["sap_after"],
+                     "bandAfter": r["rating_after"], "gasSavingKwh": one(s["gas"]), "elecSavingKwh": one(s["elec"])}
+                plans.append(plan("toC", "First steps to EPC C", k)); break
+        return finance.finance_block(plans, rating, grant)
+
+    @staticmethod
+    def _finance_facts(fin) -> dict:
+        full = fin["plans"][0]; o = next(x for x in full["options"] if x["loan"] == "personal" and x["termYears"] == 10)
+        loan = next(l for l in fin["assumptions"]["loans"] if l["id"] == "personal")
+        out = {"monthly_repayment_low_gbp": o["repaymentGbp"][0], "monthly_repayment_high_gbp": o["repaymentGbp"][1], "monthly_bill_saving_gbp": full["billSavingMonthGbp"][1],
+               "monthly_net_low_gbp": o["netGbp"][0], "monthly_net_high_gbp": o["netGbp"][1], "loan_apr_pct": loan["aprPct"], "loan_term_years": 10,
+               "reaches_epc_c": full["reachesC"], "illustration_only": "Illustration with assumed loan terms, not financial advice or a quote."}
+        to_c = next((x for x in fin["plans"] if x["id"] == "toC"), None)
+        if to_c: out.update(to_c_cost_low_gbp=to_c["costGbp"][0], to_c_cost_high_gbp=to_c["costGbp"][1])
+        return out
+
     def eng_scenario(self, p, elec, gas, ids, src, inten):
-        from .retrofits import analyse_scenario
         return solver._score_after(p, analyse_scenario(p, elec, gas, ids), src, inten)
 
     @staticmethod

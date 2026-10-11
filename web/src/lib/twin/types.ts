@@ -99,6 +99,54 @@ export type PackageResult = {
   elementScoresAfter: ElementScores;
 };
 
+/** GBP a month, [best, worst]: best = low cost with high saving, worst = high cost with low saving. */
+export type MonthlyRange = [number, number];
+
+export type FinanceOption = {
+  loan: "personal" | "mortgage";
+  termYears: number;
+  /** Repayment on the low and high install cost. */
+  repaymentGbp: MonthlyRange;
+  /** Repayment minus the monthly bill saving; positive means the plan costs more a month than it saves. */
+  netGbp: MonthlyRange;
+  /** As above with the heat pump grant taken off the cost; null when the plan has no heat pump or the grant doesn't apply. */
+  repaymentWithGrantGbp: MonthlyRange | null;
+  netWithGrantGbp: MonthlyRange | null;
+  /** Total interest over the term on the low and high cost (no grant). */
+  interestGbp: [number, number];
+};
+
+export type FinancePlan = {
+  /** full: the recommended package; noHeatPump: the fabric-led alternative; toC: the shortest start of the ordered plan that reaches EPC C. */
+  id: "full" | "noHeatPump" | "toC";
+  label: string;
+  retrofits: RetrofitId[];
+  costGbp: [number, number];
+  costWithGrantGbp: [number, number] | null;
+  /** GBP a month from the per-fuel savings at the documented tariffs: [low, middle, high]; negative means bills rise. */
+  billSavingMonthGbp: [number, number, number];
+  sapAfter: number;
+  bandAfter: EpcBand;
+  /** yes: SAP after at or above 69 with margin; borderline: within the estimate's uncertainty of 69; no: below. */
+  reachesC: "yes" | "borderline" | "no";
+  options: FinanceOption[];
+};
+
+export type Finance = {
+  thresholdSap: number;
+  /** The home is already at EPC C or better before any work. */
+  alreadyC: boolean;
+  plans: FinancePlan[];
+  assumptions: {
+    loans: { id: "personal" | "mortgage"; label: string; aprPct: number; terms: number[] }[];
+    tariffGbpPerKwh: { elec: number; gas: number };
+    /** Boiler Upgrade Scheme grant off a heat pump (England and Wales); null when the home is outside them. */
+    heatPumpGrantGbp: number | null;
+    sources: string[];
+  };
+  note: string;
+};
+
 export type EpcBand = "A" | "B" | "C" | "D" | "E" | "F" | "G";
 /** 0-100 insulation state of each part (higher is better); null when the part doesn't apply (e.g. a flat with a home above). */
 export type ElementScores = Record<"roof" | "walls" | "floor" | "windows", number | null>;
@@ -150,6 +198,8 @@ export type TwinState = {
     valueAfterGbp: [number, number] | null;
     note: string;
   };
+  /** Monthly-cost illustration of the plan (loan repayment against bill saving) and EPC C, the common green-mortgage bar; null without a package. */
+  finance: Finance | null;
   /** Conflicts, estimated inputs, outside the training area, etc. */
   flags: DataFlag[];
   /** Savings, carbon and value are unavailable for heating outside grid electricity + gas; the reason. */

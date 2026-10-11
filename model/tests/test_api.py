@@ -11,7 +11,7 @@ HOUSE = dict(propertyType="house", builtForm="semi", storeys=2, ageBand="1950_19
              controls="thermostat_trvs", solarPv="no", epcBand="E", sapScore=47, usage={"months": [{"month": m, "elecKwh": a, "gasKwh": b} for m, a, b in MONTHS]})
 PLACE = {"postcode": "M14 6HT", "lat": 53.45, "lon": -2.22, "region": "E12000002", "country": "E92000001", "district": "Manchester"}
 TWIN_KEYS = {"rating", "score", "scoreClass", "scoreRange", "components", "keyIssues", "isPoor", "elementScores", "energy", "carbonKg", "retrofits", "excluded",
-             "needsInfo", "package", "packageNoHeatPump", "value", "flags", "unavailableReason", "modelVersion"}
+             "needsInfo", "package", "packageNoHeatPump", "value", "finance", "flags", "unavailableReason", "modelVersion"}
 
 
 def twin(rec, place=PLACE, retrofits=None):

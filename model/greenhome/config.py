@@ -60,6 +60,19 @@ EMISSION_FACTORS, EMISSION_SOURCE = _ef()
 # roughly 25-28 p/kWh electricity and 6-7 p/kWh gas in 2025-26. Not looked up per region or quarter: re-check against the current cap before
 # quoting any bill figure. Used ONLY for payback / suitability and the SAP cost proxy, never for energy or carbon.
 TARIFF = {"elec": 0.27, "gas": 0.07}
+# ---------------------------------------------------------------- Green finance illustration (finance.py)
+# INDICATIVE assumptions for an illustration only, not a quote or financial advice. Rates are round numbers of the order of UK household
+# quoted rates (Bank of England Bankstats, "Effective and quoted rates", table G1.4); a lender's APR, fees and eligibility will differ.
+FINANCE = {"loans": [{"id": "personal", "label": "Green personal loan", "aprPct": 7.0, "terms": [5, 10]},
+                     {"id": "mortgage", "label": "Added to a mortgage", "aprPct": 4.5, "terms": [15, 25]}],
+           "epcCSap": 69,                       # EPC band C = SAP 69-80 (SAP methodology)
+           "borderlineSap": 2,                  # SAP points of doubt either side of a recorded rating before "yes" becomes "borderline"
+           "heatPumpGrantGbp": 7500,            # Boiler Upgrade Scheme, England and Wales only; eligibility rules (e.g. no outstanding loft / cavity advice) are NOT checked
+           "sources": ["Bank of England Bankstats: quoted household interest rates, table G1.4 (Effective and quoted rates)",
+                       "GOV.UK Boiler Upgrade Scheme (heat pump grant, England and Wales)",
+                       "SAP methodology: EPC band C is SAP 69-80"]}
+EPC_C_SAP = FINANCE["epcCSap"]
+SAP_BAND_BOUNDS = {"A": (92, 100), "B": (81, 91), "C": (69, 80), "D": (55, 68), "E": (39, 54), "F": (21, 38), "G": (1, 20)}
 PAYBACK_HIGH, PAYBACK_MED = 10, 20      # years -> suitability High / Medium / Low
 
 # ---------------------------------------------------------------- Retrofit physics (from dataset/retrofit_catalogue)
