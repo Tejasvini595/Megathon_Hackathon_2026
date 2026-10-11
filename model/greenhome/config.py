@@ -8,6 +8,13 @@ ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "dataset"
 MODELS = ROOT / "models"
 REPORTS = ROOT / "reports"
+
+
+def reference_table(name: str) -> Path:
+    """dataset/<name>, or the copy shipped in models/ (written by training) so the app engine runs without the dataset.
+    Still no silent fallback: if neither exists the read fails loudly."""
+    f = DATA / name
+    return f if f.exists() else MODELS / name
 CACHE = REPORTS / "cache"
 
 # ---------------------------------------------------------------- Green Home Score (fixed by the brief)
@@ -46,7 +53,7 @@ FAULT_FLOOR_AREA = (20, 500)      # m2; outside -> intensity treated as unavaila
 # ---------------------------------------------------------------- Emissions & tariffs
 def _ef():
     """Emission factors come ONLY from dataset/emissions_factors.parquet (DESNZ 2025). No silent fallback: a missing file must stop the run."""
-    e = pd.read_parquet(DATA / "emissions_factors.parquet").set_index("fuel")
+    e = pd.read_parquet(reference_table("emissions_factors.parquet")).set_index("fuel")
     return {"elec": float(e.loc["electricity", "kg_co2e_per_kwh"]), "gas": float(e.loc["gas", "kg_co2e_per_kwh"])}, str(e.loc["gas", "source"])
 EMISSION_FACTORS, EMISSION_SOURCE = _ef()
 # GBP/kWh, INDICATIVE unit rates: order of magnitude of Ofgem's default-tariff price cap (https://www.ofgem.gov.uk/energy-price-cap),
@@ -56,7 +63,7 @@ TARIFF = {"elec": 0.27, "gas": 0.07}
 PAYBACK_HIGH, PAYBACK_MED = 10, 20      # years -> suitability High / Medium / Low
 
 # ---------------------------------------------------------------- Retrofit physics (from dataset/retrofit_catalogue)
-CATALOGUE = pd.read_parquet(DATA / "retrofit_catalogue.parquet").set_index("retrofit_id")   # no silent fallback: fail loudly if missing
+CATALOGUE = pd.read_parquet(reference_table("retrofit_catalogue.parquet")).set_index("retrofit_id")   # no silent fallback: fail loudly if missing
 ORDER = ["loft_insulation", "cavity_wall_insulation", "solid_wall_insulation", "floor_insulation", "double_glazing",
          "smart_controls", "heat_pump", "condensing_boiler", "solar_pv"]     # = catalogue fabric_first_order
 LABEL = {"loft_insulation": "Loft insulation", "cavity_wall_insulation": "Cavity wall insulation",

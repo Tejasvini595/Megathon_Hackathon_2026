@@ -53,9 +53,12 @@ HDD_FILE = C.MODELS / "monthly_hdd.parquet"
 
 
 def save_reference(df: pd.DataFrame):
-    """Also copies the monthly heating-degree-day table (tiny) so a customer's monthly readings can be annualised without the dataset."""
+    """Also copies the monthly heating-degree-day table, the emission factors and the retrofit catalogue (all tiny), so the app
+    engine runs without the dataset."""
     REFERENCE_FILE.write_text(json.dumps(cost_reference(df), indent=1))
     pd.read_parquet(C.DATA / "monthly_hdd.parquet")[["climate_region", "month", "hdd"]].to_parquet(HDD_FILE)
+    for name in ("emissions_factors.parquet", "retrofit_catalogue.parquet"):      # the small reference tables config.py reads
+        pd.read_parquet(C.DATA / name).to_parquet(C.MODELS / name)
 
 
 def load_reference() -> dict:
