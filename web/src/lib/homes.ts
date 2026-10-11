@@ -1,6 +1,8 @@
 import "server-only";
 import { cache } from "react";
 import { cookies } from "next/headers";
+import { notFound, redirect } from "next/navigation";
+import { LAST_HOME_COOKIE, type HomeSection } from "@/lib/active-home";
 import { prisma } from "@/lib/prisma";
 import { requireUser } from "@/lib/dal";
 import { getTwin } from "@/lib/engine";
@@ -18,7 +20,7 @@ export const getActiveHomeRow = cache(async (homeId?: string) => {
   }
 
   const cookieStore = await cookies();
-  const lastId = cookieStore.get("last_home_id")?.value;
+  const lastId = cookieStore.get(LAST_HOME_COOKIE)?.value;
   if (lastId) {
     const home = await prisma.home.findFirst({
       where: { id: lastId, userId: user.id },
@@ -41,11 +43,25 @@ export const getActiveHomeRow = cache(async (homeId?: string) => {
   return { user, home };
 });
 
-/** As above plus the engine's twin for that home, or null if they have none yet. */
-export async function getActiveHome(homeId?: string) {
-  const { user, home } = await getActiveHomeRow(homeId);
-  if (!home) return { user, home: null, twin: null } as const;
-  return { user, home, twin: await getTwin(home) } as const;
+/** The signed-in user and the home in the URL; 404 when it isn't theirs. */
+export const getOwnedHome = cache(async (id: string) => {
+  const user = await requireUser();
+  const home = await prisma.home.findFirst({ where: { id, userId: user.id } });
+  if (!home) notFound();
+  return { user, home };
+});
+
+/** As above plus the engine's twin for that home. */
+export async function getOwnedHomeTwin(id: string) {
+  const { user, home } = await getOwnedHome(id);
+  return { user, home, twin: await getTwin(home) };
+}
+
+/** For a bare section URL: redirects to that section of the last-opened home. Returns the user when they have no homes. */
+export async function redirectToActiveHome(section: HomeSection) {
+  const { user, home } = await getActiveHomeRow();
+  if (home) redirect(`/${section}/${home.id}`);
+  return user;
 }
 
 

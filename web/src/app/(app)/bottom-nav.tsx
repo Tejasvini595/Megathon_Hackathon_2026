@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
 import { Gauge, House, Mic, Route, UserRound } from "lucide-react";
+import { homeIdFromPath, LAST_HOME_COOKIE } from "@/lib/active-home";
 import { cn } from "@/lib/utils";
 
 const ITEMS = [
@@ -16,6 +18,12 @@ const ITEMS = [
 
 export function BottomNav() {
   const pathname = usePathname();
+  // On a home's page, links stay on that home and it's remembered for the bare URLs (pages 404 on homes that aren't yours).
+  const homeId = homeIdFromPath(pathname);
+  useEffect(() => {
+    if (homeId) document.cookie = `${LAST_HOME_COOKIE}=${encodeURIComponent(homeId)}; path=/; max-age=31536000; SameSite=Lax`;
+  }, [homeId]);
+  const hrefOf = (href: string) => (homeId && href !== "/you" ? `${href}/${homeId}` : href);
   return (
     <nav className="pointer-events-none fixed inset-x-0 bottom-0 z-40 flex justify-center px-4 pb-safe">
       <div className="glass pointer-events-auto relative flex w-full max-w-md items-center justify-between rounded-[28px] px-2 py-1.5 shadow-2xl shadow-black/50">
@@ -24,7 +32,7 @@ export function BottomNav() {
           const Icon = item.icon;
           if ("orb" in item) {
             return (
-              <Link key={item.href} href={item.href} aria-label="Ask your home" className="relative -mt-7 grid place-items-center">
+              <Link key={item.href} href={hrefOf(item.href)} aria-label="Ask your home" className="relative -mt-7 grid place-items-center">
                 <span className="absolute size-20 animate-breathe rounded-full bg-[radial-gradient(circle,color-mix(in_oklch,var(--volt)_40%,transparent),transparent_70%)]" />
                 <span className="relative grid size-14 place-items-center rounded-full bg-[radial-gradient(circle_at_30%_25%,#d8fff0,var(--volt)_45%,#0e6b4f)] text-black shadow-[0_8px_30px_-6px_var(--volt)] ring-4 ring-background transition-transform active:scale-95">
                   <Icon className="size-6" strokeWidth={2.2} />
@@ -35,7 +43,7 @@ export function BottomNav() {
           return (
             <Link
               key={item.href}
-              href={item.href}
+              href={hrefOf(item.href)}
               className={cn(
                 "relative flex flex-1 flex-col items-center gap-0.5 rounded-2xl py-1.5 text-[10px] font-medium tracking-wide transition-colors",
                 active ? "text-foreground" : "text-muted-foreground",

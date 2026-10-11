@@ -29,11 +29,12 @@ Set `ENGINE_URL` to the Python engine to replace the preview numbers (see "Engin
 | `/` | Landing page with the auto-rotating twin, cycling between normal and thermal views |
 | `/sign-up`, `/sign-in` | Email + password (Better Auth) |
 | `/new` | Free-form capture: describe the home, take or upload photos, add a floor plan, dictate by voice, add an optional postcode. With a postcode, "Find on map" opens a 3D model of the street (OSM footprints) where the user taps their home; its footprint suggests built form, storeys and roof. The analysis then builds the house part by part from what was found, highlighting the supporting words in the user's text. The review walks through Shape, Walls, Roof, Windows, Heating, Power, Usage and Rating like a character creator: the camera flies to each part, the rest of the house fades, cutaways show wall, floor and loft insulation and glazing panes, and amber hotspots mark parts with guesses. Custom controls: an age timeline, loft insulation pictures, the EPC ladder, a thermostat dial and a solar size stepper. Usage takes monthly readings (typed or from a supplier / smart-meter CSV) or yearly totals; the review cannot finish until every applicable required field and usage are filled |
-| `/home` | Twin hero (drag to orbit, Home/Thermal toggle), score ring, where-heat-goes bars (tap one to fly the camera there), stats, performance gap, key issues, next step, score breakdown |
-| `/plan` | Ordered retrofit plan; the Today/After plan toggle animates the solar panels and heat pump into place and cools the thermal view; per-fuel savings (negative = increase), carbon, value range |
-| `/ask` | Voice-first "talk to your house" (Web Speech API dictation). The reply is a placeholder until the LLM layer is wired |
+| `/home/[id]` | Twin hero (drag to orbit, Home/Thermal toggle), score ring, where-heat-goes bars (tap one to fly the camera there), stats, performance gap, key issues, next step, score breakdown |
+| `/plan/[id]` | Ordered retrofit plan; the Today/After plan toggle animates the solar panels and heat pump into place and cools the thermal view; per-fuel savings (negative = increase), carbon, value range |
+| `/ask/[id]` | Voice-first "talk to your house" (Web Speech API dictation): what-ifs re-run the engine, the LLM explains its numbers |
+| `/home`, `/plan`, `/ask`, `/energy` | Redirect to that page for the home the user last opened (`last_home_id` cookie, set by the bottom nav on any `/{section}/[id]` page; falls back to the latest confirmed home). The nav keeps the current home id when switching tabs; another user's id is a 404 |
 | `/edit/[id]` | Edit a saved home (or continue a draft) with the same step-by-step review |
-| `/energy`, `/you` | Energy tiles; profile, homes (edit, rename, delete), share status, memory placeholder, sign out |
+| `/energy/[id]`, `/you` | Energy tiles; profile, homes (edit, rename, delete), share status, memory placeholder, sign out |
 | `/t/[slug]` | Public "twin card" (share from `/home`): holographic house that tilts with the phone or pointer, live score from the engine, no address or postcode |
 
 ## Where things live
@@ -44,7 +45,7 @@ Pages are server components. Client code is limited to the interactive pieces (3
 src/app/(auth)/actions.ts            signIn / signUp server functions (Better Auth + nextCookies)
 src/app/(flow)/new/actions.ts        createHome (multipart capture) and confirmHome server functions
 src/app/(flow)/new/*.tsx             capture flow, analysing view, review step, on-device photo downscaling
-src/app/(app)/home|plan/page.tsx     server-rendered content; *-stage.tsx is the only client part
+src/app/(app)/home|plan/[id]/page.tsx  server-rendered content; *-stage.tsx is the only client part
 src/app/(app)/ask/actions.ts         askHome server function (placeholder until the LLM layer lands)
 src/app/(app)/you/actions.ts         signOut server function
 src/app/api/uploads/[id]             owner-only file serving for <img src> (files in ./storage, gitignored)

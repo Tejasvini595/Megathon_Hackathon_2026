@@ -46,7 +46,7 @@ async function Loader() {
           const isActive = h.id === activeHomeId;
           return (
             <div key={h.id} className={cn("flex items-center transition-colors hover:bg-surface-2", i > 0 && "border-t hairline")}>
-              <Link href={`/home?homeId=${h.id}`} className="group flex min-w-0 flex-1 items-center justify-between gap-3 py-3.5 pl-4 pr-2 active:scale-[0.99]">
+              <Link href={`/home/${h.id}`} className="group flex min-w-0 flex-1 items-center justify-between gap-3 py-3.5 pl-4 pr-2 active:scale-[0.99]">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-medium truncate group-hover:text-foreground transition-colors">{h.nickname}</p>

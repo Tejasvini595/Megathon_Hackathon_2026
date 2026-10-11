@@ -99,7 +99,7 @@ export async function confirmSampleHome(page: Page) {
   await enterYearlyUsage(page);
   await reviewStep(page, "Done").click();
   await page.getByRole("button", { name: "Looks right. Build my twin" }).click();
-  await page.waitForURL(/\/home\?homeId=/, { timeout: 60_000 });
+  await page.waitForURL(/\/home\/[^/?]+$/, { timeout: 60_000 });
   return new URL(page.url()).searchParams.get("homeId")!;
 }
 

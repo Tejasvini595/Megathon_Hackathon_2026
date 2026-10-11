@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import type { Prisma } from "@/generated/prisma/client";
+import { LAST_HOME_COOKIE } from "@/lib/active-home";
 import { requireUser } from "@/lib/dal";
 import type { ExtractInput } from "@/lib/extract";
 import { autoExtractor as extract } from "@/lib/extract/llm";
@@ -95,6 +96,6 @@ export async function confirmHome(homeId: string, input: z.input<typeof confirmS
   });
   if (count === 0) return { error: "That home no longer exists." };
   const cookieStore = await cookies();
-  cookieStore.set("last_home_id", homeId, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
-  redirect(`/home?homeId=${homeId}`);
+  cookieStore.set(LAST_HOME_COOKIE, homeId, { path: "/", maxAge: 60 * 60 * 24 * 365, sameSite: "lax" });
+  redirect(`/home/${homeId}`);
 }

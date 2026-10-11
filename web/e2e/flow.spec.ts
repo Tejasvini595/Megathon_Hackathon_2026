@@ -28,7 +28,7 @@ test("capture, analysing, review, then confirm lands on /home", async ({ app }) 
 
   await reviewStep(app, "Done").click();
   await app.getByRole("button", { name: "Looks right. Build my twin" }).click();
-  await app.waitForURL(/\/home\?homeId=/, { timeout: 60_000 });
+  await app.waitForURL(/\/home\/[^/?]+$/, { timeout: 60_000 });
   await expect(app.getByRole("tab", { name: "Thermal" })).toBeVisible();
 });
 

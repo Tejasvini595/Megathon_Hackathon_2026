@@ -29,7 +29,7 @@ async function update(id: string, change: (m: Memory) => string | null) {
   if (!text) return;
   memory.log = [...memory.log, { at: new Date().toISOString(), text }].slice(-100);
   await prisma.home.update({ where: { id: home.id }, data: { memory: memory as unknown as Prisma.InputJsonValue } });
-  revalidatePath("/plan");
+  revalidatePath(`/plan/${home.id}`);
   revalidatePath("/you");
 }
 

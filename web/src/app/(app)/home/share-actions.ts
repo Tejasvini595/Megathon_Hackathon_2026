@@ -8,8 +8,8 @@ import { prisma } from "@/lib/prisma";
 
 const homeId = z.string().min(1).max(64);
 
-const refresh = () => {
-  revalidatePath("/home");
+const refresh = (id: string) => {
+  revalidatePath(`/home/${id}`);
   revalidatePath("/you");
 };
 
@@ -20,7 +20,7 @@ export async function shareHome(id: string): Promise<string | null> {
   if (!home) return null;
   const shareSlug = home.shareSlug ?? randomBytes(9).toString("base64url");
   await prisma.home.update({ where: { id: home.id }, data: { shareSlug, sharedAt: home.sharedAt ?? new Date() } });
-  refresh();
+  refresh(id);
   return `/t/${shareSlug}`;
 }
 
@@ -28,5 +28,5 @@ export async function shareHome(id: string): Promise<string | null> {
 export async function unshareHome(id: string): Promise<void> {
   const user = await requireUser();
   await prisma.home.updateMany({ where: { id: homeId.parse(id), userId: user.id }, data: { shareSlug: null, sharedAt: null } });
-  refresh();
+  refresh(id);
 }

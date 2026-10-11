@@ -39,19 +39,14 @@ export function HomeSwitcher({
   const [, startTransition] = useTransition();
   const { setIsSwitching } = useTwinView();
 
-  // Reset switching state and keep cookie synced when current home changes
-  useEffect(() => {
-    setIsSwitching(false);
-    if (currentHomeId) {
-      document.cookie = `last_home_id=${currentHomeId}; path=/; max-age=31536000; SameSite=Lax`;
-    }
-  }, [currentHomeId, setIsSwitching]);
+  // Reset switching state when the current home changes
+  useEffect(() => setIsSwitching(false), [currentHomeId, setIsSwitching]);
 
   function handleSelect(homeId: string) {
     if (homeId === currentHomeId) return;
     setIsSwitching(true);
     startTransition(() => {
-      router.push(`/home?homeId=${homeId}`);
+      router.push(`/home/${homeId}`);
     });
   }
 

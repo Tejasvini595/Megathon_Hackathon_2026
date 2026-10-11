@@ -33,7 +33,7 @@ test("rename, edit and delete a home from /you", async ({ app }) => {
   await (await openField(app, /^Wall insulation/, "Insulated")).click();
   await nav.getByRole("button", { name: "Done", exact: true }).click();
   await app.getByRole("button", { name: "Looks right. Build my twin" }).click();
-  await app.waitForURL(`**/home?homeId=${id}`, { timeout: 60_000 });
+  await app.waitForURL(`**/home/${id}`, { timeout: 60_000 });
 
   await app.goto(`/edit/${id}`);
   await expect(nav).toBeVisible({ timeout: 60_000 });

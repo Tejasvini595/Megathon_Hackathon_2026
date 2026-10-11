@@ -7,12 +7,18 @@ import { getAnalysis, runEngine } from "@/lib/engine";
 import { detectMemory, type MemorySuggestion } from "@/lib/llm/memory-notes";
 import { parseMemory, retrofitId } from "@/lib/memory";
 import { prisma } from "@/lib/prisma";
-import { getActiveHomeRow } from "@/lib/homes";
+import { requireUser } from "@/lib/dal";
 import { explain, parseQuestion } from "@/lib/llm/ask";
 import type { Band, RetrofitId, ScoreClass } from "@/lib/twin/types";
 
 const RETROFIT_IDS = ["loft_insulation", "cavity_wall_insulation", "solid_wall_insulation", "floor_insulation", "double_glazing", "smart_thermostat", "heat_pump", "solar_pv", "condensing_boiler"] as const;
 const input = z.object({ question: z.string().trim().min(1).max(500), current: z.array(z.enum(RETROFIT_IDS)).max(9) });
+
+/** Re-checks the session; null unless the home belongs to the signed-in user. */
+async function ownedHome(id: string) {
+  const user = await requireUser();
+  return prisma.home.findFirst({ where: { id: z.string().min(1).max(64).parse(id), userId: user.id } });
+}
 
 export type AskReply = {
   text: string;
@@ -31,9 +37,9 @@ export type AskReply = {
 };
 
 /** What-if: parse the question into a typed scenario, re-run the engine, then let the LLM explain only the engine's outputs. */
-export async function askHome(question: string, current: RetrofitId[] = []): Promise<AskReply> {
+export async function askHome(homeId: string, question: string, current: RetrofitId[] = []): Promise<AskReply> {
   const { question: q, current: cur } = input.parse({ question, current });
-  const { home } = await getActiveHomeRow();
+  const home = await ownedHome(homeId);
   if (!home?.record) return { text: "Add your home first, then ask me anything about it.", source: "template", note: null, scenario: null, trace: [], memory: null };
 
   const base = await getAnalysis(home);
@@ -73,10 +79,10 @@ const suggestion = z.object({
 });
 
 /** Saves the facts the user confirmed from an Ask message into the home's memory; the plan adapts on its next load. */
-export async function rememberFromAsk(input: z.input<typeof suggestion>, said: string): Promise<{ saved: string[] }> {
+export async function rememberFromAsk(homeId: string, input: z.input<typeof suggestion>, said: string): Promise<{ saved: string[] }> {
   const s = suggestion.parse(input);
   const quote = z.string().trim().max(160).parse(said);
-  const { home } = await getActiveHomeRow();
+  const home = await ownedHome(homeId);
   if (!home) return { saved: [] };
   const m = parseMemory(home.memory);
   const saved: string[] = [];
@@ -90,6 +96,6 @@ export async function rememberFromAsk(input: z.input<typeof suggestion>, said: s
   if (!saved.length) return { saved };
   m.log = [...m.log, { at: new Date().toISOString(), text: `From Ask ("${quote}"): ${saved.join(", ")}.`.slice(0, 300) }].slice(-100);
   await prisma.home.update({ where: { id: home.id }, data: { memory: m as unknown as Prisma.InputJsonValue } });
-  revalidatePath("/plan");
+  revalidatePath(`/plan/${home.id}`);
   return { saved };
 }

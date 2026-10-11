@@ -17,7 +17,7 @@ const SUGGESTIONS = ["Why this score?", "What if I add solar?", "We rent, so ski
  * Voice-first "talk to your house". Each question becomes a typed scenario, the engine re-runs, and the LLM explains
  * only the engine's outputs (checked before they're shown). Follow-ups build on the last scenario.
  */
-export function AskView() {
+export function AskView({ homeId }: { homeId: string }) {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
   const [current, setCurrent] = useState<RetrofitId[]>([]);
@@ -34,7 +34,7 @@ export function AskView() {
     setMessages((m) => [...m, { role: "user", text: q }]);
     startThinking(async () => {
       try {
-        const reply = await askHome(q, current);
+        const reply = await askHome(homeId, q, current);
         if (reply.scenario) setCurrent(reply.scenario.retrofits);
         setMessages((m) => [...m, { role: "assistant", text: reply.text, reply, asked: q }]);
       } catch {
@@ -68,7 +68,7 @@ export function AskView() {
                 {m.reply?.scenario?.after && <ScenarioCard s={m.reply.scenario} />}
                 {m.role === "assistant" ? <Prose text={m.text} /> : m.text}
                 {m.reply?.note && <p className="mt-2 text-[11px] text-muted-foreground">{m.reply.note}</p>}
-                {m.reply?.memory && <RememberChips s={m.reply.memory} said={m.asked ?? ""} />}
+                {m.reply?.memory && <RememberChips homeId={homeId} s={m.reply.memory} said={m.asked ?? ""} />}
                 {m.reply && (
                   <div className="mt-3 flex flex-wrap gap-1">
                     {m.reply.source === "llm" && (
@@ -174,7 +174,7 @@ function memoryLabels(s: NonNullable<AskReply["memory"]>) {
 }
 
 /** Facts spotted in the message, remembered only if the user says so; the plan then adapts. */
-function RememberChips({ s, said }: { s: NonNullable<AskReply["memory"]>; said: string }) {
+function RememberChips({ homeId, s, said }: { homeId: string; s: NonNullable<AskReply["memory"]>; said: string }) {
   const [state, setState] = useState<"ask" | "saving" | "saved" | "dismissed">("ask");
   if (state === "dismissed") return null;
   return (
@@ -190,7 +190,7 @@ function RememberChips({ s, said }: { s: NonNullable<AskReply["memory"]>; said: 
         ))}
       </div>
       {state === "saved" ? (
-        <Link href="/plan" className="mt-2 inline-flex items-center gap-1 text-[11px] text-volt underline-offset-2 hover:underline">
+        <Link href={`/plan/${homeId}`} className="mt-2 inline-flex items-center gap-1 text-[11px] text-volt underline-offset-2 hover:underline">
           <Check className="size-3" /> See how your plan changed
         </Link>
       ) : (
@@ -199,7 +199,7 @@ function RememberChips({ s, said }: { s: NonNullable<AskReply["memory"]>; said: 
             disabled={state === "saving"}
             onClick={async () => {
               setState("saving");
-              await rememberFromAsk(s, said);
+              await rememberFromAsk(homeId, s, said);
               setState("saved");
             }}
             className="rounded-full bg-volt px-3 py-1 text-[11px] font-semibold text-black disabled:opacity-50"
