@@ -250,6 +250,9 @@ async function HomeContent({ params }: { params: PageProps<"/home/[id]">["params
               </li>
             ))}
           </ul>
+          <Link href="/methods" className="mt-4 inline-flex items-center gap-1 text-xs text-muted-foreground underline-offset-4 hover:underline">
+            How we calculate <ArrowRight className="size-3" />
+          </Link>
         </Card>
 
         <FlagList twin={twin} className="mt-4" />
