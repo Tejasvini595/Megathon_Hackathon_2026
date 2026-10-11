@@ -1,11 +1,35 @@
 diff --git a/node_modules/@react-three/drei/.bun-tag-1a5ce39bd13ad155 b/.bun-tag-1a5ce39bd13ad155
 new file mode 100644
 index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/node_modules/@react-three/drei/.bun-tag-7e90852041eab872 b/.bun-tag-7e90852041eab872
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
 diff --git a/web/Html.js b/web/Html.js
-index 81d68b7f4e9893a7d0b436a398bb38883d333374..f7b73f9fa729b561a15a49737eeab01f5b25efe1 100644
+index 81d68b7f4e9893a7d0b436a398bb38883d333374..47271d4cbddc744d7dda5eee609456ec31593dff 100644
 --- a/web/Html.js
 +++ b/web/Html.js
-@@ -152,8 +152,10 @@ const Html = /* @__PURE__ */React.forwardRef(({
+@@ -78,6 +78,7 @@ const getObjectCSSMatrix = (scaleMultipliers => {
+ function isRefObject(ref) {
+   return ref && typeof ref === 'object' && 'current' in ref;
+ }
++const pendingUnmounts = new WeakMap();
+ const Html = /* @__PURE__ */React.forwardRef(({
+   children,
+   eps = 0.001,
+@@ -140,7 +141,11 @@ const Html = /* @__PURE__ */React.forwardRef(({
+   }, [occlude]);
+   React.useLayoutEffect(() => {
+     if (group.current) {
+-      const currentRoot = root.current = ReactDOM.createRoot(el);
++      // Reuse a root whose deferred unmount hasn't run yet (effects re-run immediately in development), else create one.
++      const pending = pendingUnmounts.get(el);
++      if (pending) clearTimeout(pending.timer);
++      pendingUnmounts.delete(el);
++      const currentRoot = root.current = pending ? pending.root : ReactDOM.createRoot(el);
+       scene.updateMatrixWorld();
+       if (transform) {
+         el.style.cssText = `position:absolute;top:0;left:0;pointer-events:none;overflow:hidden;`;
+@@ -152,8 +157,14 @@ const Html = /* @__PURE__ */React.forwardRef(({
          if (prepend) target.prepend(el);else target.appendChild(el);
        }
        return () => {
@@ -14,7 +38,11 @@ index 81d68b7f4e9893a7d0b436a398bb38883d333374..f7b73f9fa729b561a15a49737eeab01f
 +        // The container may already be gone (canvas torn down, effects run twice in development): remove only if attached.
 +        el.remove();
 +        // Deferred: unmounting a root synchronously during React's commit warns in React 19 (race with the current render).
-+        setTimeout(() => currentRoot.unmount());
++        const timer = setTimeout(() => {
++          pendingUnmounts.delete(el);
++          currentRoot.unmount();
++        });
++        pendingUnmounts.set(el, { root: currentRoot, timer });
        };
      }
    }, [target, transform]);

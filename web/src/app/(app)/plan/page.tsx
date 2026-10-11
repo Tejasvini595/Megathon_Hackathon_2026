@@ -6,7 +6,7 @@ import { ExampleBanner, FlagList } from "@/components/app/flags";
 import { PageSkeleton } from "@/components/app/page-skeleton";
 import { ValueCard } from "@/components/app/value-card";
 import { TwinViewProvider } from "@/components/twin/twin-view";
-import { engineJson, placeOf } from "@/lib/engine";
+import { engineJson, placeOf, engineRecord } from "@/lib/engine";
 import { getActiveHome } from "@/lib/homes";
 import { parseMemory, toEngineMemory } from "@/lib/memory";
 import type { RetrofitId } from "@/lib/twin/types";
@@ -36,7 +36,7 @@ async function PlanContent() {
   if (!twin || !home) return <EmptyHome name={user.name} />;
   const packages = { full: twin.package, noHeatPump: twin.packageNoHeatPump };
   const memory = parseMemory(home.memory);
-  const plan = home.record ? await engineJson<RoutePlan>("/plan", { record: home.record, place: await placeOf(home.postcode), memory: toEngineMemory(memory), top: 3 }) : null;
+  const plan = home.record ? await engineJson<RoutePlan>("/plan", { record: engineRecord(home.record), place: await placeOf(home.postcode), memory: toEngineMemory(memory), top: 3 }) : null;
   const statusOf = (id: RetrofitId): StepStatus => (memory.completed.includes(id) ? { kind: "done" } : memory.declined[id] ? { kind: "declined", reason: memory.declined[id] } : null);
   const label = (id: RetrofitId) => twin.retrofits.find((r) => r.id === id)?.label ?? id.replaceAll("_", " ");
 

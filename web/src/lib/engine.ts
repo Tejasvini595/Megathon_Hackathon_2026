@@ -1,6 +1,7 @@
 import "server-only";
 import { createHash } from "node:crypto";
 import type { Prisma } from "@/generated/prisma/client";
+import { normaliseRecord } from "@/lib/extract";
 import type { PropertyRecord } from "@/lib/extract/fields";
 import { findPostcode } from "@/lib/geo/postcode";
 import { prisma } from "@/lib/prisma";
@@ -20,6 +21,9 @@ async function post(path: string, body: unknown) {
   if (!res.ok) throw new Error(`engine ${path} ${res.status}: ${(await res.text()).slice(0, 300)}`);
   return res.json();
 }
+
+/** A saved record in the current format: homes saved before a schema change are migrated on the way to the engine. */
+export const engineRecord = (record: unknown) => normaliseRecord((record ?? {}) as Record<string, unknown>);
 
 /** Where the home is, for the engine's climate region and location. Never sent to the share page. */
 export async function placeOf(postcode: string | null) {
@@ -55,7 +59,7 @@ function mock(home: HomeLike): Twin {
 async function fetchTwin(home: HomeLike, scenario: RetrofitId[] | null): Promise<EngineResponse | null> {
   if (!engineUrl() || !home.record) return null;
   try {
-    return engineResponseSchema.parse(await post("/twin", { record: home.record, place: await placeOf(home.postcode), retrofits: scenario }));
+    return engineResponseSchema.parse(await post("/twin", { record: engineRecord(home.record), place: await placeOf(home.postcode), retrofits: scenario }));
   } catch (e) {
     console.error("engine unavailable:", e instanceof Error ? e.message : e);
     return null;
@@ -68,7 +72,7 @@ export async function runEngine(home: HomeLike, scenario: RetrofitId[] | null = 
 }
 
 async function twinKey(home: HomeLike) {
-  return createHash("sha256").update(JSON.stringify([home.record, await placeOf(home.postcode), await modelVersion()])).digest("hex");
+  return createHash("sha256").update(JSON.stringify([engineRecord(home.record), await placeOf(home.postcode), await modelVersion()])).digest("hex");
 }
 
 /**
