@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { AnimatePresence, LayoutGroup, motion, useDragControls } from "motion/react";
 import { Html } from "@react-three/drei";
 import { toast } from "sonner";
@@ -55,6 +55,7 @@ export function ReviewStep({
   const [nickname, setNickname] = useState(initialNickname);
   const [saving, startSaving] = useTransition();
   const drag = useDragControls();
+  const scroller = useRef<HTMLDivElement>(null);
   const [hints, setHints] = useState(() => {
     try {
       return localStorage.getItem(HINTS_KEY) !== "off";
@@ -90,6 +91,7 @@ export function ReviewStep({
       return !h;
     });
   }
+  useEffect(() => scroller.current?.scrollTo({ top: 0 }), [index]);
   useEffect(() => {
     onView({ geometry, detail, focus: step?.focus ?? null, isolate: step?.focus ?? null, autoRotate: !step, interactive: true, focusDistance: 1.7, markers });
   }, [geometry, detail, step, markers, onView]);
@@ -140,7 +142,7 @@ export function ReviewStep({
         </nav>
       </LayoutGroup>
 
-      <div className="relative min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+      <div ref={scroller} className="relative min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
         <AnimatePresence mode="popLayout" custom={dir} initial={false}>
           <motion.div
             key={index}

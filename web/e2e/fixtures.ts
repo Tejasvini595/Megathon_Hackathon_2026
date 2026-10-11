@@ -1,4 +1,4 @@
-import { test as base, expect, type BrowserContext, type Page } from "@playwright/test";
+import { test as base, expect, type BrowserContext, type Locator, type Page } from "@playwright/test";
 import { Client } from "pg";
 
 const DATABASE_URL = process.env.DATABASE_URL ?? "postgresql://ght:ght@localhost:5432/ght";
@@ -85,9 +85,18 @@ export async function analyseSample(page: Page) {
   await expect(stepNav(page)).toBeVisible({ timeout: 60_000 });
 }
 
+/** The review won't finish without energy use: yearly totals are the quickest way to give it. */
+export async function enterYearlyUsage(page: Page) {
+  await reviewStep(page, "Usage").click();
+  await page.getByRole("button", { name: "I only have yearly totals" }).click();
+  await page.getByLabel("Electricity kWh a year").fill("3200");
+  await page.getByLabel("Gas kWh a year").fill("14000");
+}
+
 /** Sample home all the way to a confirmed twin; returns the new home's id. */
 export async function confirmSampleHome(page: Page) {
   await analyseSample(page);
+  await enterYearlyUsage(page);
   await reviewStep(page, "Done").click();
   await page.getByRole("button", { name: "Looks right. Build my twin" }).click();
   await page.waitForURL(/\/home\?homeId=/, { timeout: 60_000 });
@@ -96,9 +105,17 @@ export async function confirmSampleHome(page: Page) {
 
 /** Expands a review row unless it is already open (rows with guesses start open). */
 export async function openField(page: Page, label: RegExp, option: string) {
-  const choice = page.getByRole("button", { name: option, exact: true });
+  const choice = page.getByRole("button", { name: option, exact: true }).first();
   await page.getByRole("button", { name: label }).waitFor();
   if (!(await choice.isVisible())) await page.getByRole("button", { name: label }).click();
   await expect(choice).toBeVisible();
   return choice;
+}
+
+/** Expands a review row unless it already shows `probe` (rows with guesses start open). */
+export async function openRow(page: Page, label: RegExp, probe: Locator) {
+  await page.getByRole("button", { name: label }).waitFor();
+  if (!(await probe.isVisible())) await page.getByRole("button", { name: label }).click();
+  await expect(probe).toBeVisible();
+  return probe;
 }

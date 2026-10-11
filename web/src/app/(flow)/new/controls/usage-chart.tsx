@@ -19,7 +19,7 @@ export function UsageChart({ groups }: { groups: ChartGroup[] }) {
   const spring = reduce ? { duration: 0 } : { type: "spring" as const, stiffness: 220, damping: 26 };
   return (
     <figure>
-      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Energy use by month, peak ${Math.round(max)} kWh`} className="w-full">
+      <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`Energy use by month, peak ${Math.round(max)} kWh`} className="mx-auto max-h-44 w-full">
         {groups.map((g, i) => g.winter && <rect key={`w${i}`} x={i * slot} y={0} width={slot} height={BASE} className="fill-foreground/[0.05]" />)}
         <line x1="0" x2={W} y1={BASE} y2={BASE} className="stroke-foreground/15" />
         {groups.map((g, i) => {

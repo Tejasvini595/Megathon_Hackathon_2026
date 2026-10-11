@@ -17,7 +17,7 @@ bun run db:seed                 # demo user demo@ght.dev / demo12345 with three 
 bun run dev                      # http://localhost:3000, open with phone-sized devtools
 bun test src                     # unit tests (footprint geometry, eval scoring)
 bun run e2e                      # Playwright suite on its own dev server (port 3500, needs the DB; fresh user per test)
-bun run eval:extract             # extraction baseline on 25 hand-written descriptions -> src/lib/extract/eval/results.md
+bun run eval:extract             # extraction baseline on 32 hand-written descriptions -> src/lib/extract/eval/results.md
 ```
 
 Set `ENGINE_URL` to the Python engine to replace the preview numbers (see "Engine contract" below).
@@ -28,7 +28,7 @@ Set `ENGINE_URL` to the Python engine to replace the preview numbers (see "Engin
 | --- | --- |
 | `/` | Landing page with the auto-rotating twin, cycling between normal and thermal views |
 | `/sign-up`, `/sign-in` | Email + password (Better Auth) |
-| `/new` | Free-form capture: describe the home, take or upload photos, add a floor plan, dictate by voice, add an optional postcode. With a postcode, "Find on map" opens a 3D model of the street (OSM footprints) where the user taps their home; its footprint suggests built form, storeys and roof. The analysis then builds the house part by part from what was found, highlighting the supporting words in the user's text. The review walks through Shape, Walls, Roof, Windows, Heating and Power like a character creator: the camera flies to each part, the rest of the house fades, cutaways show wall and loft insulation and glazing panes, and amber hotspots mark parts with guesses |
+| `/new` | Free-form capture: describe the home, take or upload photos, add a floor plan, dictate by voice, add an optional postcode. With a postcode, "Find on map" opens a 3D model of the street (OSM footprints) where the user taps their home; its footprint suggests built form, storeys and roof. The analysis then builds the house part by part from what was found, highlighting the supporting words in the user's text. The review walks through Shape, Walls, Roof, Windows, Heating, Power, Usage and Rating like a character creator: the camera flies to each part, the rest of the house fades, cutaways show wall, floor and loft insulation and glazing panes, and amber hotspots mark parts with guesses. Custom controls: an age timeline, loft insulation pictures, the EPC ladder, a thermostat dial and a solar size stepper. Usage takes monthly readings (typed or from a supplier / smart-meter CSV) or yearly totals; the review cannot finish until every applicable required field and usage are filled |
 | `/home` | Twin hero (drag to orbit, Home/Thermal toggle), score ring, where-heat-goes bars (tap one to fly the camera there), stats, performance gap, key issues, next step, score breakdown |
 | `/plan` | Ordered retrofit plan; the Today/After plan toggle animates the solar panels and heat pump into place and cools the thermal view; per-fuel savings (negative = increase), carbon, value range |
 | `/ask` | Voice-first "talk to your house" (Web Speech API dictation). The reply is a placeholder until the LLM layer is wired |
@@ -72,7 +72,10 @@ prisma/schema.prisma                 auth models + Home, HomeInput, Extraction, 
 ## Record notes
 
 - Flats and maisonettes record `flatLevel` (ground / mid / top) and `blockStoreys`; their own `storeys` can be more than 1. Fields that don't apply (e.g. loft insulation for a flat with a home above) are hidden by `when` in `fields.ts`.
-- `secondaryHeating` is multi-select (a home can have a stove and a gas fire); the main heating stays single because the engine models one primary system.
+- Every field the score needs is required (no "not sure"); only `sapScore`, `thermostatC` and `currentValueGbp` may be null. `epcBand: "unknown"` asks the engine's estimator to fill the rating. Fields that don't apply to the home (`when`) are saved as null.
+- `rooms` is bedrooms plus living rooms; text that only gives bedrooms adds one living room at lower confidence. `loftInsulation` is a category (none / thin / some / thick; the 3D loft draws 0 / 50 / 150 / 270 mm for display only). `solarKw` can come from a panel count at `SOLAR_KW_PER_PANEL` = 0.4 kW (`src/lib/extract/solar.ts`); the 3D house draws `round(kW / 0.4)` panels.
+- `record.usage` holds metered energy: monthly readings (`YYYY-MM`, kWh) need at least 6 months with electricity (and gas for gas heating) and one December to February month, otherwise yearly totals (`src/lib/extract/usage.ts`). Oil, heat-network and other-fuel amounts are asked for when the heating type needs them.
+- `normaliseRecord` migrates records saved before v2 (bedrooms to rooms, loft mm to category, the old age bands, solid walls, one heat pump) and drops `secondaryHeating`.
 - `normaliseRecord` fills fields missing from homes saved before a field existed.
 
 ## Engine contract
