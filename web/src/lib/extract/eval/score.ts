@@ -1,4 +1,4 @@
-import type { ExtractionResult, FieldKey, FieldValue } from "../fields";
+import type { ExtractedField, ExtractionResult, FieldKey, FieldValue } from "../fields";
 import type { EvalCase } from "./cases";
 
 /** One field of one case, with what the extractor said. */
@@ -10,7 +10,7 @@ export const TIERS: Tier[] = ["Sure", "Likely", "Guess"];
 export const tierOf = (confidence: number): Tier => (confidence >= 0.85 ? "Sure" : confidence >= 0.6 ? "Likely" : "Guess");
 
 /** Numbers that the review UI only offers in steps count as right within one step. */
-const TOLERANCE: Partial<Record<FieldKey, number>> = { floorAreaM2: 5, loftInsulationMm: 25 };
+const TOLERANCE: Partial<Record<FieldKey, number>> = { floorAreaM2: 5, solarKw: 0.1, thermostatC: 0.5, currentValueGbp: 5000 };
 
 export function matches(key: FieldKey, gold: FieldValue, value: FieldValue) {
   if (Array.isArray(gold) || Array.isArray(value)) {
@@ -24,10 +24,12 @@ export function matches(key: FieldKey, gold: FieldValue, value: FieldValue) {
 
 export function outcomesOf(c: EvalCase, result: ExtractionResult) {
   const outcomes = (Object.entries(c.gold) as [FieldKey, FieldValue][]).map(([key, gold]): Outcome => {
-    const f = result.fields[key];
+    // Optional fields are absent from the result until the text gives them.
+    const f: ExtractedField | undefined = result.fields[key];
+    if (!f) return { caseId: c.id, key, gold, value: "(none)", confidence: 0, source: "default", correct: false, filled: false };
     return { caseId: c.id, key, gold, value: f.value, confidence: f.confidence, source: f.source, correct: matches(key, gold, f.value), filled: f.source !== "default" };
   });
-  const falseFills = (c.open ?? []).filter((k) => result.fields[k].source !== "default").map((k) => ({ caseId: c.id, key: k, value: result.fields[k].value }));
+  const falseFills = (c.open ?? []).filter((k) => result.fields[k]?.source !== "default" && result.fields[k]).map((k) => ({ caseId: c.id, key: k, value: result.fields[k].value }));
   return { outcomes, falseFills };
 }
 
