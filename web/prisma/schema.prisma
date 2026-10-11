@@ -123,6 +123,8 @@ model Home {
   /// Last engine result for this home and the key it was computed for (record + place + model version).
   twin        Json?
   twinKey     String?
+  /// Customer memory: completed / declined measures, constraints, budget, priority and a change log (see src/lib/memory.ts).
+  memory      Json?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   inputs      HomeInput[]
