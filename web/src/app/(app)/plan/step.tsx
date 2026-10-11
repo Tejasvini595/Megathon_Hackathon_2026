@@ -4,11 +4,12 @@ import { formatGbp, formatSaving } from "@/lib/score";
 import type { Band, Retrofit } from "@/lib/twin/types";
 import { cn } from "@/lib/utils";
 import { billText } from "./format";
+import { StepActions, type StepStatus } from "./step-actions";
 
 const kwh = (n: number) => Math.round(n).toLocaleString("en-GB");
 const nonZero = (b: Band) => b.p10 !== 0 || b.p50 !== 0 || b.p90 !== 0;
 
-export function Step({ r }: { r: Retrofit }) {
+export function Step({ r, homeId, status }: { r: Retrofit; homeId: string; status: StepStatus }) {
   const tier = r.relevance?.tier ?? r.suitability;
   const survey = tier === "needs survey";
   const chip = (t: string) => (t === "High" ? "bg-volt/15 text-volt" : t === "Medium" ? "bg-amber/15 text-amber" : "bg-surface-2 text-muted-foreground");
@@ -65,6 +66,9 @@ export function Step({ r }: { r: Retrofit }) {
           </span>
         </span>
       </FocusButton>
+      <div className="pl-11">
+        <StepActions homeId={homeId} id={r.id} status={status} />
+      </div>
     </li>
   );
 }

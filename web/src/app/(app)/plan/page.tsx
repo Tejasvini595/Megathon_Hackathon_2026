@@ -6,12 +6,19 @@ import { ExampleBanner, FlagList } from "@/components/app/flags";
 import { PageSkeleton } from "@/components/app/page-skeleton";
 import { ValueCard } from "@/components/app/value-card";
 import { TwinViewProvider } from "@/components/twin/twin-view";
+import { engineJson, placeOf } from "@/lib/engine";
 import { getActiveHome } from "@/lib/homes";
+import { parseMemory, toEngineMemory } from "@/lib/memory";
 import type { RetrofitId } from "@/lib/twin/types";
+import { AboutYou } from "./about-you";
+import { MemoryTimeline } from "./memory-timeline";
 import { PlanStage } from "./plan-stage";
 import { PlanSummary } from "./plan-summary";
 import { PlanVariantProvider } from "./plan-variant";
+import { RouteSection } from "./route-section";
+import type { RoutePlan } from "./route-types";
 import { Step } from "./step";
+import type { StepStatus } from "./step-actions";
 
 export const metadata: Metadata = { title: "Plan" };
 
@@ -27,6 +34,9 @@ async function PlanContent() {
   const { user, home, twin } = await getActiveHome();
   if (!twin || !home) return <EmptyHome name={user.name} />;
   const packages = { full: twin.package, noHeatPump: twin.packageNoHeatPump };
+  const memory = parseMemory(home.memory);
+  const plan = home.record ? await engineJson<RoutePlan>("/plan", { record: home.record, place: await placeOf(home.postcode), memory: toEngineMemory(memory), top: 3 }) : null;
+  const statusOf = (id: RetrofitId): StepStatus => (memory.completed.includes(id) ? { kind: "done" } : memory.declined[id] ? { kind: "declined", reason: memory.declined[id] } : null);
   const label = (id: RetrofitId) => twin.retrofits.find((r) => r.id === id)?.label ?? id.replaceAll("_", " ");
 
   return (
@@ -50,9 +60,13 @@ async function PlanContent() {
 
           <ol className="relative mt-6 space-y-3 before:absolute before:bottom-6 before:left-[15px] before:top-6 before:w-px before:bg-hairline">
             {twin.retrofits.map((r) => (
-              <Step key={r.id} r={r} />
+              <Step key={r.id} r={r} homeId={home.id} status={statusOf(r.id)} />
             ))}
           </ol>
+
+          <RouteSection plan={plan?.available === undefined ? null : plan} />
+          <AboutYou key={JSON.stringify([memory.renting, memory.listed, memory.budget_gbp])} homeId={home.id} renting={memory.renting} listed={memory.listed} budget={memory.budget_gbp} priority={memory.priority} />
+          <MemoryTimeline log={memory.log} />
 
           {twin.excluded.length > 0 && (
             <details className="group mt-5 rounded-3xl bg-surface ring-1 ring-hairline">
