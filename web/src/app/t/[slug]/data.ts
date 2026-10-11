@@ -8,16 +8,17 @@ const slugSchema = z.string().regex(/^[A-Za-z0-9_-]{10,64}$/);
 
 /**
  * The live twin for a public slug, or null if unknown, revoked or unconfirmed. Selects only what
- * the card shows; the postcode, address and raw inputs never leave the database, and the home id
- * only goes to the engine, never to the page.
+ * the card shows; the postcode only goes to the engine (for the climate region), and the address, raw inputs
+ * and home id never reach the page.
  */
 export const getSharedTwin = cache(async (slug: string) => {
   const parsed = slugSchema.safeParse(slug);
   if (!parsed.success) return null;
   const home = await prisma.home.findUnique({
     where: { shareSlug: parsed.data },
-    select: { id: true, nickname: true, record: true, status: true, footprint: true },
+    select: { id: true, nickname: true, record: true, status: true, footprint: true, postcode: true, twin: true, twinKey: true },
   });
   if (!home || home.status !== "CONFIRMED") return null;
-  return { record: home.record, twin: await getTwin({ id: home.id, nickname: home.nickname, postcode: null, record: home.record, footprint: home.footprint }) };
+  const twin = await getTwin(home);
+  return { record: home.record, twin: { ...twin, postcode: null } };
 });

@@ -110,7 +110,7 @@ export const MOCK_TWIN: TwinState = {
     sapAfter: 63,
     bandAfter: "D",
   },
-  value: { currentGbp: 285000, upliftPct: [0.4, 5.1], upliftGbp: [286100, 299500], note: "Indicative range from historical sales in the dataset, not a proven effect." },
+  value: { currentGbp: 285000, upliftPct: [0.4, 5.1], valueAfterGbp: [286100, 299500], note: "Indicative range from historical sales in the dataset, not a proven effect." },
   flags: [{ field: "energy", message: "Example data: the engine is not connected", severity: "warn" }],
   unavailableReason: null,
   modelVersion: "mock",

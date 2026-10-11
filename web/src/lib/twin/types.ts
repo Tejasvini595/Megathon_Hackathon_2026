@@ -145,9 +145,9 @@ export type TwinState = {
   packageNoHeatPump: PackageResult | null;
   value: {
     currentGbp: number | null;
-    /** Indicative uplift range for the package; the pound range needs the home's value. */
+    /** Indicative uplift range for the package; the value after it (in pounds) needs the home's current value. */
     upliftPct: [number, number] | null;
-    upliftGbp: [number, number] | null;
+    valueAfterGbp: [number, number] | null;
     note: string;
   };
   /** Conflicts, estimated inputs, outside the training area, etc. */

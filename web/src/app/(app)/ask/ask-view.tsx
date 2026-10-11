@@ -2,23 +2,24 @@
 
 import { useEffect, useRef, useState, useTransition } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowUp, Cpu, Mic, Square } from "lucide-react";
+import { ArrowRight, ArrowUp, Cpu, Mic, ShieldCheck, Square } from "lucide-react";
 import { useDictation } from "@/hooks/use-dictation";
 import { cn } from "@/lib/utils";
-import { askHome } from "./actions";
+import type { RetrofitId } from "@/lib/twin/types";
+import { askHome, type AskReply } from "./actions";
 
-type Msg = { role: "user" | "assistant"; text: string; trace?: string[] };
+type Msg = { role: "user" | "assistant"; text: string; reply?: AskReply };
 
-const SUGGESTIONS = ["Why is my score 38?", "What if I add solar?", "Skip the heat pump", "What should I do first?"];
+const SUGGESTIONS = ["Why this score?", "What if I add solar?", "Skip the heat pump", "What should I do first?"];
 
 /**
- * Voice-first "talk to your house". Flow once wired: decision model parses the request into a typed
- * scenario -> feasibility rules -> engine reruns -> LLM explains the computed diff -> grounding check.
- * Replies come from the askHome server function.
+ * Voice-first "talk to your house". Each question becomes a typed scenario, the engine re-runs, and the LLM explains
+ * only the engine's outputs (checked before they're shown). Follow-ups build on the last scenario.
  */
 export function AskView() {
   const [messages, setMessages] = useState<Msg[]>([]);
   const [input, setInput] = useState("");
+  const [current, setCurrent] = useState<RetrofitId[]>([]);
   const [thinking, startThinking] = useTransition();
   const bottom = useRef<HTMLDivElement>(null);
   const dictation = useDictation((t) => t && send(t));
@@ -32,8 +33,9 @@ export function AskView() {
     setMessages((m) => [...m, { role: "user", text: q }]);
     startThinking(async () => {
       try {
-        const reply = await askHome(q);
-        setMessages((m) => [...m, { role: "assistant", ...reply }]);
+        const reply = await askHome(q, current);
+        if (reply.scenario) setCurrent(reply.scenario.retrofits);
+        setMessages((m) => [...m, { role: "assistant", text: reply.text, reply }]);
       } catch {
         setMessages((m) => [...m, { role: "assistant", text: "Sorry, I couldn't reach the engine. Try again in a moment." }]);
       }
@@ -62,10 +64,17 @@ export function AskView() {
           {messages.map((m, i) => (
             <motion.div key={i} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
               <div className={cn("max-w-[85%] rounded-3xl px-4 py-3 text-[15px] leading-relaxed", m.role === "user" ? "rounded-br-lg bg-primary text-primary-foreground" : "rounded-bl-lg bg-surface ring-1 ring-hairline")}>
-                {m.text}
-                {m.trace && (
+                {m.reply?.scenario?.after && <ScenarioCard s={m.reply.scenario} />}
+                {m.role === "assistant" ? <Prose text={m.text} /> : m.text}
+                {m.reply?.note && <p className="mt-2 text-[11px] text-muted-foreground">{m.reply.note}</p>}
+                {m.reply && (
                   <div className="mt-3 flex flex-wrap gap-1">
-                    {m.trace.map((t) => (
+                    {m.reply.source === "llm" && (
+                      <span className="flex items-center gap-1 rounded-full bg-volt/10 px-2 py-0.5 text-[10px] text-volt">
+                        <ShieldCheck className="size-2.5" /> numbers from the engine
+                      </span>
+                    )}
+                    {m.reply.trace.map((t) => (
                       <span key={t} className="flex items-center gap-1 rounded-full bg-surface-2 px-2 py-0.5 font-mono text-[10px] text-muted-foreground">
                         <Cpu className="size-2.5" />
                         {t}
@@ -120,6 +129,43 @@ export function AskView() {
           </button>
         </form>
       </div>
+    </div>
+  );
+}
+
+const kwh = (n: number) => `${n < 0 ? "+" : "−"}${Math.abs(Math.round(n)).toLocaleString("en-GB")} kWh`;
+
+/** The engine's before -> after for the scenario, shown before the words. */
+function ScenarioCard({ s }: { s: NonNullable<AskReply["scenario"]> }) {
+  const a = s.after!;
+  return (
+    <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} className="mb-3 rounded-2xl bg-surface-2 p-3 ring-1 ring-hairline">
+      <p className="text-[11px] text-muted-foreground">{s.labels.join(" · ")}</p>
+      <div className="mt-1.5 flex items-center gap-2">
+        <span className="tabular text-2xl font-semibold">{s.before.score}</span>
+        <ArrowRight className="size-4 text-muted-foreground" />
+        <motion.span initial={{ opacity: 0, x: -6 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.15 }} className="tabular text-2xl font-semibold text-volt">
+          {a.score}
+        </motion.span>
+        <span className="text-xs text-muted-foreground">{a.scoreClass}</span>
+      </div>
+      <div className="mt-2 grid grid-cols-3 gap-2 text-[11px]">
+        <span><span className="block text-muted-foreground">Gas</span><span className="tabular">{kwh(-a.gasSavingKwh.p50)}</span></span>
+        <span><span className="block text-muted-foreground">Electricity</span><span className="tabular">{kwh(-a.elecSavingKwh.p50)}</span></span>
+        <span><span className="block text-muted-foreground">Bills</span><span className="tabular">{a.billSavingGbp >= 0 ? "−" : "+"}£{Math.abs(a.billSavingGbp).toLocaleString("en-GB")}/yr</span></span>
+      </div>
+      <p className="mt-2 text-[10px] text-muted-foreground">Engine estimates, not guarantees.</p>
+    </motion.div>
+  );
+}
+
+/** Paragraphs and **bold**, which is all the explanations use. */
+function Prose({ text }: { text: string }) {
+  return (
+    <div className="space-y-2">
+      {text.split(/\n{2,}/).map((para, i) => (
+        <p key={i}>{para.split(/(\*\*[^*]+\*\*)/).map((t, j) => (t.startsWith("**") ? <strong key={j}>{t.slice(2, -2)}</strong> : t))}</p>
+      ))}
     </div>
   );
 }

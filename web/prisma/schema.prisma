@@ -120,6 +120,9 @@ model Home {
   sharedAt    DateTime?
   /// Upload id of the canvas snapshot used as the share preview image.
   shareImage  String?
+  /// Last engine result for this home and the key it was computed for (record + place + model version).
+  twin        Json?
+  twinKey     String?
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
   inputs      HomeInput[]
