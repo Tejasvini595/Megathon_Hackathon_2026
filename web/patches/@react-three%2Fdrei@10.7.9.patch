@@ -1,0 +1,14 @@
+diff --git a/web/Html.js b/web/Html.js
+index 81d68b7f4e9893a7d0b436a398bb38883d333374..b19aa76bf844d81972269b0a4efccb34ee0fef0e 100644
+--- a/web/Html.js
++++ b/web/Html.js
+@@ -153,7 +153,8 @@ const Html = /* @__PURE__ */React.forwardRef(({
+       }
+       return () => {
+         if (target) target.removeChild(el);
+-        currentRoot.unmount();
++        // Deferred: unmounting a root synchronously during React's commit warns in React 19 (race with the current render).
++        setTimeout(() => currentRoot.unmount());
+       };
+     }
+   }, [target, transform]);
