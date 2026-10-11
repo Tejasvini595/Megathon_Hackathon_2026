@@ -1,9 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, useTransition } from "react";
 import { Check, Copy, Link2Off, Share2 } from "lucide-react";
 import { toast } from "sonner";
 import { shareHome, unshareHome } from "./share-actions";
+
+const noSubscribe = () => () => {};
+/** The page origin on the client, "" during server rendering (window isn't available there). */
+const useOrigin = () => useSyncExternalStore(noSubscribe, () => window.location.origin, () => "");
 
 const canNativeShare = () => typeof navigator !== "undefined" && typeof navigator.share === "function";
 
@@ -26,7 +30,8 @@ export function ShareButton({ homeId, sharedPath }: { homeId: string; sharedPath
     };
   }, [open]);
 
-  const url = path ? `${window.location.origin}${path}` : "";
+  const origin = useOrigin();
+  const url = path ? `${origin}${path}` : "";
 
   const create = () =>
     start(async () => {

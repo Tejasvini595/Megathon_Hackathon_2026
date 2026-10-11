@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useSyncExternalStore, useTransition } from "react";
 import { AnimatePresence, LayoutGroup, motion, useDragControls } from "motion/react";
 import { Html } from "@react-three/drei";
 import { toast } from "sonner";
@@ -25,6 +25,24 @@ import type { StageView } from "./capture-flow";
 
 const STEP_ICON: Record<StepId, LucideIcon> = { shape: Ruler, walls: BrickWall, roof: House, windows: Grid2x2, heating: Flame, power: Sun, usage: Zap, rating: Gauge };
 const HINTS_KEY = "ght:review-hints";
+/** "Show hints" preference in localStorage, read through useSyncExternalStore so server and first client render agree (on). */
+const hintListeners = new Set<() => void>();
+const hintsStore = {
+  subscribe: (fn: () => void) => (hintListeners.add(fn), () => void hintListeners.delete(fn)),
+  get: () => {
+    try {
+      return localStorage.getItem(HINTS_KEY) !== "off";
+    } catch {
+      return true;
+    }
+  },
+  set: (on: boolean) => {
+    try {
+      localStorage.setItem(HINTS_KEY, on ? "on" : "off");
+    } catch {}
+    hintListeners.forEach((fn) => fn());
+  },
+};
 
 const SUMMARY = STEPS.length;
 
@@ -63,13 +81,7 @@ export function ReviewStep({
   const [saving, startSaving] = useTransition();
   const drag = useDragControls();
   const scroller = useRef<HTMLDivElement>(null);
-  const [hints, setHints] = useState(() => {
-    try {
-      return localStorage.getItem(HINTS_KEY) !== "off";
-    } catch {
-      return true;
-    }
-  });
+  const hints = useSyncExternalStore(hintsStore.subscribe, hintsStore.get, () => true);
 
   const record = useMemo(() => ({ ...recordOf(fields), usage }), [fields, usage]);
   const missing = useMemo(() => missingOf(record, usage), [record, usage]);
@@ -107,14 +119,7 @@ export function ReviewStep({
     return <Hotspots geometry={geometry} counts={toCheck} current={index} onSelect={(i) => setIndex(([cur]) => [i, i > cur ? 1 : -1])} />;
   }, [geometry, toCheck, index, hints]);
 
-  function toggleHints() {
-    setHints((h) => {
-      try {
-        localStorage.setItem(HINTS_KEY, h ? "off" : "on");
-      } catch {}
-      return !h;
-    });
-  }
+  const toggleHints = () => hintsStore.set(!hints);
   useEffect(() => {
     if (jump) return;
     scroller.current?.scrollTo({ top: 0 });
