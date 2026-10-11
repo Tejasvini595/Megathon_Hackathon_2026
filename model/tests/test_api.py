@@ -67,3 +67,14 @@ def test_parse_plan_prompt_health():
 def test_missing_required_field_is_422():
     r = client.post("/twin", json={"record": {k: v for k, v in HOUSE.items() if k != "glazing"}, "place": PLACE})
     assert r.status_code == 422
+
+
+def test_sensitivity_ranks_questions_that_change_the_plan():
+    alts = {"loftInsulation": {"thin": 0.5, "none": 0.3, "thick": 0.2}, "controls": {"thermostat_trvs": 0.9, "smart": 0.1},
+            "glazing": {"single": 0.4, "double": 0.6}}
+    r = client.post("/sensitivity", json={"record": HOUSE, "place": PLACE, "alternatives": alts}).json()
+    keys = [f["key"] for f in r["fields"]]
+    assert set(keys) == set(alts) and all(f["best"] == max(alts[f["key"]], key=alts[f["key"]].get) for f in r["fields"])
+    impact = {f["key"]: f["score_spread"] + 3 * f["plan_change_prob"] + f["bill_spread_gbp"] / 100 for f in r["fields"]}
+    assert impact[keys[0]] >= impact[keys[-1]]
+    assert impact["glazing"] > impact["controls"]            # single vs double glazing moves this home far more than a 10% chance of smart controls

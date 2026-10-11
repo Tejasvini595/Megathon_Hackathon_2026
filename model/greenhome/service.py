@@ -9,7 +9,7 @@ from .engine import GreenEngine
 from .models import load
 from .custom import HDD_FILE
 from .scoring import green_score, element_scores
-from .retrofits import band_of, carbon_saving, monte_carlo
+from .retrofits import band_of, carbon_saving, monte_carlo, recommend
 from .app_input import property_from_record
 
 APP_ID = {"smart_controls": "smart_thermostat"}             # the app's id for the same measure
@@ -167,6 +167,41 @@ class AppEngine:
         if k == "renewable":
             return f"Solar PV {p['solar_kwp_est']:g} kW" if p.get("has_solar_pv") else "No solar or other generation"
         return {"none": "No heating controls", "basic": "Timer only", "standard": "Programmer, room thermostat and TRVs", "advanced": "Smart or zoned controls"}[p["controls_label"]]
+
+    def _quick(self, rec: dict, place: dict) -> dict:
+        """Score, recommended package, score after it and its bill change: the engine's rules without the Monte Carlo or the
+        relevance model, fast enough to try every plausible answer to every question."""
+        p, _, _ = self.home(rec, place)
+        elec, gas, src = self.eng.baseline(p)
+        inten = p["intensity"] if src == "metered" else np.nan
+        score = green_score(dict(p, intensity=inten))["score"]
+        if p["fuel_scope"] != "gas_elec":
+            return {"score": score, "measures": (), "after": score, "bill": 0.0}
+        pack = recommend(p, elec, gas)["package"]
+        return {"score": score, "measures": tuple(pack["selected"]), "after": solver._score_after(p, pack, src, inten)["score"], "bill": pack["bill_saving_gbp"]}
+
+    def sensitivity(self, rec: dict, place: dict, alternatives: dict) -> dict:
+        """For each field with a probability per answer: how much would the score, the plan and the bill saving move if the
+        true answer differed from the most likely one (probability-weighted). Ranked so the review asks what matters first."""
+        out = []
+        for field, probs in alternatives.items():
+            probs = {k: float(v) for k, v in (probs or {}).items() if v is not None}
+            if field not in rec or not probs:
+                continue
+            best = max(probs, key=probs.get)
+            ref = self._quick({**rec, field: best}, place)
+            spread = plan = bill = 0.0
+            for opt, pr in probs.items():
+                if opt == best or pr < 0.02:
+                    continue
+                r = self._quick({**rec, field: opt}, place)
+                spread += pr * abs(r["score"] - ref["score"]) + pr * abs(r["after"] - ref["after"]) / 2
+                plan += pr * (r["measures"] != ref["measures"])
+                bill += pr * abs(r["bill"] - ref["bill"])
+            out.append({"key": field, "best": best, "score_spread": round(spread, 2), "plan_change_prob": round(plan, 3), "bill_spread_gbp": round(bill)})
+        out.sort(key=lambda f: -(f["score_spread"] + 3 * f["plan_change_prob"] + f["bill_spread_gbp"] / 100))
+        return {"fields": out, "note": "Impact = probability-weighted change in score (now and after the plan), plan, and bill saving; ranking weight "
+                "score points + 3 x P(plan changes) + bill change / 100."}
 
     def plan(self, rec: dict, place: dict, mem: dict = None, top: int = 3) -> dict:
         p, _, _ = self.home(rec, place)

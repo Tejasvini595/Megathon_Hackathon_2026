@@ -30,6 +30,10 @@ class PlanIn(Home):
     top: int = 3
 
 
+class SensitivityIn(Home):
+    alternatives: dict[str, dict[str, float]]
+
+
 class ParseIn(BaseModel):
     text: str
     current: list[str] = []
@@ -60,6 +64,12 @@ def twin(h: Scenario):
 @app.post("/plan")
 def plan(h: PlanIn):
     return _run(lambda: engine().plan(h.record, h.place, h.memory, h.top))
+
+
+@app.post("/sensitivity")
+def sensitivity(h: SensitivityIn):
+    """Which review questions matter for this home (the decision model supplies the probabilities, the engine the stakes)."""
+    return _run(lambda: engine().sensitivity(h.record, h.place, h.alternatives))
 
 
 @app.get("/llm/prompt")
