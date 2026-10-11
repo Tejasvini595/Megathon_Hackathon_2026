@@ -79,10 +79,36 @@ class AppEngine:
                 "scoreAfter": sc_after["score"], "classAfter": sc_after["classification"], "sapAfter": round(r["sap_after"], 1), "bandAfter": r["rating_after"],
                 "elementScoresAfter": element_scores({**p, **r["new_state"]})}
 
-    def twin(self, rec: dict, place: dict, scenario=None) -> dict:
+    @staticmethod
+    def _memory(mem: dict = None) -> dict:
+        """The web app's memory (app ids) -> the engine's memory format."""
+        m = memory.empty()
+        if mem:
+            m["completed"] = [ENGINE_ID.get(x, x) for x in mem.get("completed", [])]
+            m["declined"] = {ENGINE_ID.get(k, k): v for k, v in (mem.get("declined") or {}).items()}
+            m["constraints"].update({k: mem[k] for k in ("renting", "listed", "budget_gbp") if k in mem})
+            m["priority"] = mem.get("priority")
+        return m
+
+    def twin(self, rec: dict, place: dict, scenario=None, mem: dict = None) -> dict:
         p, rating, notes = self.home(rec, place)
+        exclude = None
+        if mem:
+            # completed work is applied to the home (score, rating, energy and the 3D state follow); declined / not-allowed measures leave the plan
+            orig = p
+            p, exclude, _, mnotes = memory.personalise(self.eng, p, self._memory(mem))
+            notes += [{"code": "memory", "message": n} for n in mnotes]
+            if p.get("memory_applied"):
+                # personalise treats the adjusted baseline as metered; keep the real reading count, and a modelled home stays modelled (re-modelled on the new state)
+                p.update({k: orig[k] for k in ("elec_months", "gas_months")})
+                if orig.get("usage_status") != "metered":
+                    p.update({k: orig.get(k) for k in ("usage_status", "elec_annual", "gas_annual", "intensity")})
+                d = p["sap_score"] - rating["sap"]
+                rating = {**rating, "sap": round(p["sap_score"], 1), "band": p["energy_rating"],
+                          "range": rating["range"] and {"sap": [round(x + d, 1) for x in rating["range"]["sap"]],
+                                                        "band": [band_of(rating["range"]["sap"][1] + d), band_of(rating["range"]["sap"][0] + d)]}}
         scen_ids = None if scenario is None else [ENGINE_ID.get(x, x) for x in scenario]
-        a = self.eng.analyse_property(p, scen_ids)
+        a = self.eng.analyse_property(p, scen_ids, exclude)
         elec, gas, src = self.eng.baseline(p)
         inten = p["intensity"] if src == "metered" else np.nan
         sc = a["score"]
@@ -237,13 +263,7 @@ class AppEngine:
 
     def plan(self, rec: dict, place: dict, mem: dict = None, top: int = 3) -> dict:
         p, _, _ = self.home(rec, place)
-        m = memory.empty()
-        if mem:
-            m["completed"] = [ENGINE_ID.get(x, x) for x in mem.get("completed", [])]
-            m["declined"] = {ENGINE_ID.get(k, k): v for k, v in (mem.get("declined") or {}).items()}
-            m["constraints"].update({k: mem[k] for k in ("renting", "listed", "budget_gbp") if k in mem})
-            m["priority"] = mem.get("priority")
-        r = memory.plan_with_memory(self.eng, p, m, top)
+        r = memory.plan_with_memory(self.eng, p, self._memory(mem), top)
         ren = lambda ids: [APP_ID.get(x, x) for x in ids]
         for o in (r.get("options") or []) + (r.get("frontier") or []) + ([r["best_reachable"]] if r.get("best_reachable") else []):
             o["retrofits"] = ren(o["retrofits"])

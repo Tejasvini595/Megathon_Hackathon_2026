@@ -15,6 +15,19 @@ export const RETROFIT_IDS = [
 
 export const retrofitId = z.enum(RETROFIT_IDS);
 
+/** Display names, as the engine labels them (config.LABEL), for measures that are no longer in the plan. */
+export const RETROFIT_LABEL: Record<RetrofitId, string> = {
+  loft_insulation: "Loft insulation",
+  cavity_wall_insulation: "Cavity wall insulation",
+  solid_wall_insulation: "Solid wall insulation",
+  floor_insulation: "Floor insulation",
+  double_glazing: "Double glazing",
+  smart_thermostat: "Smart thermostat / zoned controls",
+  heat_pump: "Heat pump",
+  solar_pv: "Solar PV",
+  condensing_boiler: "Condensing boiler",
+};
+
 export const memorySchema = z.object({
   completed: z.array(retrofitId).default([]),
   declined: z.partialRecord(retrofitId, z.string().max(200)).default({}),

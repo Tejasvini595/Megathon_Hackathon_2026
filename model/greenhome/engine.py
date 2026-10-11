@@ -48,8 +48,8 @@ class GreenEngine:
     def analyse(self, pid: str, scenario: list = None) -> dict:
         return self.analyse_property(self.prop(pid), scenario)
 
-    def analyse_property(self, p: dict, scenario: list = None) -> dict:
-        """Core pipeline for ONE property record (a dataset home or a customer-entered home)."""
+    def analyse_property(self, p: dict, scenario: list = None, exclude: dict = None) -> dict:
+        """Core pipeline for ONE property record (a dataset home or a customer-entered home). exclude: {retrofit: reason} kept out of the default plan."""
         elec, gas, src = self.baseline(p)
         p_s = dict(p, intensity=p["intensity"] if src == "metered" else np.nan)   # modelled usage never feeds the score
         sc = green_score(p_s)
@@ -75,7 +75,7 @@ class GreenEngine:
                                      "is_default_package": True,
                                      "label": "Savings, carbon and improvement potential unavailable for this heating type."}})
             return out
-        rec = recommend(p, elec, gas)
+        rec = recommend(p, elec, gas, exclude=exclude)
         ml = self.rel.predict_property(p, [r["retrofit"] for r in rec["recommendations"]])    # learned relevance + confidence; 'needs survey' when unsure
         for r in rec["recommendations"]: r["ml_relevance"] = ml.get(r["retrofit"])
         default = rec["package"]["selected"]

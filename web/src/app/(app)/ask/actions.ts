@@ -7,6 +7,7 @@ import { getAnalysis, runEngine } from "@/lib/engine";
 import { detectMemory, type MemorySuggestion } from "@/lib/llm/memory-notes";
 import { parseMemory, retrofitId } from "@/lib/memory";
 import { prisma } from "@/lib/prisma";
+import { HOME_SECTIONS } from "@/lib/active-home";
 import { requireUser } from "@/lib/dal";
 import { explain, parseQuestion } from "@/lib/llm/ask";
 import type { Band, RetrofitId, ScoreClass } from "@/lib/twin/types";
@@ -96,6 +97,6 @@ export async function rememberFromAsk(homeId: string, input: z.input<typeof sugg
   if (!saved.length) return { saved };
   m.log = [...m.log, { at: new Date().toISOString(), text: `From Ask ("${quote}"): ${saved.join(", ")}.`.slice(0, 300) }].slice(-100);
   await prisma.home.update({ where: { id: home.id }, data: { memory: m as unknown as Prisma.InputJsonValue } });
-  revalidatePath(`/plan/${home.id}`);
+  for (const section of HOME_SECTIONS) if (section !== "ask") revalidatePath(`/${section}/${home.id}`);
   return { saved };
 }

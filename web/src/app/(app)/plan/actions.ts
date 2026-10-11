@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { HOME_SECTIONS } from "@/lib/active-home";
 import { requireUser } from "@/lib/dal";
 import { parseMemory, retrofitId, type Memory } from "@/lib/memory";
 import type { Prisma } from "@/generated/prisma/client";
@@ -29,7 +30,8 @@ async function update(id: string, change: (m: Memory) => string | null) {
   if (!text) return;
   memory.log = [...memory.log, { at: new Date().toISOString(), text }].slice(-100);
   await prisma.home.update({ where: { id: home.id }, data: { memory: memory as unknown as Prisma.InputJsonValue } });
-  revalidatePath(`/plan/${home.id}`);
+  // memory changes the engine's view of the home, so every page of it refreshes
+  for (const section of HOME_SECTIONS) revalidatePath(`/${section}/${home.id}`);
   revalidatePath("/you");
 }
 

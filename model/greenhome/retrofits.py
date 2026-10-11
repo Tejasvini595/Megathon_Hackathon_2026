@@ -265,9 +265,12 @@ def monte_carlo(p: dict, elec: float, gas: float, selected, n: int = 200, seed: 
             "note": "P10-P90 over catalogue/parameter ranges, widened by a factor calibrated on train homes against reference savings. Estimates, not guarantees."}
 
 
-def recommend(p: dict, elec: float, gas: float, par=None) -> dict:
-    """Feasible retrofits only, fabric-first. Heat pump replaces a boiler upgrade. Also the fabric-led (no heat pump) variant."""
+def recommend(p: dict, elec: float, gas: float, par=None, exclude=None) -> dict:
+    """Feasible retrofits only, fabric-first. Heat pump replaces a boiler upgrade. Also the fabric-led (no heat pump) variant.
+    exclude: {retrofit: reason} left out of the plan although feasible (customer memory: done, declined, needs consent)."""
     feas = feasibility(p)
+    exclude = exclude or {}
+    if exclude: feas = {r: (False, exclude[r]) if r in exclude else v for r, v in feas.items()}
     chosen = [r for r in C.ORDER if feas[r][0]]
     if "heat_pump" in chosen and "condensing_boiler" in chosen:
         chosen.remove("condensing_boiler")

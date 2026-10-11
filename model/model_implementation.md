@@ -413,6 +413,8 @@ Costs are catalogue ranges; bills use indicative tariffs; everything is labelled
 
 Memory changes **what** is recommended; every number still comes from the engine. Stored per customer: completed measures, declined measures with a reason, constraints (renting, listed building or conservation area, budget) and a stated priority. It is held for the session in the app; the module can also save a small JSON file under an opaque id.
 
+**In the web app** memory is stored on the home (`Home.memory`) and sent with every `/twin` request (`AppEngine.twin(..., mem)`), so the whole app reflects it, not only the routes from `/plan`: `personalise` applies completed measures to the home (score, rating, element scores and the 3D state follow; a home without meter readings stays "modelled" and keeps its real reading count), and declined or not-allowed measures are passed to `recommend` as `exclude` with the memory reason, so they leave the plan and appear among the exclusions. With no memory the output is identical to before (`tests/test_memory_twin.py`). The web app's twin cache key includes the memory.
+
 **Parsing (rules):** notes are split into clauses; a clause naming measures is *declined* if it carries a refusal phrase (reason captured: too disruptive, too expensive, landlord, and so on), else *completed* if it carries a completion phrase (installed, fitted, had, already have). "Rent/tenant/landlord", "listed/conservation area", a budget ("budget up to 5,000", "3k") and a priority (carbon, bills) are recognised.
 
 **Effects (`personalise`):**

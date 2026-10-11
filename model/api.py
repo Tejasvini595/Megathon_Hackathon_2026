@@ -23,6 +23,7 @@ class Home(BaseModel):
 
 class Scenario(Home):
     retrofits: list[str] | None = None
+    memory: dict[str, Any] | None = None
 
 
 class PlanIn(Home):
@@ -62,7 +63,7 @@ def health():
 
 @app.post("/twin")
 def twin(h: Scenario):
-    return _run(lambda: engine().twin(h.record, h.place, h.retrofits))
+    return _run(lambda: engine().twin(h.record, h.place, h.retrofits, h.memory))
 
 
 @app.post("/plan")
@@ -122,3 +123,10 @@ def portfolio(limit: int = 200, council: str | None = None):
     pf = pf.assign(measures=pf.measures.fillna("").map(lambda m: "+".join(APP_ID.get(x, x) for x in m.split("+") if x)))
     out = pf[cols].head(limit).astype(object).where(pf[cols].head(limit).notna(), None)
     return {"councils": sorted(pf.local_authority.astype(str).unique()), "total": int(len(pf)), "rows": out.to_dict("records")}
+
+
+@app.get("/methods")
+def methods_endpoint():
+    """The engine's documented methods and evidence for the web app's "How we calculate" page."""
+    from greenhome.methods import methods
+    return methods()

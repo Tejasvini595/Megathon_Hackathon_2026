@@ -40,8 +40,8 @@ export function Step({ r, homeId, status }: { r: Retrofit; homeId: string; statu
 
           {(gas || elec) && (
             <span className="mt-3 block space-y-2">
-              {gas && <RangeBar icon={Flame} label="Gas" band={r.gasSavingKwh} lo={lo} hi={hi} />}
-              {elec && <RangeBar icon={Zap} label="Electricity" band={r.elecSavingKwh} lo={lo} hi={hi} />}
+              {gas && <RangeBar icon={Flame} label="Gas, in this plan" band={r.gasSavingKwh} lo={lo} hi={hi} />}
+              {elec && <RangeBar icon={Zap} label="Electricity, in this plan" band={r.elecSavingKwh} lo={lo} hi={hi} />}
               {r.elecSavingKwh.p50 < 0 && <span className="block text-[11px] text-amber">Electricity use rises with this measure; gas use falls.</span>}
             </span>
           )}
@@ -54,6 +54,7 @@ export function Step({ r, homeId, status }: { r: Retrofit; homeId: string; statu
             <span className="tabular rounded-full bg-surface-2 px-2 py-0.5 text-muted-foreground">
               {formatGbp(r.costGbp[0])}–{formatGbp(r.costGbp[1])}
             </span>
+            <span className="tabular rounded-full bg-surface-2 px-2 py-0.5 text-muted-foreground">On its own: score {r.scoreAfter}</span>
           </span>
           <span className="mt-2 block text-xs text-muted-foreground">
             Bills (est.): <span className={cn("tabular", r.billSavingGbp < 0 ? "text-amber" : "text-foreground")}>{billText(r.billSavingGbp)}</span>
