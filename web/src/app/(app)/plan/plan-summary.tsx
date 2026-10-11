@@ -4,13 +4,11 @@ import { Flame, Leaf, Zap, type LucideIcon } from "lucide-react";
 import { EpcLadder } from "@/components/app/epc-ladder";
 import { Segmented } from "@/components/app/segmented";
 import { useTwinView } from "@/components/twin/twin-view";
-import { formatGbp, formatSaving, scoreTone } from "@/lib/score";
-import type { Band, PackageResult, TwinState } from "@/lib/twin/types";
+import { formatGbp, formatSaving, formatSavingRange, scoreTone } from "@/lib/score";
+import type { PackageResult, TwinState } from "@/lib/twin/types";
 import { cn } from "@/lib/utils";
 import { billText } from "./format";
 import { usePlanVariant, type Variant } from "./plan-variant";
-
-const range = (b: Band) => `${Math.round(b.p10).toLocaleString("en-GB")} to ${Math.round(b.p90).toLocaleString("en-GB")}`;
 
 const tonnes = (kg: number) => (kg / 1000).toFixed(1);
 
@@ -81,8 +79,8 @@ export function PlanSummary({ score, scoreClass, rating, packages, unavailableRe
       </div>
 
       <div className="mt-4 grid grid-cols-3 gap-2">
-        <Mini icon={Flame} label="Gas kWh/yr" value={formatSaving(p.gasSavingKwh.p50)} sub={range(p.gasSavingKwh)} warn={p.gasSavingKwh.p50 < 0} />
-        <Mini icon={Zap} label="Electricity kWh/yr" value={formatSaving(p.elecSavingKwh.p50)} sub={range(p.elecSavingKwh)} warn={p.elecSavingKwh.p50 < 0} />
+        <Mini icon={Flame} label="Gas kWh/yr" value={formatSaving(p.gasSavingKwh.p50)} sub={formatSavingRange(p.gasSavingKwh)} warn={p.gasSavingKwh.p50 < 0} />
+        <Mini icon={Zap} label="Electricity kWh/yr" value={formatSaving(p.elecSavingKwh.p50)} sub={formatSavingRange(p.elecSavingKwh)} warn={p.elecSavingKwh.p50 < 0} />
         <Mini icon={Leaf} label="Carbon t CO₂e/yr" value={`−${tonnes(p.carbonSavingKg.p50)}`} sub={`${tonnes(p.carbonSavingKg.p10)} to ${tonnes(p.carbonSavingKg.p90)}`} />
       </div>
       {p.elecSavingKwh.p50 < 0 && (

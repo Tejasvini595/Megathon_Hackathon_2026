@@ -24,4 +24,12 @@ export const formatNumber = (n: number | null | undefined, digits = 0) =>
 /** Savings are positive; an increase in use is shown with a plus sign. */
 export const formatSaving = (n: number) => `${n > 0 ? "−" : n < 0 ? "+" : ""}${Math.abs(Math.round(n)).toLocaleString("en-GB")}`;
 
+/** A P10 to P90 saving band in the same convention: magnitudes when it stays on one side of zero (the headline carries the sign), signed ends when it crosses. */
+export const formatSavingRange = (b: { p10: number; p90: number }) => {
+  const abs = (n: number) => Math.abs(Math.round(n)).toLocaleString("en-GB");
+  if (b.p10 >= 0) return `${abs(b.p10)} to ${abs(b.p90)}`;
+  if (b.p90 <= 0) return `${abs(b.p90)} to ${abs(b.p10)}`;
+  return `${formatSaving(b.p90)} to ${formatSaving(b.p10)}`;
+};
+
 export const formatGbp = (n: number) => `£${Math.round(n).toLocaleString("en-GB")}`;

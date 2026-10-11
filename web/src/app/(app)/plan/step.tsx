@@ -1,6 +1,6 @@
 import { Flame, Leaf, Search, Zap, type LucideIcon } from "lucide-react";
 import { FocusButton } from "@/components/twin/twin-view";
-import { formatGbp, formatSaving } from "@/lib/score";
+import { formatGbp, formatSaving, formatSavingRange } from "@/lib/score";
 import type { Band, Retrofit } from "@/lib/twin/types";
 import { cn } from "@/lib/utils";
 import { billText } from "./format";
@@ -96,7 +96,7 @@ function RangeBar({ icon: Icon, label, band, lo, hi }: { icon: LucideIcon; label
           {label}
         </span>
         <span className="tabular">
-          {formatSaving(band.p50)} kWh <span className="opacity-70">({kwh(band.p10)} to {kwh(band.p90)})</span>
+          {formatSaving(band.p50)} kWh <span className="opacity-70">({formatSavingRange(band)})</span>
         </span>
       </span>
       <span className="relative mt-1 block h-1.5 rounded-full bg-surface-2">

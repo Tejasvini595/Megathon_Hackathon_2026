@@ -237,7 +237,7 @@ function EditBox({ text, busy, onChange, onCancel, onSubmit }: { text: string; b
   );
 }
 
-const kwh = (n: number) => `${n < 0 ? "+" : "−"}${Math.abs(Math.round(n)).toLocaleString("en-GB")} kWh`;
+const kwh = (n: number) => `${n < 0 ? "+" : n > 0 ? "−" : ""}${Math.abs(Math.round(n)).toLocaleString("en-GB")} kWh`;
 
 /** The engine's before -> after for the scenario, shown before the words. */
 /** Collapsed by default: how the answer was put together, in plain words. */
@@ -271,8 +271,8 @@ function ScenarioCard({ s }: { s: NonNullable<AskReply["scenario"]> }) {
         <span className="text-xs text-muted-foreground">{a.scoreClass}</span>
       </div>
       <div className="mt-2 grid grid-cols-3 gap-2 text-[11px]">
-        <span><span className="block text-muted-foreground">Gas</span><span className="tabular">{kwh(-a.gasSavingKwh.p50)}</span></span>
-        <span><span className="block text-muted-foreground">Electricity</span><span className="tabular">{kwh(-a.elecSavingKwh.p50)}</span></span>
+        <span><span className="block text-muted-foreground">Gas</span><span className="tabular">{kwh(a.gasSavingKwh.p50)}</span></span>
+        <span><span className="block text-muted-foreground">Electricity</span><span className="tabular">{kwh(a.elecSavingKwh.p50)}</span></span>
         <span><span className="block text-muted-foreground">Bills</span><span className="tabular">{a.billSavingGbp >= 0 ? "−" : "+"}£{Math.abs(a.billSavingGbp).toLocaleString("en-GB")}/yr</span></span>
       </div>
       <p className="mt-2 text-[10px] text-muted-foreground">Engine estimates, not guarantees.</p>
