@@ -1,0 +1,7600 @@
+{
+ "date": "2026-10-11T04:36:06.490Z",
+ "model": "z-ai/glm-5.3-flash",
+ "rows": [
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "plain",
+   "text": "what if I only add solar and loft insulation?",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2273,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "plain",
+   "text": "add solar",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2662,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "plain",
+   "text": "just the heat pump",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2372,
+   "llm": {
+    "retrofits": [
+     "heat_pump"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "plain",
+   "text": "smart controls",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "smart_thermostat"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1967,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "smart_thermostat"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "smart_thermostat"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "plain",
+   "text": "double glazing and a smart thermostat",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "double_glazing",
+    "smart_thermostat"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2517,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "smart_thermostat"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "double_glazing",
+     "smart_thermostat"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "plain",
+   "text": "what about a new condensing boiler and glazing",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "condensing_boiler",
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2079,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "double_glazing",
+     "condensing_boiler"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "plain",
+   "text": "loft insulation only",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1487,
+   "llm": {
+    "retrofits": [
+     "loft_insulation"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "plain",
+   "text": "floor insulation and cavity wall insulation",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "floor_insulation",
+    "cavity_wall_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1679,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "floor_insulation",
+     "double_glazing"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "cavity_wall_insulation",
+     "floor_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "plain",
+   "text": "I want solar panels and a heat pump",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "solar_pv",
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1502,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "heat_pump",
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "heat_pump",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "plain",
+   "text": "only windows",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1223,
+   "llm": {
+    "retrofits": [
+     "double_glazing"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "plain",
+   "text": "just roof insulation",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2685,
+   "llm": {
+    "retrofits": [
+     "loft_insulation"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "plain",
+   "text": "solid wall insulation",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "solid_wall_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1126,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "solid_wall_insulation",
+     "double_glazing"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "solid_wall_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "generic",
+   "text": "wall insulation and floor insulation",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1260,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "floor_insulation",
+     "double_glazing"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "generic",
+   "text": "only insulation",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 3166,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "generic",
+   "text": "all the insulation and a heat pump",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1165,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "heat_pump"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "generic",
+   "text": "new windows and wall insulation",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "double_glazing",
+    "cavity_wall_insulation",
+    "solid_wall_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2676,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [
+     "wall_insulation"
+    ],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": false,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "generic",
+   "text": "something for the walls",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "cavity_wall_insulation",
+    "solid_wall_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2693,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "double_glazing"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "cavity_wall_insulation",
+     "solid_wall_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "everything",
+   "text": "what if I do everything",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "smart_thermostat",
+    "heat_pump",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1059,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump",
+     "solar_pv",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "everything",
+   "text": "everything except the heat pump",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "smart_thermostat",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1375,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": false,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "everything",
+   "text": "do all of it but skip solar",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "smart_thermostat",
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1445,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "everything",
+   "text": "all except heat pump and solar",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "smart_thermostat"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1973,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "everything",
+   "text": "everything without insulation",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "double_glazing",
+    "smart_thermostat",
+    "heat_pump",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1672,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": false,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "everything",
+   "text": "all of it without the solar panels",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "smart_thermostat",
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2569,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "everything",
+   "text": "everything apart from windows",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "smart_thermostat",
+    "heat_pump",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1575,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "smart_thermostat",
+     "heat_pump",
+     "solar_pv",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "smart_thermostat",
+     "heat_pump",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "everything",
+   "text": "the full package but not the heat pump",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "smart_thermostat",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2954,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "solar_pv",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "everything",
+   "text": "every measure except smart controls",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "heat_pump",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1380,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "heat_pump",
+     "solar_pv",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "heat_pump",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "negation",
+   "text": "without solar",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 1027,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "negation",
+   "text": "heat pump but skip solar",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1167,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "heat_pump"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "negation",
+   "text": "no double glazing",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1076,
+   "llm": {
+    "retrofits": [
+     "loft_insulation"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "negation",
+   "text": "skip the loft",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2945,
+   "llm": {
+    "retrofits": [
+     "double_glazing"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "negation",
+   "text": "I don't want a heat pump",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 935,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "negation",
+   "text": "heat pump and solar but no glazing",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "heat_pump",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2965,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "heat_pump",
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "heat_pump",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "negation",
+   "text": "add solar but not the heat pump",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1425,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "negation",
+   "text": "without the thermostat",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 1167,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "colloquial",
+   "text": "panels on the roof",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2932,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "colloquial",
+   "text": "an air source heat pump",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2333,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "heat_pump"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "colloquial",
+   "text": "get rid of the gas boiler and put in a heat pump",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1521,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "heat_pump"
+    ],
+    "kind": "scenario",
+    "unsupported": [
+     "condensing_boiler"
+    ],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "colloquial",
+   "text": "thicker loft insulation",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1302,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": false,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "colloquial",
+   "text": "replace the old windows",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1026,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": false,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "colloquial",
+   "text": "a smarter heating thermostat",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "smart_thermostat"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1380,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "smart_thermostat"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "smart_thermostat"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "colloquial",
+   "text": "insulate the cavity walls",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "cavity_wall_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1113,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "double_glazing"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "cavity_wall_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "colloquial",
+   "text": "upgrade my boiler",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "condensing_boiler"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1303,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "condensing_boiler"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "colloquial",
+   "text": "put PV on the roof and insulate the loft",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "solar_pv",
+    "loft_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1168,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "colloquial",
+   "text": "stop the heat escaping through the floor",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "floor_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1035,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "floor_insulation",
+     "double_glazing"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "floor_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "colloquial",
+   "text": "cut my bills with better glazing",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1497,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": false,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "unsupported",
+   "text": "solar panels with a battery",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "solar_pv"
+   ],
+   "unsupportedGold": [
+    "battery"
+   ],
+   "wantKind": "scenario",
+   "latencyMs": 2229,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [
+     "battery storage"
+    ],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "solar_pv"
+    ],
+    "unsupported": [
+     "battery"
+    ]
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "unsupported",
+   "text": "add draught proofing",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "unsupportedGold": [
+    "draught"
+   ],
+   "wantKind": "explain",
+   "latencyMs": 4181,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [
+     "draught_proofing"
+    ],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "unsupported": [
+     "draught"
+    ]
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "unsupported",
+   "text": "triple glazing please",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "double_glazing"
+   ],
+   "unsupportedGold": [
+    "triple glazing"
+   ],
+   "wantKind": "scenario",
+   "latencyMs": 2525,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [
+     "triple_glazing"
+    ],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": false,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "double_glazing"
+    ],
+    "unsupported": [
+     "triple glazing"
+    ]
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "unsupported",
+   "text": "LED lighting and loft insulation",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation"
+   ],
+   "unsupportedGold": [
+    "lighting"
+   ],
+   "wantKind": "scenario",
+   "latencyMs": 1064,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [
+     "LED lighting"
+    ],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": false,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation"
+    ],
+    "unsupported": [
+     "led",
+     "lighting"
+    ]
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "unsupported",
+   "text": "a wind turbine",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "unsupportedGold": [
+    "wind turbine"
+   ],
+   "wantKind": "explain",
+   "latencyMs": 1354,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [
+     "wind_turbine"
+    ],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "unsupported": [
+     "wind turbine"
+    ]
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "unsupported",
+   "text": "ground source heat pump",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "heat_pump"
+   ],
+   "unsupportedGold": [
+    "ground source"
+   ],
+   "wantKind": "scenario",
+   "latencyMs": 1363,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "heat_pump"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": false,
+   "rules": {
+    "retrofits": [
+     "heat_pump"
+    ],
+    "unsupported": [
+     "ground source"
+    ]
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "unclear",
+   "text": "make my house better",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 1050,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "unclear",
+   "text": "what is best for me?",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 1317,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "unclear",
+   "text": "blah",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 1111,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "unclear",
+   "text": "can you explain my score",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 1028,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-1",
+   "kind": "unclear",
+   "text": "how much will it cost",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 1251,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "can you check heat pump plus solar plus loft",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "heat_pump",
+    "solar_pv",
+    "loft_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1430,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "heat_pump",
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "heat_pump",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "I'd rather avoid the heat pump, do everything else",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "smart_thermostat",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1190,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": false,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "no solar please, just insulation",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 4073,
+   "llm": {
+    "retrofits": [
+     "loft_insulation"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "everything but the thermostat",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "heat_pump",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1373,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": false,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "heat_pump",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "upgrade windows and loft",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "double_glazing",
+    "loft_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 2194,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "what happens if I insulate the floor and the walls",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "floor_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2736,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "floor_insulation",
+     "double_glazing"
+    ],
+    "kind": "scenario",
+    "unsupported": [
+     "wall insulation"
+    ],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "everything, leave out the heat pump",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "smart_thermostat",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 3908,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "solar_pv",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "a boiler replacement and a thermostat",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "condensing_boiler",
+    "smart_thermostat"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 3152,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "smart_thermostat",
+     "condensing_boiler"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "go big on solar",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 960,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "double glazed windows and an ASHP",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "double_glazing",
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1211,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "heat_pump"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "double_glazing",
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "add triple glazing and a battery",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "double_glazing"
+   ],
+   "unsupportedGold": [
+    "triple glazing",
+    "battery"
+   ],
+   "wantKind": "scenario",
+   "latencyMs": 1562,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [
+     "triple_glazing",
+     "battery_storage"
+    ],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": false,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "double_glazing"
+    ],
+    "unsupported": [
+     "battery",
+     "triple glazing"
+    ]
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "heat pump instead of the boiler",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 10125,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "heat_pump"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "I only care about carbon so everything except solar",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "smart_thermostat",
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1060,
+   "llm": {
+    "retrofits": [
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "put a thermostat in",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "smart_thermostat"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1070,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "smart_thermostat"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "smart_thermostat"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "tell me a joke",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 939,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "put in solar and a heat pump but not new windows",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "solar_pv",
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1428,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "heat_pump",
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [
+     "new windows"
+    ],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "heat_pump",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "all measures except the floor",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "double_glazing",
+    "smart_thermostat",
+    "heat_pump",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1319,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump",
+     "solar_pv",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "I'm only interested in loft and glazing",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 1755,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "skip everything except solar",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1361,
+   "llm": {
+    "retrofits": [
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": false,
+   "rulesLenient": false,
+   "rulesKind": false,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "a heat pump would be great, no thanks to solar",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1418,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": false,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "can we see what new windows and insulating the roof does",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "double_glazing",
+    "loft_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 2045,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": false,
+   "rulesLenient": false,
+   "rulesKind": false,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "just a thermostat upgrade",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "smart_thermostat"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 920,
+   "llm": {
+    "retrofits": [
+     "smart_thermostat"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "smart_thermostat"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "everything apart from the boiler",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "smart_thermostat",
+    "heat_pump",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1388,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": false,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "I'd like loft insulation, but without the floor",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1118,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": false,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "add panels, and leave the heat pump out",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1759,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "heat_pump",
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "heat_pump",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": false,
+   "rulesLenient": false,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "only the cheapest things",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 2240,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "heat pump plus smart thermostat plus glazing, no solar",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "heat_pump",
+    "smart_thermostat",
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1522,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "everything but heat pump and solar",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "smart_thermostat"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2019,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "what happens if I do nothing",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 2111,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = loft + glazing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "wall and loft insulation with new double glazing",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2405,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "solid_wall_insulation",
+     "double_glazing"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "plain",
+   "text": "what if I only add solar and loft insulation?",
+   "current": [],
+   "gold": [
+    "loft_insulation",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 3805,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "plain",
+   "text": "add solar",
+   "current": [],
+   "gold": [
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1202,
+   "llm": {
+    "retrofits": [
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "plain",
+   "text": "just the heat pump",
+   "current": [],
+   "gold": [
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2828,
+   "llm": {
+    "retrofits": [
+     "heat_pump"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "plain",
+   "text": "smart controls",
+   "current": [],
+   "gold": [
+    "smart_thermostat"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1392,
+   "llm": {
+    "retrofits": [
+     "smart_thermostat"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "smart_thermostat"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "plain",
+   "text": "double glazing and a smart thermostat",
+   "current": [],
+   "gold": [
+    "double_glazing",
+    "smart_thermostat"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1882,
+   "llm": {
+    "retrofits": [
+     "double_glazing",
+     "smart_thermostat"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "double_glazing",
+     "smart_thermostat"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "plain",
+   "text": "what about a new condensing boiler and glazing",
+   "current": [],
+   "gold": [
+    "condensing_boiler",
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1283,
+   "llm": {
+    "retrofits": [
+     "double_glazing",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "double_glazing",
+     "condensing_boiler"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "plain",
+   "text": "loft insulation only",
+   "current": [],
+   "gold": [
+    "loft_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1168,
+   "llm": {
+    "retrofits": [
+     "loft_insulation"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "plain",
+   "text": "floor insulation and cavity wall insulation",
+   "current": [],
+   "gold": [
+    "floor_insulation",
+    "cavity_wall_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1220,
+   "llm": {
+    "retrofits": [
+     "cavity_wall_insulation",
+     "floor_insulation"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "cavity_wall_insulation",
+     "floor_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "plain",
+   "text": "I want solar panels and a heat pump",
+   "current": [],
+   "gold": [
+    "solar_pv",
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1979,
+   "llm": {
+    "retrofits": [
+     "heat_pump",
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "heat_pump",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "plain",
+   "text": "only windows",
+   "current": [],
+   "gold": [
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1336,
+   "llm": {
+    "retrofits": [
+     "double_glazing"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "plain",
+   "text": "just roof insulation",
+   "current": [],
+   "gold": [
+    "loft_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1181,
+   "llm": {
+    "retrofits": [
+     "loft_insulation"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "plain",
+   "text": "solid wall insulation",
+   "current": [],
+   "gold": [
+    "solid_wall_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1043,
+   "llm": {
+    "retrofits": [
+     "solid_wall_insulation"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "solid_wall_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "generic",
+   "text": "wall insulation and floor insulation",
+   "current": [],
+   "gold": [
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1768,
+   "llm": {
+    "retrofits": [
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "generic",
+   "text": "only insulation",
+   "current": [],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 5566,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "generic",
+   "text": "all the insulation and a heat pump",
+   "current": [],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 3176,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "heat_pump"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "generic",
+   "text": "new windows and wall insulation",
+   "current": [],
+   "gold": [
+    "double_glazing",
+    "cavity_wall_insulation",
+    "solid_wall_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1148,
+   "llm": {
+    "retrofits": [
+     "cavity_wall_insulation",
+     "double_glazing"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "generic",
+   "text": "something for the walls",
+   "current": [],
+   "gold": [
+    "cavity_wall_insulation",
+    "solid_wall_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1559,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": false,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "cavity_wall_insulation",
+     "solid_wall_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "everything",
+   "text": "what if I do everything",
+   "current": [],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "smart_thermostat",
+    "heat_pump",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2690,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump",
+     "solar_pv",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "everything",
+   "text": "everything except the heat pump",
+   "current": [],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "smart_thermostat",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1380,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "solar_pv",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "everything",
+   "text": "do all of it but skip solar",
+   "current": [],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "smart_thermostat",
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1183,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "everything",
+   "text": "all except heat pump and solar",
+   "current": [],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "smart_thermostat"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1352,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "everything",
+   "text": "everything without insulation",
+   "current": [],
+   "gold": [
+    "double_glazing",
+    "smart_thermostat",
+    "heat_pump",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 25298,
+   "llm": {
+    "retrofits": [
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump",
+     "solar_pv",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "everything",
+   "text": "all of it without the solar panels",
+   "current": [],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "smart_thermostat",
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1607,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "everything",
+   "text": "everything apart from windows",
+   "current": [],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "smart_thermostat",
+    "heat_pump",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1794,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "smart_thermostat",
+     "heat_pump",
+     "solar_pv",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "smart_thermostat",
+     "heat_pump",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "everything",
+   "text": "the full package but not the heat pump",
+   "current": [],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "smart_thermostat",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1088,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "solar_pv",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "everything",
+   "text": "every measure except smart controls",
+   "current": [],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "heat_pump",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2159,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "heat_pump",
+     "solar_pv",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "heat_pump",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "negation",
+   "text": "without solar",
+   "current": [],
+   "gold": [],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 1142,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "negation",
+   "text": "heat pump but skip solar",
+   "current": [],
+   "gold": [
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1195,
+   "llm": {
+    "retrofits": [
+     "heat_pump"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "negation",
+   "text": "no double glazing",
+   "current": [],
+   "gold": [],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 1018,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "negation",
+   "text": "skip the loft",
+   "current": [],
+   "gold": [],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 1504,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "negation",
+   "text": "I don't want a heat pump",
+   "current": [],
+   "gold": [],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 2139,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "negation",
+   "text": "heat pump and solar but no glazing",
+   "current": [],
+   "gold": [
+    "heat_pump",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2066,
+   "llm": {
+    "retrofits": [
+     "heat_pump",
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "heat_pump",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "negation",
+   "text": "add solar but not the heat pump",
+   "current": [],
+   "gold": [
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2836,
+   "llm": {
+    "retrofits": [
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "negation",
+   "text": "without the thermostat",
+   "current": [],
+   "gold": [],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 1551,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "colloquial",
+   "text": "panels on the roof",
+   "current": [],
+   "gold": [
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1000,
+   "llm": {
+    "retrofits": [
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "colloquial",
+   "text": "an air source heat pump",
+   "current": [],
+   "gold": [
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1077,
+   "llm": {
+    "retrofits": [
+     "heat_pump"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "colloquial",
+   "text": "get rid of the gas boiler and put in a heat pump",
+   "current": [],
+   "gold": [
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2795,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": false,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "colloquial",
+   "text": "thicker loft insulation",
+   "current": [],
+   "gold": [
+    "loft_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1115,
+   "llm": {
+    "retrofits": [
+     "loft_insulation"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "colloquial",
+   "text": "replace the old windows",
+   "current": [],
+   "gold": [
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1454,
+   "llm": {
+    "retrofits": [
+     "double_glazing"
+    ],
+    "kind": "scenario",
+    "unsupported": [
+     "window replacement beyond double glazing"
+    ],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "colloquial",
+   "text": "a smarter heating thermostat",
+   "current": [],
+   "gold": [
+    "smart_thermostat"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 976,
+   "llm": {
+    "retrofits": [
+     "smart_thermostat"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "smart_thermostat"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "colloquial",
+   "text": "insulate the cavity walls",
+   "current": [],
+   "gold": [
+    "cavity_wall_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1197,
+   "llm": {
+    "retrofits": [
+     "cavity_wall_insulation"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "cavity_wall_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "colloquial",
+   "text": "upgrade my boiler",
+   "current": [],
+   "gold": [
+    "condensing_boiler"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1214,
+   "llm": {
+    "retrofits": [
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "condensing_boiler"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "colloquial",
+   "text": "put PV on the roof and insulate the loft",
+   "current": [],
+   "gold": [
+    "solar_pv",
+    "loft_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1694,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "colloquial",
+   "text": "stop the heat escaping through the floor",
+   "current": [],
+   "gold": [
+    "floor_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1156,
+   "llm": {
+    "retrofits": [
+     "floor_insulation"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "floor_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "colloquial",
+   "text": "cut my bills with better glazing",
+   "current": [],
+   "gold": [
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1477,
+   "llm": {
+    "retrofits": [
+     "double_glazing"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "unsupported",
+   "text": "solar panels with a battery",
+   "current": [],
+   "gold": [
+    "solar_pv"
+   ],
+   "unsupportedGold": [
+    "battery"
+   ],
+   "wantKind": "scenario",
+   "latencyMs": 2582,
+   "llm": {
+    "retrofits": [
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [
+     "battery_storage"
+    ],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "solar_pv"
+    ],
+    "unsupported": [
+     "battery"
+    ]
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "unsupported",
+   "text": "add draught proofing",
+   "current": [],
+   "gold": [],
+   "unsupportedGold": [
+    "draught"
+   ],
+   "wantKind": "explain",
+   "latencyMs": 1225,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [
+     "draught_proofing"
+    ],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [],
+    "unsupported": [
+     "draught"
+    ]
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "unsupported",
+   "text": "triple glazing please",
+   "current": [],
+   "gold": [
+    "double_glazing"
+   ],
+   "unsupportedGold": [
+    "triple glazing"
+   ],
+   "wantKind": "scenario",
+   "latencyMs": 1485,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [
+     "triple_glazing"
+    ],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": false,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "double_glazing"
+    ],
+    "unsupported": [
+     "triple glazing"
+    ]
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "unsupported",
+   "text": "LED lighting and loft insulation",
+   "current": [],
+   "gold": [
+    "loft_insulation"
+   ],
+   "unsupportedGold": [
+    "lighting"
+   ],
+   "wantKind": "scenario",
+   "latencyMs": 981,
+   "llm": {
+    "retrofits": [
+     "loft_insulation"
+    ],
+    "kind": "scenario",
+    "unsupported": [
+     "LED lighting"
+    ],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation"
+    ],
+    "unsupported": [
+     "led",
+     "lighting"
+    ]
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "unsupported",
+   "text": "a wind turbine",
+   "current": [],
+   "gold": [],
+   "unsupportedGold": [
+    "wind turbine"
+   ],
+   "wantKind": "explain",
+   "latencyMs": 1822,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [
+     "wind_turbine"
+    ],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [],
+    "unsupported": [
+     "wind turbine"
+    ]
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "unsupported",
+   "text": "ground source heat pump",
+   "current": [],
+   "gold": [
+    "heat_pump"
+   ],
+   "unsupportedGold": [
+    "ground source"
+   ],
+   "wantKind": "scenario",
+   "latencyMs": 1112,
+   "llm": {
+    "retrofits": [
+     "heat_pump"
+    ],
+    "kind": "scenario",
+    "unsupported": [
+     "ground source heat pump"
+    ],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "heat_pump"
+    ],
+    "unsupported": [
+     "ground source"
+    ]
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "unclear",
+   "text": "make my house better",
+   "current": [],
+   "gold": [],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 1320,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "unclear",
+   "text": "what is best for me?",
+   "current": [],
+   "gold": [],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 1078,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "unclear",
+   "text": "blah",
+   "current": [],
+   "gold": [],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 1093,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "unclear",
+   "text": "can you explain my score",
+   "current": [],
+   "gold": [],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 3512,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-1",
+   "kind": "unclear",
+   "text": "how much will it cost",
+   "current": [],
+   "gold": [],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 1188,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "can you check heat pump plus solar plus loft",
+   "current": [],
+   "gold": [
+    "heat_pump",
+    "solar_pv",
+    "loft_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1162,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "heat_pump",
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "heat_pump",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "I'd rather avoid the heat pump, do everything else",
+   "current": [],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "smart_thermostat",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1432,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": false,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "no solar please, just insulation",
+   "current": [],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1345,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "everything but the thermostat",
+   "current": [],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "heat_pump",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1221,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "heat_pump",
+     "solar_pv",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "heat_pump",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "upgrade windows and loft",
+   "current": [],
+   "gold": [
+    "double_glazing",
+    "loft_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 895,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "what happens if I insulate the floor and the walls",
+   "current": [],
+   "gold": [
+    "floor_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 4633,
+   "llm": {
+    "retrofits": [
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "everything, leave out the heat pump",
+   "current": [],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "smart_thermostat",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2488,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "solar_pv",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "a boiler replacement and a thermostat",
+   "current": [],
+   "gold": [
+    "condensing_boiler",
+    "smart_thermostat"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1025,
+   "llm": {
+    "retrofits": [
+     "smart_thermostat",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "smart_thermostat",
+     "condensing_boiler"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "go big on solar",
+   "current": [],
+   "gold": [
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1360,
+   "llm": {
+    "retrofits": [
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "double glazed windows and an ASHP",
+   "current": [],
+   "gold": [
+    "double_glazing",
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1086,
+   "llm": {
+    "retrofits": [
+     "double_glazing",
+     "heat_pump"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "double_glazing",
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "add triple glazing and a battery",
+   "current": [],
+   "gold": [
+    "double_glazing"
+   ],
+   "unsupportedGold": [
+    "triple glazing",
+    "battery"
+   ],
+   "wantKind": "scenario",
+   "latencyMs": 1516,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [
+     "triple_glazing",
+     "battery_storage"
+    ],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": false,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "double_glazing"
+    ],
+    "unsupported": [
+     "battery",
+     "triple glazing"
+    ]
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "heat pump instead of the boiler",
+   "current": [],
+   "gold": [
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1310,
+   "llm": {
+    "retrofits": [
+     "heat_pump"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "I only care about carbon so everything except solar",
+   "current": [],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "smart_thermostat",
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1331,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": false,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "put a thermostat in",
+   "current": [],
+   "gold": [
+    "smart_thermostat"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2582,
+   "llm": {
+    "retrofits": [
+     "smart_thermostat"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "smart_thermostat"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-tuned-2",
+   "kind": "tuned-2",
+   "text": "tell me a joke",
+   "current": [],
+   "gold": [],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 1065,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "put in solar and a heat pump but not new windows",
+   "current": [],
+   "gold": [
+    "solar_pv",
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2711,
+   "llm": {
+    "retrofits": [
+     "heat_pump",
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [
+     "new windows"
+    ],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "heat_pump",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "all measures except the floor",
+   "current": [],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "double_glazing",
+    "smart_thermostat",
+    "heat_pump",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 3187,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump",
+     "solar_pv",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "I'm only interested in loft and glazing",
+   "current": [],
+   "gold": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2639,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "skip everything except solar",
+   "current": [],
+   "gold": [
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1244,
+   "llm": {
+    "retrofits": [
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [],
+    "unsupported": []
+   },
+   "rulesExact": false,
+   "rulesLenient": false,
+   "rulesKind": false,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "a heat pump would be great, no thanks to solar",
+   "current": [],
+   "gold": [
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1679,
+   "llm": {
+    "retrofits": [
+     "heat_pump"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "can we see what new windows and insulating the roof does",
+   "current": [],
+   "gold": [
+    "double_glazing",
+    "loft_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1203,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": false,
+   "rulesLenient": false,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "just a thermostat upgrade",
+   "current": [],
+   "gold": [
+    "smart_thermostat"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1227,
+   "llm": {
+    "retrofits": [
+     "smart_thermostat"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "smart_thermostat"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "everything apart from the boiler",
+   "current": [],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "smart_thermostat",
+    "heat_pump",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2372,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump",
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "I'd like loft insulation, but without the floor",
+   "current": [],
+   "gold": [
+    "loft_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2273,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "floor_insulation"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "add panels, and leave the heat pump out",
+   "current": [],
+   "gold": [
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1396,
+   "llm": {
+    "retrofits": [
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "heat_pump",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": false,
+   "rulesLenient": false,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "heat pump plus smart thermostat plus glazing, no solar",
+   "current": [],
+   "gold": [
+    "heat_pump",
+    "smart_thermostat",
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1813,
+   "llm": {
+    "retrofits": [
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "double_glazing",
+     "smart_thermostat",
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "everything but heat pump and solar",
+   "current": [],
+   "gold": [
+    "loft_insulation",
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "floor_insulation",
+    "double_glazing",
+    "smart_thermostat"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 4012,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat",
+     "condensing_boiler"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": false,
+   "llmLenient": false,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "floor_insulation",
+     "double_glazing",
+     "smart_thermostat"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "what happens if I do nothing",
+   "current": [],
+   "gold": [],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 1058,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "current = nothing",
+   "set": "rules-held-out",
+   "kind": "held-out",
+   "text": "wall and loft insulation with new double glazing",
+   "current": [],
+   "gold": [
+    "cavity_wall_insulation",
+    "solid_wall_insulation",
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 16588,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "double_glazing"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation",
+     "cavity_wall_insulation",
+     "solid_wall_insulation",
+     "double_glazing"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "app phrasings",
+   "set": "app phrasings (some are prompt examples)",
+   "kind": "explain",
+   "text": "Why this score?",
+   "current": [],
+   "gold": [],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 1043,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "app phrasings",
+   "set": "app phrasings (some are prompt examples)",
+   "kind": "explain",
+   "text": "Why this score?",
+   "current": [
+    "heat_pump",
+    "solar_pv"
+   ],
+   "gold": [
+    "heat_pump",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 1101,
+   "llm": {
+    "retrofits": [
+     "heat_pump",
+     "solar_pv"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "heat_pump",
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "app phrasings",
+   "set": "app phrasings (some are prompt examples)",
+   "kind": "explain",
+   "text": "What should I do first?",
+   "current": [],
+   "gold": [],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 978,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "app phrasings",
+   "set": "app phrasings (some are prompt examples)",
+   "kind": "explain",
+   "text": "How can I improve my home?",
+   "current": [],
+   "gold": [],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 2150,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "app phrasings",
+   "set": "app phrasings (some are prompt examples)",
+   "kind": "explain",
+   "text": "What does my score mean?",
+   "current": [],
+   "gold": [],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 2836,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "app phrasings",
+   "set": "app phrasings (some are prompt examples)",
+   "kind": "explain",
+   "text": "Why would electricity go up with a heat pump?",
+   "current": [
+    "heat_pump"
+   ],
+   "gold": [
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 1333,
+   "llm": {
+    "retrofits": [
+     "heat_pump"
+    ],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "app phrasings",
+   "set": "app phrasings (some are prompt examples)",
+   "kind": "add",
+   "text": "What if I add solar?",
+   "current": [],
+   "gold": [
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1466,
+   "llm": {
+    "retrofits": [
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "app phrasings",
+   "set": "app phrasings (some are prompt examples)",
+   "kind": "add",
+   "text": "What if I add solar?",
+   "current": [
+    "heat_pump"
+   ],
+   "gold": [
+    "heat_pump",
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 919,
+   "llm": {
+    "retrofits": [
+     "heat_pump",
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": false,
+   "rulesLenient": false,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "app phrasings",
+   "set": "app phrasings (some are prompt examples)",
+   "kind": "add",
+   "text": "What if I also add a heat pump?",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "loft_insulation",
+    "double_glazing",
+    "heat_pump"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1677,
+   "llm": {
+    "retrofits": [
+     "loft_insulation",
+     "double_glazing",
+     "heat_pump"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "heat_pump"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": false,
+   "rulesLenient": false,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "app phrasings",
+   "set": "app phrasings (some are prompt examples)",
+   "kind": "remove",
+   "text": "without the heat pump",
+   "current": [
+    "heat_pump",
+    "solar_pv"
+   ],
+   "gold": [
+    "solar_pv"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 2357,
+   "llm": {
+    "retrofits": [
+     "solar_pv"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "solar_pv"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "app phrasings",
+   "set": "app phrasings (some are prompt examples)",
+   "kind": "remove",
+   "text": "without the heat pump",
+   "current": [],
+   "gold": [],
+   "unsupportedGold": [],
+   "wantKind": "explain",
+   "latencyMs": 970,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "app phrasings",
+   "set": "app phrasings (some are prompt examples)",
+   "kind": "remove",
+   "text": "Now take out the loft insulation",
+   "current": [
+    "loft_insulation",
+    "double_glazing"
+   ],
+   "gold": [
+    "double_glazing"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1180,
+   "llm": {
+    "retrofits": [
+     "double_glazing"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": false,
+   "rulesLenient": false,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "app phrasings",
+   "set": "app phrasings (some are prompt examples)",
+   "kind": "only",
+   "text": "Just loft insulation",
+   "current": [
+    "heat_pump"
+   ],
+   "gold": [
+    "loft_insulation"
+   ],
+   "unsupportedGold": [],
+   "wantKind": "scenario",
+   "latencyMs": 1099,
+   "llm": {
+    "retrofits": [
+     "loft_insulation"
+    ],
+    "kind": "scenario",
+    "unsupported": [],
+    "source": "llm"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [
+     "loft_insulation"
+    ],
+    "unsupported": []
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  },
+  {
+   "run": "app phrasings",
+   "set": "app phrasings (some are prompt examples)",
+   "kind": "unsupported",
+   "text": "Is it worth getting a wind turbine?",
+   "current": [],
+   "gold": [],
+   "unsupportedGold": [
+    "wind turbine"
+   ],
+   "wantKind": "explain",
+   "latencyMs": 7001,
+   "llm": {
+    "retrofits": [],
+    "kind": "explain",
+    "unsupported": [
+     "wind turbine"
+    ],
+    "source": "rules"
+   },
+   "llmExact": true,
+   "llmLenient": true,
+   "llmKind": true,
+   "llmUnsupported": true,
+   "rules": {
+    "retrofits": [],
+    "unsupported": [
+     "wind turbine"
+    ]
+   },
+   "rulesExact": true,
+   "rulesLenient": true,
+   "rulesKind": true,
+   "rulesUnsupported": true
+  }
+ ]
+}
