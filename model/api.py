@@ -96,5 +96,6 @@ def portfolio(limit: int = 200, council: str | None = None):
     cols = ["rank", "property_id", "postcode", "local_authority", "score", "classification", "energy_rating", "intensity_kwh_m2", "floor_area",
             "improvement_potential_pct", "improvement_potential_no_hp_pct", "elec_saving_kwh", "gas_saving_kwh", "carbon_saving_t", "package_cost_gbp",
             "measures", "unavailable_reason", "key_issues"]
+    pf = pf.assign(measures=pf.measures.fillna("").map(lambda m: "+".join(APP_ID.get(x, x) for x in m.split("+") if x)))
     out = pf[cols].head(limit).astype(object).where(pf[cols].head(limit).notna(), None)
     return {"councils": sorted(pf.local_authority.astype(str).unique()), "total": int(len(pf)), "rows": out.to_dict("records")}
