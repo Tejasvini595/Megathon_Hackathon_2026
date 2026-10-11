@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import { Sun, Thermometer } from "lucide-react";
 import { TwinCanvas } from "@/components/twin/twin-canvas";
@@ -9,7 +10,11 @@ import { Segmented } from "@/components/app/segmented";
 import { cn } from "@/lib/utils";
 import { dayOfYear, groundDirection, SEASONS, sunDirection, sunPosition } from "@/lib/twin/sun";
 import type { SunView } from "@/components/twin/sun-layer";
-import type { Element, Geometry } from "@/lib/twin/types";
+import { thermalGlow, type ElementScores, type Geometry } from "@/lib/twin/types";
+import { NeedsInfoMarkers, type NeedsInfoMarker } from "./needs-info-markers";
+
+export type PartInfo = Record<keyof ElementScores, { label: string; saving: string | null }>;
+const PARTS: (keyof ElementScores)[] = ["walls", "roof", "windows", "floor"];
 
 // Without a picked map outline we assume the front faces south (+x points east).
 const DEFAULT_X_BEARING = 90;
@@ -34,18 +39,38 @@ const clock = (h: number) => `${String(Math.floor(h)).padStart(2, "0")}:${String
  * `lat` comes from the home's postcode (UK average when unknown). The sun view is visual only: it
  * lights the twin from the sun's real position and draws its shadow; no figure is derived from it.
  */
-export function HomeStage({ geometry, heatLoss, lat }: { geometry: Geometry; heatLoss: Record<Element, number>; lat: number | null }) {
+export function HomeStage({
+  geometry,
+  elementScores,
+  parts,
+  needs,
+  editHref,
+  lat,
+}: {
+  geometry: Geometry;
+  elementScores: ElementScores;
+  parts: PartInfo;
+  needs: NeedsInfoMarker[];
+  editHref: string;
+  lat: number | null;
+}) {
+  const router = useRouter();
+  const glow = useMemo(() => thermalGlow(elementScores), [elementScores]);
   const { mode, setMode, focus, setFocus, isSwitching } = useTwinView();
   const [sunOn, setSunOn] = useState(false);
   const [season, setSeason] = useState<Season>("today");
   const [hour, setHour] = useState(15);
   const sun = useSunView(sunOn, lat ?? 53, geometry.xBearingDeg ?? DEFAULT_X_BEARING, season, hour);
+  const part = focus && focus in parts ? parts[focus as keyof ElementScores] : null;
+  const score = part ? elementScores[focus as keyof ElementScores] : null;
   const approximate = lat === null || geometry.xBearingDeg === undefined;
   return (
     <>
       {/* While another home loads, the current one just dims a little. */}
       <div className={cn("absolute inset-0 transition-opacity duration-300", isSwitching && "opacity-50")}>
-        <TwinCanvas geometry={geometry} heatLoss={heatLoss} mode={mode} focus={focus} sun={sun} className="size-full" />
+        <TwinCanvas geometry={geometry} heatLoss={glow} heatRef={1} mode={mode} focus={focus} sun={sun} className="size-full">
+          {!sunOn && <NeedsInfoMarkers items={needs} geometry={geometry} onSelect={() => router.push(editHref)} />}
+        </TwinCanvas>
       </div>
 
       <div className="absolute inset-x-0 bottom-14 flex flex-col items-center gap-3">
@@ -80,15 +105,32 @@ export function HomeStage({ geometry, heatLoss, lat }: { geometry: Geometry; hea
             </motion.div>
           )}
           {mode === "thermal" && (
-            <motion.div
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 6 }}
-              className="flex items-center gap-2 text-[10px] uppercase tracking-[0.16em] text-muted-foreground"
-            >
-              <span>Less heat lost</span>
-              <span className="h-1 w-24 rounded-full bg-[linear-gradient(90deg,#2f8cff,#ffb020,#ff3b1f)]" />
-              <span>More</span>
+            <motion.div key="thermal" initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 6 }} className="flex w-full max-w-sm flex-col items-center gap-2 px-5">
+              {part && (
+                <div className="glass w-full rounded-2xl px-3.5 py-2 text-center text-xs">
+                  <p className="tabular font-medium">
+                    {part.label} · {score == null ? "not applicable" : `${score}/100`}
+                  </p>
+                  {part.saving && <p className="mt-0.5 text-muted-foreground">{part.saving}</p>}
+                </div>
+              )}
+              <div className="flex gap-1">
+                {PARTS.map((k) => (
+                  <button
+                    key={k}
+                    onClick={() => setFocus(focus === k ? null : k)}
+                    aria-pressed={focus === k}
+                    className={cn("rounded-full px-2.5 py-1 text-[11px] transition-colors", focus === k ? "bg-foreground text-background" : "bg-surface/80 text-muted-foreground")}
+                  >
+                    {parts[k].label}
+                  </button>
+                ))}
+              </div>
+              <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.16em] text-muted-foreground">
+                <span>Better insulated</span>
+                <span className="h-1 w-24 rounded-full bg-[linear-gradient(90deg,#2f8cff,#ffb020,#ff3b1f)]" />
+                <span>Worse</span>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

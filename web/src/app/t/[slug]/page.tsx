@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { ArrowRight } from "lucide-react";
 import { optionLabel, type PropertyRecord } from "@/lib/extract/fields";
 import { scoreTone } from "@/lib/score";
+import { thermalGlow } from "@/lib/twin/types";
 import { getSharedTwin } from "./data";
 import { HoloCard } from "./holo-card";
 
@@ -35,7 +36,7 @@ export default async function Page({ params }: PageProps<"/t/[slug]">) {
 
   return (
     <main className="stage-glow flex min-h-dvh flex-col items-center justify-center gap-5 px-5 py-8">
-      <HoloCard geometry={twin.geometry} heatLoss={twin.heatLoss}>
+      <HoloCard geometry={twin.geometry} heatLoss={thermalGlow(twin.elementScores)}>
         <div className="px-5 pb-5 pt-1">
           <p className="text-[10px] uppercase tracking-[0.22em] text-muted-foreground">Green Home Twin</p>
           <h1 className="mt-1 truncate text-xl font-semibold tracking-tight">{twin.nickname}</h1>

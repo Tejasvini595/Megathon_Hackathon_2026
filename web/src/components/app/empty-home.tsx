@@ -2,6 +2,9 @@ import Link from "next/link";
 import { ArrowRight, Camera, FileText, Mic } from "lucide-react";
 import { TwinCanvas } from "@/components/twin/twin-canvas";
 import { MOCK_TWIN } from "@/lib/twin/mock";
+import { thermalGlow } from "@/lib/twin/types";
+
+const GLOW = thermalGlow(MOCK_TWIN.elementScores);
 
 export function EmptyHome({ name }: { name: string }) {
   return (
@@ -11,7 +14,7 @@ export function EmptyHome({ name }: { name: string }) {
         <h1 className="text-gradient mt-1 text-4xl font-semibold leading-[1.05] tracking-tight">Let&apos;s build your home&apos;s twin.</h1>
       </div>
       <div className="relative -mx-5 my-4 h-[42dvh] min-h-[300px] opacity-80">
-        <TwinCanvas geometry={MOCK_TWIN.geometry} heatLoss={MOCK_TWIN.heatLoss} mode="thermal" interactive={false} autoRotate className="absolute inset-0" />
+        <TwinCanvas geometry={MOCK_TWIN.geometry} heatLoss={GLOW} heatRef={1} mode="thermal" interactive={false} autoRotate className="absolute inset-0" />
       </div>
       <p className="text-muted-foreground">
         A photo, a few words, a floor plan or a voice note is enough. We&apos;ll work out the rest and you check it.
