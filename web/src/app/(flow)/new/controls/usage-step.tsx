@@ -6,6 +6,7 @@ import type { EnergyUsage } from "@/lib/extract/fields";
 import { isGasHeated, monthlyProblems } from "@/lib/extract/usage";
 import { cn } from "@/lib/utils";
 import type { Reading } from "./csv";
+import { BillUpload } from "./bill-upload";
 import { CsvDrop } from "./csv-drop";
 import { UsageChart } from "./usage-chart";
 
@@ -75,6 +76,23 @@ export function UsageStep({ usage, heating, onChange }: Props) {
     emit({ rows: next });
   };
 
+  function useBill(read: EnergyUsage) {
+    if (read.annual) {
+      const a = { elec: text(read.annual.elecKwh), gas: text(read.annual.gasKwh) };
+      setAnnualMode(true);
+      setAnnual(a);
+      setNote(null);
+      emit({ annualMode: true, annual: a });
+      return;
+    }
+    const next = rowsFor(read.months);
+    setAnnualMode(false);
+    setRows(next);
+    setVersion((v) => v + 1);
+    setNote("Filled from your bill. Check the months below.");
+    emit({ annualMode: false, rows: next });
+  }
+
   const input = "w-full rounded-lg bg-surface-2 px-2 py-1.5 text-sm tabular-nums outline-none ring-1 ring-hairline focus:ring-volt";
 
   return (
@@ -87,6 +105,8 @@ export function UsageStep({ usage, heating, onChange }: Props) {
       </div>
 
       <UsageChart groups={groups} />
+
+      <BillUpload heating={heating} onUse={useBill} />
 
       {annualMode ? (
         <div className="grid grid-cols-2 gap-3">
