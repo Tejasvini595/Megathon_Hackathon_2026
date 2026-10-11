@@ -24,7 +24,7 @@ const intent = z.object({
   kind: z.enum(["scenario", "explain"]).describe("scenario: the user proposes doing or not doing measures. explain: a question about the current result."),
   mode: z.enum(["add", "only", "remove"]).describe("add: on top of the current selection; only: exactly these measures; remove: drop these from the current selection"),
   measures: z.array(z.enum(IDS)).describe("Measures named in the request, catalogue ids only"),
-  unsupported: z.array(z.string()).describe("Things the user asked about that are not in the catalogue (e.g. a wind turbine)"),
+  unsupported: z.array(z.string()).describe("Things the user asked about that match NO measure id above (e.g. a wind turbine). Never list a measure id or its label here, even if it seems unsuitable for the home"),
 });
 
 export type Parsed = { kind: "scenario" | "explain"; retrofits: RetrofitId[]; unsupported: string[]; source: "llm" | "rules"; note: string };
@@ -48,7 +48,10 @@ export async function parseQuestion(question: string, current: RetrofitId[]): Pr
         prompt: question,
       });
       const retrofits = output.kind === "scenario" ? compose(output.mode, output.measures, current) : current;
-      return { kind: output.kind, retrofits, unsupported: output.unsupported, source: "llm", note: output.unsupported.length ? `Not in the retrofit catalogue, so ignored: ${output.unsupported.join(", ")}.` : "" };
+      // Small models sometimes list a catalogue measure as unsupported; feasibility is the engine's call, not the parser's.
+      const known = new Set(Object.entries(p.measures).flatMap(([id, label]) => [id, id.replaceAll("_", " "), label.toLowerCase()]));
+      const unsupported = output.unsupported.filter((u) => !known.has(u.trim().toLowerCase()));
+      return { kind: output.kind, retrofits, unsupported, source: "llm", note: unsupported.length ? `Not in the retrofit catalogue, so ignored: ${unsupported.join(", ")}.` : "" };
     } catch (e) {
       console.error("LLM parse failed, using rules", e instanceof Error ? e.message : e);
     }

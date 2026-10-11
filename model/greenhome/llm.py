@@ -181,7 +181,7 @@ def slot_table(f: dict) -> dict:
 
 
 _SLOT = re.compile(r"\[\[\s*([\w.]+?)\s*(\|abs)?\s*\]\]")
-_UNIT_AFTER = {"kwh": r"^\s*kWh", "pct": r"^\s*(%|percent|pp)", "tonnes": r"^\s*(t\b|t CO|tonnes?)", "kg": r"^\s*kg"}
+_UNIT_AFTER = {"kwh": r"^\s*kWh", "pct": r"^\s*(%|per ?cent|pp)", "tonnes": r"^\s*(t\b|t CO|tonnes?)", "kg": r"^\s*kg"}
 
 
 def render_slots(text: str, f: dict):
@@ -200,10 +200,14 @@ def render_slots(text: str, f: dict):
             key = path.split(".")[-1]; after = text[m.end():m.end() + 14]; before = text[max(0, m.start() - 6):m.start()]
             for tag, pat in _UNIT_AFTER.items():
                 if tag in key and not re.search(pat, after, re.I) and not (tag == "pct" and "%" in before): problems.append(f"slot [[{path}]] is not followed by its unit")
-            if "gbp" in key and not re.search(r"(£|GBP)\s*$", before, re.I): problems.append(f"slot [[{path}]] is not preceded by a pound sign")
+            if "gbp" in key and not re.search(r"(£|GBP)\s*$", before, re.I) and not re.match(r"\s*(GBP|pounds)\b", after, re.I):
+                # the slot says it is pounds, so the engine writes the sign; shown with another unit it is still an error
+                if re.match(r"\s*(kWh|%|percent|t\b|t CO|tonnes?|kg)", after, re.I): problems.append(f"slot [[{path}]] is shown with a unit other than pounds")
+                else: val = "£" + val
         pieces.append(val); last = m.end()
     pieces.append(text[last:]); rendered = "".join(pieces)
-    stripped = _SLOT.sub(" ", text); stripped = re.sub(r"(?m)^\s*\d+[.)]\s+", "", stripped); stripped = stripped.replace("/100", " ")   # list numbering and the "/100" denominator are allowed
+    stripped = _SLOT.sub(" ", text); stripped = re.sub(r"(?m)^\s*\d+[.)]\s+", "", stripped); stripped = re.sub(r"(?i)\b(co2e?|m2)\b|co₂|\bout of 100\b", " ", stripped.replace("/100", " "))   # list numbering and the "/100" denominator are allowed
+    for y in re.findall(r"\d{4}", str((f.get("property") or {}).get("age_band") or "")): stripped = re.sub(rf"\b{y}\b", " ", stripped)   # the age band is text in FACTS ("1930_1949"), so its years may be written
     if re.search(r"\d", stripped): problems.append("digits typed outside a slot: " + ", ".join(sorted(set(re.findall(r"\d[\d,.]*", stripped)))[:6]))
     return rendered, problems
 
@@ -257,9 +261,9 @@ def _allowed(f: dict) -> dict:
 def _unit_in_text(line: str, m) -> str:
     after = line[m.end():m.end() + 12]; before = line[max(0, m.start() - 4):m.start()]
     if re.search(r"(£|GBP)\s*$", before, re.I): return "gbp"
-    if re.match(r"\s*kWh\s*/\s*m", after, re.I): return "other"
+    if re.match(r"\s*kWh\s*(/|per|a|each)\s*(m|sq)", after, re.I): return "other"
     if re.match(r"\s*kWh", after, re.I): return "kwh"
-    if re.match(r"\s*(%|percent|pp\b)", after, re.I): return "pct"
+    if re.match(r"\s*(%|per ?cent|pp\b)", after, re.I): return "pct"
     if re.match(r"\s*(t CO2|tonnes?|t\b)", after, re.I): return "tonnes"
     if re.match(r"\s*kg", after, re.I): return "kg"
     return "all"
@@ -290,12 +294,13 @@ def claim_violations(text: str, f: dict) -> list:
     for m in _OVERCLAIM.finditer(text):
         if not _negated(text, m.start()): v.append(f"over-claim: '{m.group(0)}'")
     for w in _UNSUPPORTED_MEASURES:
-        if w in low: v.append(f"measure not in the retrofit catalogue: '{w.strip()}'")
+        if re.search(rf"\b{re.escape(w.strip())}\b", low): v.append(f"measure not in the retrofit catalogue: '{w.strip()}'")
     infeas = {x["retrofit"] for x in f.get("infeasible_requested", [])} | {x["retrofit"] for x in f.get("excluded_infeasible", [])}
     for sent in re.split(r"(?<=[.!?])\s+|\n+", text):
         sl = sent.lower(); ms = {k for k, ws in KEYWORDS.items() if any(w in sl for w in ws)}
         for k in ms & infeas:
-            if _SAVINGS.search(sent) and not _UNFEAS.search(sent) and k not in set(f.get("scenario_retrofits", [])):
+            sv = _SAVINGS.search(sent)
+            if sv and not _UNFEAS.search(sent) and not _negated(sent, sv.start()) and k not in set(f.get("scenario_retrofits", [])):
                 v.append(f"savings claimed for infeasible/excluded measure: {k}")
         clean = re.sub(r"\([^)]*\)", " ", sent)                      # ignore explanatory parentheticals such as "(positive = saving, negative = rises)"
         if pk:
@@ -310,6 +315,7 @@ def claim_violations(text: str, f: dict) -> list:
                 if rise == fall: continue                               # no claim, or ambiguous
                 if _negated(clause, 0) and re.match(r"\s*(not|no|never)\b", cl): continue
                 if abs(val) < 1:
+                    if re.search(r"(?<![\d.,])0(\.0+)?\s*kWh|no change|unchanged|stays?\b|the same|nothing|zero", cl): continue
                     v.append(f"claims a {'electricity' if fuel == 'elec' else 'gas'} change but the engine reports none"); continue
                 expected_fall = val > 0                                  # positive saving = consumption falls
                 if (fall and not expected_fall) or (rise and expected_fall):
@@ -336,6 +342,11 @@ def check_text(text: str, f: dict) -> dict:
             "details": details, "checked_atoms": max(nums_total + viol_total, 1)}
 
 
+def _name(r: str) -> str:
+    """Display name without the bracketed detail, so a label never adds a figure (e.g. "Solar PV (2.5 kWp)") the checks would have to excuse."""
+    return re.sub(r"\s*\(.*?\)", "", C.LABEL.get(r, r))
+
+
 def template_explanation(f: dict, question: str = "") -> str:
     out = [f"**Green Home Score: {f['score_now']}/100 ({f['class_now']}).** "
            + ("Main issues: " + "; ".join(f["key_issues"]) + "." if f["key_issues"] else "No major weak components.")]
@@ -350,10 +361,11 @@ def template_explanation(f: dict, question: str = "") -> str:
         out.append(f"Savings, carbon and value impact are unavailable: {f['savings_unavailable_reason']}.")
         return "\n\n".join(out)
     for x in f["infeasible_requested"]:
-        out.append((f"{x['retrofit']} cannot be estimated yet: {x['reason'].replace('Status unknown: ', '')}." if x.get("needs_info") else f"{x['retrofit']} is not feasible here: {x['reason']}."))
+        name = _name(x["retrofit"])
+        out.append((f"{name} cannot be estimated yet: {x['reason'].replace('Status unknown: ', '')}." if x.get("needs_info") else f"{name} is not feasible here: {x['reason']}."))
     if f["scenario_retrofits"]:
         pk, v = f["package"], f["value_impact"]
-        out.append(f"**Scenario ({', '.join(f['scenario_retrofits'])}):** estimated electricity change {pk['electricity_saving_kwh']:+,} kWh/yr and gas change "
+        out.append(f"**Scenario ({', '.join(_name(r) for r in f['scenario_retrofits'])}):** estimated electricity change {pk['electricity_saving_kwh']:+,} kWh/yr and gas change "
                    f"{pk['gas_saving_kwh']:+,} kWh/yr (positive = saving, negative = consumption rises), net {pk['net_saving_kwh']:,} kWh/yr "
                    f"({pk['improvement_potential_pct']}% of purchased energy). Estimated carbon reduction {pk['carbon_saving_tonnes']} t CO2e/yr. "
                    f"Estimated rating {pk['rating_before']} to {pk['rating_after']}; score {f['score_now']} to {pk['score_after']} ({pk['class_after']}). "
