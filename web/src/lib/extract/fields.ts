@@ -121,6 +121,8 @@ export type ExtractedField = {
   evidence: string;
   /** The exact words in the user's text that support this value, so the UI can point at them. */
   quote?: string;
+  /** The decision model's probability for each option of an enum field (sums to ~1), when it was asked. */
+  probabilities?: Record<string, number>;
 };
 
 export type Conflict = { field: FieldKey; message: string };

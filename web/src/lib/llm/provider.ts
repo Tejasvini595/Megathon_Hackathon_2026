@@ -29,8 +29,8 @@ export function config(role: Role) {
   return { model: process.env[`${key}_MODEL`] ?? DEFAULTS[role].model, effort: effort as Effort | "default", provider: routing(key) };
 }
 
-/** The Jev-style decision model for typed questions with probabilities (OpenRouter Decisions API). */
-export const decisionModelId = () => process.env.DECISION_MODEL ?? "typesafe/jev-1.13";
+/** The decision model (Jev-style: typed questions in, a probability per option out; OpenRouter Decisions API). */
+export const decisionModelId = () => process.env.DECISION_MODEL ?? "perplexity/pplx-decider-v1.1-27b";
 export const decisionRouting = () => routing("DECISION");
 
 export const llmEnabled = () => Boolean(process.env.OPENROUTER_API_KEY);
